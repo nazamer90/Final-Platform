@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,6 +15,12 @@ import {
   Smartphone
 } from 'lucide-react';
 import type { Product } from '@/data/storeProducts';
+import {
+  PRODUCT_IMAGE_FALLBACK_SRC,
+  advanceImageOnError,
+  buildProductMediaConfig,
+  getImageMimeType
+} from '@/lib/utils';
 
 interface EnhancedNotifyModalProps {
   isOpen: boolean;
@@ -48,6 +54,11 @@ const EnhancedNotifyModal: React.FC<EnhancedNotifyModalProps> = ({
     quantity: 1
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const mediaConfig = useMemo(
+    () => buildProductMediaConfig(product, PRODUCT_IMAGE_FALLBACK_SRC),
+    [product]
+  );
 
   if (!isOpen) return null;
 
@@ -138,11 +149,21 @@ const EnhancedNotifyModal: React.FC<EnhancedNotifyModalProps> = ({
               
               {/* صورة المنتج */}
               <div className="mb-4">
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="w-20 h-20 object-cover rounded-lg mx-auto"
-                />
+                <picture>
+                  {mediaConfig.pictureSources.map((src) => {
+                    const type = getImageMimeType(src);
+                    return <source key={src} srcSet={src} {...(type ? { type } : {})} />;
+                  })}
+                  <img
+                    src={mediaConfig.primary}
+                    alt={product.name}
+                    className="w-20 h-20 object-cover rounded-lg mx-auto"
+                    data-image-sources={JSON.stringify(mediaConfig.datasetSources)}
+                    data-image-index="0"
+                    data-fallback-src={PRODUCT_IMAGE_FALLBACK_SRC}
+                    onError={advanceImageOnError}
+                  />
+                </picture>
               </div>
               
               {/* اسم المنتج */}
@@ -295,11 +316,21 @@ const EnhancedNotifyModal: React.FC<EnhancedNotifyModalProps> = ({
           <div className="text-center">
             {/* صورة المنتج */}
             <div className="mb-4">
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="w-20 h-20 object-cover rounded-lg mx-auto"
-              />
+              <picture>
+                {mediaConfig.pictureSources.map((src) => {
+                  const type = getImageMimeType(src);
+                  return <source key={src} srcSet={src} {...(type ? { type } : {})} />;
+                })}
+                <img
+                  src={mediaConfig.primary}
+                  alt={product.name}
+                  className="w-20 h-20 object-cover rounded-lg mx-auto"
+                  data-image-sources={JSON.stringify(mediaConfig.datasetSources)}
+                  data-image-index="0"
+                  data-fallback-src={PRODUCT_IMAGE_FALLBACK_SRC}
+                  onError={advanceImageOnError}
+                />
+              </picture>
             </div>
             
             {/* اسم المنتج */}

@@ -637,6 +637,7 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl relative border-2 border-green-200">
             <button
               onClick={() => setShowSuccessModal(false)}
+              title="إغلاق"
               className="absolute top-4 left-4 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors z-10"
             >
               <X className="h-4 w-4 text-gray-700" />
@@ -698,6 +699,7 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl relative border-2 border-red-200">
             <button
               onClick={() => setShowDuplicateModal(false)}
+              title="إغلاق"
               className="absolute top-4 left-4 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors z-10"
             >
               <X className="h-4 w-4 text-gray-700" />
@@ -760,6 +762,7 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
                 setShowWelcomeModal(false);
                 onNavigateToLogin();
               }}
+              title="إغلاق"
               className="absolute top-4 left-4 w-8 h-8 bg-gray-200/80 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors z-10"
             >
               <X className="h-4 w-4 text-gray-700" />

@@ -493,7 +493,7 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
       // Load Google Maps script if not already loaded
       if (!(window as any).google?.maps) {
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY&callback=initStoreGoogleMaps`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY&callback=initStoreGoogleMaps&loading=async`;
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
@@ -1230,6 +1230,7 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
                             type="file"
                             accept="image/*"
                             className="hidden"
+                            aria-label="رفع شعار المتجر"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) handleImageUpload(file, 'logo');
@@ -1286,6 +1287,7 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
                             type="file"
                             accept="image/*"
                             className="hidden"
+                            aria-label="رفع أيقونة المتصفح"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) handleImageUpload(file, 'favicon');
@@ -1342,6 +1344,7 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
                             type="file"
                             accept="image/*"
                             className="hidden"
+                            aria-label="رفع صورة تحسين محركات البحث"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) handleImageUpload(file, 'seoImage');
@@ -1455,6 +1458,7 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
                             accept="image/*"
                             className="hidden"
                             id={`payment-${payment.id}`}
+                            aria-label={`رفع أيقونة ${payment.name}`}
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
@@ -1464,8 +1468,7 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
                             }}
                           />
                           <div
-                            className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                            style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}
+                            className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-blue-500/10"
                             onClick={() => document.getElementById(`payment-${payment.id}`)?.click()}
                           />
                         </div>
@@ -1523,7 +1526,7 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
                         <div className="flex items-center gap-3">
                           <span className="text-sm text-gray-600 rtl-text">لا</span>
                           <div className="relative">
-                            <input type="checkbox" className="sr-only" />
+                            <input type="checkbox" className="sr-only" aria-label="تبديل عرض النافذة الإعلانية" />
                             <div className="w-10 h-6 bg-gray-300 rounded-full relative">
                               <div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1 transition-transform"></div>
                             </div>
@@ -1851,7 +1854,7 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
               </div>
 
               {/* Map Container */}
-              <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ height: '450px' }}>
+              <div className="relative bg-gray-100 rounded-lg overflow-hidden h-[450px]">
                 {!mapLoaded ? (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
                     <div className="text-center">
@@ -1860,16 +1863,15 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
                       <p className="text-gray-600 mb-2 rtl-text">يرجى الانتظار قليلاً...</p>
                       <div className="flex justify-center items-center gap-1 text-sm text-gray-500">
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse [animation-delay:0.2s]"></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse [animation-delay:0.4s]"></div>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div
                     id="store-google-map"
-                    className="w-full h-full"
-                    style={{ minHeight: '450px' }}
+                    className="w-full h-full min-h-[450px]"
                   ></div>
                 )}
               </div>

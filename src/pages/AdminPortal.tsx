@@ -239,7 +239,7 @@ const AdminPortal: React.FC = () => {
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden"
             >
@@ -261,7 +261,7 @@ const AdminPortal: React.FC = () => {
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               onClick={() => setDarkMode(!darkMode)}
             >
               {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}

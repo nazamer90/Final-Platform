@@ -1,10 +1,11 @@
 // Main application component for the EISHRO e-commerce platform
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PartnersPage from "@/pages/PartnersPage";
+import DiscountSlider from "@/pages/DiscountSlider";
 import ModernStorePage from "@/pages/ModernStorePage";
 import EnhancedProductPage from "@/pages/EnhancedProductPage";
 import CartPage from "@/pages/CartPage";
@@ -21,14 +22,14 @@ import MerchantAnalytics from "@/pages/MerchantAnalytics";
 import MerchantFinance from "@/pages/MerchantFinance";
 import MerchantSettings from "@/pages/MerchantSettings";
 import AdminPortal from "@/pages/AdminPortal";
-import CustomerDashboard from "@/pages/CustomerDashboard";
+import CustomerDashboard, { CreateOrderPayload, OrderRecord } from "@/pages/CustomerDashboard";
 import AddToCartPopup from "@/components/AddToCartPopup";
 import AddToCartSuccessModal from "@/components/AddToCartSuccessModal";
 import OrderSuccessModal from "@/components/OrderSuccessModal";
 import WelcomePopup from "@/components/WelcomePopup";
 import StoreCreatedSuccessModal from "@/components/StoreCreatedSuccessModal";
 import BrandSlider from "@/components/BrandSlider";
-import { partnersData, statsData, storesData } from "@/data/ecommerceData";
+import { partnersData, statsData, storesData, generateOrderId } from "@/data/ecommerceData";
 import { enhancedSampleProducts } from "@/data/productCategories";
 import { allStoreProducts } from "@/data/allStoreProducts";
 import {
@@ -52,6 +53,13 @@ import {
   X,
   Zap
 } from "lucide-react";
+
+const dashboardShippingConfig: Record<string, { type: "normal" | "express"; cost: number; estimatedTime: string }> = {
+  "normal-tripoli": { type: "normal", cost: 40, estimatedTime: "24-96 ساعة" },
+  "normal-outside": { type: "normal", cost: 120, estimatedTime: "24-96 ساعة" },
+  "express-tripoli": { type: "express", cost: 70, estimatedTime: "5-12 ساعة" },
+  "express-outside": { type: "express", cost: 160, estimatedTime: "5-12 ساعة" }
+};
 
 // FloatingCubes component: Renders animated floating cubes for background decoration
 // مكون المكعبات المتحركة
@@ -227,10 +235,10 @@ const Header = ({
                {/* صورة المستخدم */}
                <div className="relative">
                  {(() => {
-                   const savedImage = localStorage.getItem('userProfileImage');
-                   return savedImage ? (
+                   const avatarSrc = currentVisitor.avatar || (typeof window !== 'undefined' ? localStorage.getItem('userProfileImage') : null);
+                   return avatarSrc ? (
                      <img
-                       src={savedImage}
+                       src={avatarSrc}
                        alt="صورة المستخدم"
                        className="w-8 h-8 rounded-full object-cover border-2 border-white shadow-lg"
                      />
@@ -644,6 +652,13 @@ const PartnersSection = ({ onNavigate }: { onNavigate: (page: string) => void })
 
   return (
     <section className="py-20 bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
+      <style>{`
+        .scroll-container { width: 200%; }
+        .animate-delay-15s { animation-delay: -15s; }
+        .animate-delay-30s { animation-delay: -30s; }
+        .fade-delay-02s { animation-delay: 0.2s; }
+        .fade-delay-04s { animation-delay: 0.4s; }
+      `}</style>
       <FloatingCubes />
       
       <div className="container px-4 relative z-10">
@@ -661,27 +676,28 @@ const PartnersSection = ({ onNavigate }: { onNavigate: (page: string) => void })
               <h3 className="text-2xl font-bold text-primary">المصارف التجارية</h3>
             </div>
             <div className="relative overflow-hidden bg-white/50 backdrop-blur-sm rounded-3xl border border-primary/10 p-6">
-              <div className="flex animate-scroll space-x-6" style={{ width: '200%' }}>
+              <div className="flex animate-scroll space-x-6 scroll-container">
                 {[...partnersData.banks, ...partnersData.banks].map((bank, index) => (
-                  <div 
-                    key={index} 
-                    className="flex-shrink-0 w-48 h-28 bg-transparent rounded-2xl transition-all duration-500 p-4 flex items-center justify-center"
+                  <div
+                    key={index}
+                    className="flex-shrink-0 w-48 h-32 bg-transparent rounded-2xl transition-all duration-500 p-4 flex flex-col items-center justify-center"
                   >
-                    <img 
-                      src={bank.logo} 
+                    <img
+                      src={bank.logo}
                       alt={bank.name}
-                      className="w-24 h-16 object-contain drop-shadow-md"
+                      className="w-24 h-16 object-contain drop-shadow-md mb-2"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                         const parent = (e.target as HTMLElement).parentElement;
                         if (parent) {
                           const fallback = document.createElement('div');
-                          fallback.className = 'w-16 h-12 bg-gray-200 rounded flex items-center justify-center text-2xl';
+                          fallback.className = 'w-16 h-12 bg-gray-200 rounded flex items-center justify-center text-2xl mb-2';
                           fallback.innerHTML = '🏦';
                           parent.insertBefore(fallback, parent.lastElementChild);
                         }
                       }}
                     />
+                    <p className="text-xs font-medium text-gray-700 text-center">{bank.name}</p>
                   </div>
                 ))}
               </div>
@@ -689,7 +705,7 @@ const PartnersSection = ({ onNavigate }: { onNavigate: (page: string) => void })
           </div>
 
           {/* شركات الدفع الإلكتروني */}
-          <div className="fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <div className="fade-in-up fade-delay-02s">
             <div className="flex items-center justify-center gap-3 mb-8">
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                 <Zap className="h-4 w-4 text-white" />
@@ -697,27 +713,28 @@ const PartnersSection = ({ onNavigate }: { onNavigate: (page: string) => void })
               <h3 className="text-2xl font-bold text-primary">شركات الدفع الإلكتروني</h3>
             </div>
             <div className="relative overflow-hidden bg-white/50 backdrop-blur-sm rounded-3xl border border-primary/10 p-6">
-              <div className="flex animate-scroll space-x-6" style={{ width: '200%', animationDelay: '-15s' }}>
+              <div className="flex animate-scroll space-x-6 scroll-container animate-delay-15s">
                 {[...partnersData.payment, ...partnersData.payment].map((payment, index) => (
-                  <div 
-                    key={index} 
-                    className="flex-shrink-0 w-48 h-28 bg-transparent rounded-2xl transition-all duration-500 p-4 flex items-center justify-center"
+                  <div
+                    key={index}
+                    className="flex-shrink-0 w-48 h-32 bg-transparent rounded-2xl transition-all duration-500 p-4 flex flex-col items-center justify-center"
                   >
-                    <img 
-                      src={payment.logo} 
+                    <img
+                      src={payment.logo}
                       alt={payment.name}
-                      className="w-24 h-16 object-contain drop-shadow-md"
+                      className="w-24 h-16 object-contain drop-shadow-md mb-2"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                         const parent = (e.target as HTMLElement).parentElement;
                         if (parent) {
                           const fallback = document.createElement('div');
-                          fallback.className = 'w-16 h-12 bg-gray-200 rounded flex items-center justify-center text-2xl';
+                          fallback.className = 'w-16 h-12 bg-gray-200 rounded flex items-center justify-center text-2xl mb-2';
                           fallback.innerHTML = '💳';
                           parent.insertBefore(fallback, parent.lastElementChild);
                         }
                       }}
                     />
+                    <p className="text-xs font-medium text-gray-700 text-center">{payment.name}</p>
                   </div>
                 ))}
               </div>
@@ -725,7 +742,7 @@ const PartnersSection = ({ onNavigate }: { onNavigate: (page: string) => void })
           </div>
 
           {/* شركات الشحن والتوصيل */}
-          <div className="fade-in-up" style={{ animationDelay: '0.4s' }}>
+          <div className="fade-in-up fade-delay-04s">
             <div className="flex items-center justify-center gap-3 mb-8">
               <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
                 <Truck className="h-4 w-4 text-white" />
@@ -733,27 +750,28 @@ const PartnersSection = ({ onNavigate }: { onNavigate: (page: string) => void })
               <h3 className="text-2xl font-bold text-primary">شركات الشحن والتوصيل</h3>
             </div>
             <div className="relative overflow-hidden bg-white/50 backdrop-blur-sm rounded-3xl border border-primary/10 p-6">
-              <div className="flex animate-scroll space-x-6" style={{ width: '200%', animationDelay: '-30s' }}>
+              <div className="flex animate-scroll space-x-6 scroll-container animate-delay-30s">
                 {[...partnersData.transport, ...partnersData.transport].map((company, index) => (
-                  <div 
-                    key={index} 
-                    className="flex-shrink-0 w-48 h-28 bg-transparent rounded-2xl transition-all duration-500 p-4 flex items-center justify-center"
+                  <div
+                    key={index}
+                    className="flex-shrink-0 w-48 h-32 bg-transparent rounded-2xl transition-all duration-500 p-4 flex flex-col items-center justify-center"
                   >
-                    <img 
-                      src={company.logo} 
+                    <img
+                      src={company.logo}
                       alt={company.name}
-                      className="w-24 h-16 object-contain drop-shadow-md"
+                      className="w-24 h-16 object-contain drop-shadow-md mb-2"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                         const parent = (e.target as HTMLElement).parentElement;
                         if (parent) {
                           const fallback = document.createElement('div');
-                          fallback.className = 'w-16 h-12 bg-gray-200 rounded flex items-center justify-center text-2xl';
+                          fallback.className = 'w-16 h-12 bg-gray-200 rounded flex items-center justify-center text-2xl mb-2';
                           fallback.innerHTML = '🚚';
                           parent.insertBefore(fallback, parent.lastElementChild);
                         }
                       }}
                     />
+                    <p className="text-xs font-medium text-gray-700 text-center">{company.name}</p>
                   </div>
                 ))}
               </div>
@@ -862,6 +880,7 @@ export default function Home() {
   const [isLoggedInAsVisitor, setIsLoggedInAsVisitor] = useState(false);
   const [allStores, setAllStores] = useState<any[]>([]);
   const [merchantSubPage, setMerchantSubPage] = useState('analytics');
+  const validOrders = useMemo(() => orders.filter(order => order && order.id), [orders]);
 
   // عرض النافذة الترحيبية في كل مرة يتم فتح المنصة (لأغراض التسويق وتشجيع الاشتراك)
   useEffect(() => {
@@ -879,7 +898,10 @@ export default function Home() {
 
     if (savedOrders) {
       try {
-        setOrders(JSON.parse(savedOrders));
+        const parsedOrders = JSON.parse(savedOrders);
+        if (Array.isArray(parsedOrders)) {
+          setOrders(parsedOrders.filter((order: any) => order && order.id));
+        }
       } catch (error) {
         console.error('Failed to parse saved orders:', error);
       }
@@ -895,7 +917,44 @@ export default function Home() {
 
     if (savedFavorites) {
       try {
-        setFavorites(JSON.parse(savedFavorites));
+        const parsedFavorites = JSON.parse(savedFavorites);
+        if (Array.isArray(parsedFavorites)) {
+          const catalog = [...allStoreProducts, ...enhancedSampleProducts];
+          const normalizedFavorites = parsedFavorites
+            .map((entry: any) => {
+              if (!entry) {
+                return null;
+              }
+              if (typeof entry === 'number') {
+                return catalog.find((product) => product.id === entry) || null;
+              }
+              if (entry.id) {
+                const reference = catalog.find((product) => product.id === entry.id);
+                if (reference) {
+                  const referenceImages = Array.isArray(reference.images) ? reference.images : [];
+                  const entryImages = Array.isArray(entry.images) ? entry.images : [];
+                  const mergedImages = referenceImages.length > 0 ? referenceImages : entryImages;
+                  return {
+                    ...reference,
+                    ...entry,
+                    images: mergedImages.length > 0 ? mergedImages : entryImages
+                  };
+                }
+              }
+              if (!Array.isArray(entry.images) || entry.images.length === 0) {
+                const fallbackImage =
+                  entry.image ||
+                  entry.thumbnail ||
+                  (Array.isArray(entry.product?.images) && entry.product.images.length > 0 ? entry.product.images[0] : entry.product?.image);
+                if (fallbackImage) {
+                  return { ...entry, images: [fallbackImage] };
+                }
+              }
+              return entry;
+            })
+            .filter(Boolean);
+          setFavorites(normalizedFavorites as any[]);
+        }
       } catch (error) {
         console.error('Failed to parse saved favorites:', error);
       }
@@ -921,7 +980,16 @@ export default function Home() {
       const savedVisitorData = localStorage.getItem('eshro_visitor_user');
       if (savedVisitorData) {
         try {
-          setCurrentVisitor(JSON.parse(savedVisitorData));
+          const parsedVisitor = JSON.parse(savedVisitorData);
+          if (!parsedVisitor.avatar) {
+            const cachedAvatar = localStorage.getItem('userProfileImage');
+            if (cachedAvatar) {
+              parsedVisitor.avatar = cachedAvatar;
+            }
+          } else {
+            localStorage.setItem('userProfileImage', parsedVisitor.avatar);
+          }
+          setCurrentVisitor(parsedVisitor);
         } catch (error) {
           console.error('Failed to parse saved visitor data:', error);
         }
@@ -973,10 +1041,8 @@ export default function Home() {
 
   // حفظ البيانات في localStorage عند تغييرها
   useEffect(() => {
-    if (orders.length > 0) {
-      localStorage.setItem('eshro_orders', JSON.stringify(orders));
-    }
-  }, [orders]);
+    localStorage.setItem('eshro_orders', JSON.stringify(validOrders));
+  }, [validOrders]);
 
   useEffect(() => {
     // حفظ السلة في localStorage حتى لو كانت فارغة
@@ -991,6 +1057,8 @@ export default function Home() {
   useEffect(() => {
     if (favorites.length > 0) {
       localStorage.setItem('eshro_favorites', JSON.stringify(favorites));
+    } else {
+      localStorage.removeItem('eshro_favorites');
     }
   }, [favorites]);
 
@@ -1095,44 +1163,185 @@ export default function Home() {
   };
 
   const handleRegistrationComplete = (couponData: any) => {
-    if (couponData) {
-      setUserCoupons(prev => [...prev, couponData]);
+    if (!couponData) {
+      return;
+    }
 
-      // تسجيل دخول الزائر تلقائياً بعد اكتمال التسجيل في الترحيب
-      try {
-        const visitorData = couponData.user;
-        if (visitorData) {
-          console.log('Auto-login visitor after welcome registration:', visitorData);
-          setCurrentVisitor(visitorData);
-          setIsLoggedInAsVisitor(true);
+    setUserCoupons((prev) => {
+      const existing = prev.find((coupon) => coupon.code === couponData.code);
+      if (existing) {
+        return prev.map((coupon) => (coupon.code === couponData.code ? couponData : coupon));
+      }
+      return [...prev, couponData];
+    });
+  };
 
-          // حفظ بيانات الزائر بمفتاح فريد للحفاظ على جميع المستخدمين
-          const userKey = `eshro_visitor_user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          localStorage.setItem(userKey, JSON.stringify(visitorData));
+  const handleDashboardOrderRequest = (payload: CreateOrderPayload): OrderRecord => {
+    const product = allStoreProducts.find((item) => item.id === payload.productId);
+    if (!product) {
+      throw new Error('PRODUCT_NOT_FOUND');
+    }
+    const config = dashboardShippingConfig[payload.shippingOptionId] ?? dashboardShippingConfig['normal-tripoli'];
+    if (!config) {
+      throw new Error('SHIPPING_CONFIG_NOT_FOUND');
+    }
+    const now = new Date();
+    const isoString = now.toISOString();
+    const [datePart] = isoString.split('T');
+    const orderDate = datePart ?? isoString.slice(0, 10);
+    const orderTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const subtotal = (product.price || 0) * payload.quantity;
+    const shippingCost = config.cost;
+    const finalTotal = subtotal + shippingCost;
+    const orderId = generateOrderId();
+    const fullName = payload.fullName.trim();
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || fullName;
+    const lastName = nameParts.slice(1).join(' ');
+    const location = payload.latitude !== undefined && payload.longitude !== undefined
+      ? { latitude: payload.latitude, longitude: payload.longitude, accuracy: 10 }
+      : undefined;
 
-          // حفظ أيضاً في المفتاح العام للوصول السريع للمستخدم الحالي
-          localStorage.setItem('eshro_visitor_user', JSON.stringify(visitorData));
-
-          // حفظ قائمة بجميع مستخدمي الزوار لتسهيل البحث
-          const existingUsers = JSON.parse(localStorage.getItem('eshro_all_visitors') || '[]');
-          existingUsers.push({ key: userKey, email: visitorData.email, name: `${visitorData.firstName} ${visitorData.lastName}` });
-          localStorage.setItem('eshro_all_visitors', JSON.stringify(existingUsers));
-
-          // عرض بوب أب الترحيب بعد تأخير قصير
-          setTimeout(() => {
-            setShowWelcomeBackModal({
-              visitorName: visitorData.firstName,
-              isFirstTime: true
-            });
-          }, 500);
+    const newOrder: OrderRecord = {
+      id: orderId,
+      date: orderDate,
+      time: orderTime,
+      status: 'pending',
+      items: [
+        {
+          id: product.id,
+          name: product.name,
+          product,
+          price: product.price,
+          quantity: payload.quantity
         }
-      } catch (error) {
-        console.error('Error during auto-login after welcome registration:', error);
+      ],
+      subtotal,
+      shippingCost,
+      discountAmount: 0,
+      discountPercentage: 0,
+      finalTotal,
+      total: finalTotal,
+      totalAmount: finalTotal,
+      customer: {
+        name: fullName,
+        firstName,
+        lastName,
+        phone: payload.phone.trim(),
+        email: payload.email.trim(),
+        address: payload.address.trim(),
+        city: payload.cityId,
+        area: payload.areaId
+      },
+      shipping: {
+        type: config.type,
+        cost: shippingCost,
+        estimatedTime: config.estimatedTime,
+        company: payload.shippingCompany
+      },
+      payment: {
+        method: 'onDelivery',
+        type: payload.orderType === 'urgent' ? 'الدفع عند الاستلام' : 'الدفع عند الاستلام'
+      },
+      createdAt: isoString,
+      ...(payload.notes ? { notes: payload.notes } : {}),
+      ...(location ? { location } : {})
+    };
+
+    setOrders((prev) => [...prev, newOrder]);
+    return newOrder;
+  };
+
+  const handleUpdateVisitorProfile = (profile: any) => {
+    setCurrentVisitor((prev) => {
+      const updatedName = profile.name && profile.name.trim().length > 0 ? profile.name : `${profile.firstName || ''} ${profile.lastName || ''}`.trim();
+      const updatedVisitor = {
+        ...(prev || {}),
+        ...profile,
+        name: updatedName || prev?.name || 'مستخدم إشرو'
+      };
+      localStorage.setItem('eshro_visitor_user', JSON.stringify(updatedVisitor));
+      if (updatedVisitor.avatar) {
+        localStorage.setItem('userProfileImage', updatedVisitor.avatar);
+      } else {
+        localStorage.removeItem('userProfileImage');
+      }
+      const allVisitorsRaw = localStorage.getItem('eshro_all_visitors');
+      if (allVisitorsRaw) {
+        try {
+          const parsed = JSON.parse(allVisitorsRaw);
+          if (Array.isArray(parsed)) {
+            const updatedList = parsed.map((visitor: any) =>
+              visitor.email === updatedVisitor.email
+                ? { ...visitor, name: `${updatedVisitor.firstName || ''} ${updatedVisitor.lastName || ''}`.trim(), email: updatedVisitor.email, avatar: updatedVisitor.avatar }
+                : visitor
+            );
+            localStorage.setItem('eshro_all_visitors', JSON.stringify(updatedList));
+          }
+        } catch (error) {
+          console.error('Failed to update visitors list', error);
+        }
+      }
+      const visitorKeys: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('eshro_visitor_user_')) {
+          visitorKeys.push(key);
+        }
+      }
+      visitorKeys.forEach((key) => {
+        const value = localStorage.getItem(key);
+        if (!value) {
+          return;
+        }
+        try {
+          const parsed = JSON.parse(value);
+          if (parsed.email === updatedVisitor.email) {
+            localStorage.setItem(key, JSON.stringify({ ...parsed, ...updatedVisitor }));
+          }
+        } catch (error) {
+          console.error('Failed to sync visitor record', error);
+        }
+      });
+      return updatedVisitor;
+    });
+  };
+
+  const handleVisitorPasswordChange = async ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) => {
+    if (!currentVisitor) {
+      return;
+    }
+    if (currentVisitor.password && currentVisitor.password !== currentPassword) {
+      throw new Error('INVALID_PASSWORD');
+    }
+    const updatedVisitor = { ...currentVisitor, password: newPassword };
+    setCurrentVisitor(updatedVisitor);
+    localStorage.setItem('eshro_visitor_user', JSON.stringify(updatedVisitor));
+    const visitorKeys = [] as string[];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('eshro_visitor_user_')) {
+        visitorKeys.push(key);
       }
     }
+    visitorKeys.forEach((key) => {
+      const value = localStorage.getItem(key);
+      if (!value) {
+        return;
+      }
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed.email === updatedVisitor.email) {
+          localStorage.setItem(key, JSON.stringify({ ...parsed, password: newPassword }));
+        }
+      } catch (error) {
+        console.error('Failed to sync visitor password', error);
+      }
+    });
   };
 
   const cartItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const completedOrdersCount = validOrders.length;
 
   // معالج تسجيل الدخول
   const handleLogin = (credentials: { username: string; password: string; userType?: string }) => {
@@ -1207,11 +1416,17 @@ export default function Home() {
           console.log('✅ Visitor login successful:', matchedVisitor.data);
 
           // تحديث بيانات المستخدم للتأكد من اكتمالها
+          const storedAvatar = matchedVisitor.data.avatar || localStorage.getItem('userProfileImage');
           const updatedVisitorData = {
             ...matchedVisitor.data,
             membershipType: matchedVisitor.data.membershipType || 'عضو مسجل',
-            lastLogin: new Date().toISOString()
+            lastLogin: new Date().toISOString(),
+            avatar: storedAvatar || matchedVisitor.data.avatar
           };
+
+          if (updatedVisitorData.avatar) {
+            localStorage.setItem('userProfileImage', updatedVisitorData.avatar);
+          }
 
           setCurrentVisitor(updatedVisitorData);
           setIsLoggedInAsVisitor(true);
@@ -1394,6 +1609,11 @@ export default function Home() {
       <CustomerDashboard
         customerData={customerData}
         favorites={favorites}
+        orders={validOrders}
+        unavailableItems={unavailableItems}
+        onCreateOrder={handleDashboardOrderRequest}
+        onUpdateProfile={handleUpdateVisitorProfile}
+        onPasswordChange={handleVisitorPasswordChange}
         onBack={() => {
           console.log('🔙 Dashboard back button clicked in user login context');
           setCurrentPage('home');
@@ -1625,7 +1845,7 @@ export default function Home() {
   if (currentPage === 'orders') {
     return (
       <CompleteOrdersPage
-        orders={orders}
+        orders={validOrders}
         favorites={favorites}
         unavailableItems={unavailableItems}
         onBack={handleBackToHome}
@@ -1651,7 +1871,7 @@ export default function Home() {
           console.log('Notification requested for product ID:', productId);
         }}
         onDeleteOrder={(orderId) => {
-          setOrders(prev => prev.filter(order => order.id !== orderId));
+          setOrders(prev => prev.filter(order => order?.id && order.id !== orderId));
           alert('تم حذف الطلب بنجاح!');
         }}
         onRemoveUnavailableItem={(index) => {
@@ -1787,7 +2007,7 @@ export default function Home() {
       <Header
         onNavigate={handleNavigation}
         cartItemsCount={cartItemsCount}
-        unavailableOrdersCount={unavailableItems.length}
+        unavailableOrdersCount={completedOrdersCount}
         onCartOpen={() => setCurrentPage('cart')}
         onOrdersOpen={() => setCurrentPage('orders')}
         isLoggedInAsVisitor={isLoggedInAsVisitor}
@@ -1798,6 +2018,7 @@ export default function Home() {
       <HeroSection />
       <ServicesSection onNavigate={handleNavigation} />
       <StoresCarousel onStoreClick={handleStoreClick} />
+      <DiscountSlider />
       <PartnersSection onNavigate={handleNavigation} />
       <Footer />
       

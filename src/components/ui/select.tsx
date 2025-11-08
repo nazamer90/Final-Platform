@@ -36,7 +36,7 @@ export const Select: React.FC<SelectProps> = ({ value, defaultValue, onValueChan
   );
 };
 
-export interface SelectTriggerProps extends React.SelectHTMLAttributes<HTMLSelectElement> {}
+export type SelectTriggerProps = React.SelectHTMLAttributes<HTMLSelectElement>;
 export const SelectTrigger = React.forwardRef<HTMLSelectElement, SelectTriggerProps>(({ className, children, ...props }, ref) => {
   const ctx = React.useContext(SelectContext)!;
   return (
@@ -67,7 +67,7 @@ export const SelectContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
   return <div data-select-content className="hidden">{children}</div>;
 };
 
-export interface SelectItemProps extends React.LiHTMLAttributes<HTMLLIElement> { value: string }
+export type SelectItemProps = React.LiHTMLAttributes<HTMLLIElement> & { value: string };
 export const SelectItem: React.FC<SelectItemProps> = ({ value, children }) => {
   const ctx = React.useContext(SelectContext)!;
   React.useEffect(() => {

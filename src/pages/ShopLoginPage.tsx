@@ -660,6 +660,7 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl relative">
             <button
               onClick={() => setShowForgotPasswordModal(false)}
+              title="إغلاق"
               className="absolute top-4 left-4 w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors z-10"
             >
               <X className="h-4 w-4 text-gray-700" />

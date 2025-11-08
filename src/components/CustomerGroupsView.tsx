@@ -69,6 +69,23 @@ interface CustomerGroupsViewProps {
   onSave: () => void;
 }
 
+const COLOR_CONFIG: Record<string, { background: string; progress: string }> = {
+  '#3B82F6': { background: 'bg-[#3B82F6]', progress: 'progress-color-blue' },
+  '#10B981': { background: 'bg-[#10B981]', progress: 'progress-color-emerald' },
+  '#8B5CF6': { background: 'bg-[#8B5CF6]', progress: 'progress-color-violet' },
+  '#F59E0B': { background: 'bg-[#F59E0B]', progress: 'progress-color-amber' },
+  '#EF4444': { background: 'bg-[#EF4444]', progress: 'progress-color-rose' },
+  '#EC4899': { background: 'bg-[#EC4899]', progress: 'progress-color-pink' },
+  '#6366F1': { background: 'bg-[#6366F1]', progress: 'progress-color-indigo' },
+  '#14B8A6': { background: 'bg-[#14B8A6]', progress: 'progress-color-teal' },
+};
+
+const COLOR_OPTIONS = Object.keys(COLOR_CONFIG);
+
+const getBackgroundClass = (color: string) => COLOR_CONFIG[color]?.background ?? 'bg-gray-400';
+
+const getProgressClass = (color: string) => COLOR_CONFIG[color]?.progress ?? 'progress-color-default';
+
 const CustomerGroupsView: React.FC<CustomerGroupsViewProps> = ({ storeData, setStoreData, onSave }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showGroupModal, setShowGroupModal] = useState(false);
@@ -326,8 +343,7 @@ const CustomerGroupsView: React.FC<CustomerGroupsViewProps> = ({ storeData, setS
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold"
-                      style={{ backgroundColor: group.color }}
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold ${getBackgroundClass(group.color)}`}
                     >
                       {group.name.charAt(0)}
                     </div>
@@ -337,7 +353,7 @@ const CustomerGroupsView: React.FC<CustomerGroupsViewProps> = ({ storeData, setS
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditGroup(group)}>
+                    <Button variant="outline" size="sm" onClick={() => handleEditGroup(group)} aria-label={`تعديل ${group.name}`}>
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
@@ -345,6 +361,7 @@ const CustomerGroupsView: React.FC<CustomerGroupsViewProps> = ({ storeData, setS
                       size="sm"
                       onClick={() => handleDeleteGroup(group.id)}
                       className="text-red-600 hover:text-red-700"
+                      aria-label={`حذف ${group.name}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -370,15 +387,12 @@ const CustomerGroupsView: React.FC<CustomerGroupsViewProps> = ({ storeData, setS
 
                 {/* Progress Bar */}
                 <div className="mt-4">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full"
-                      style={{
-                        width: `${group.percentage}%`,
-                        backgroundColor: group.color
-                      }}
-                    ></div>
-                  </div>
+                  <progress
+                    className={`progress-element ${getProgressClass(group.color)}`}
+                    max={100}
+                    value={Math.max(0, Math.min(100, group.percentage))}
+                    aria-label={`نسبة تقدم مجموعة ${group.name}`}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -420,6 +434,7 @@ const CustomerGroupsView: React.FC<CustomerGroupsViewProps> = ({ storeData, setS
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowGroupModal(false)}
+                  aria-label="إغلاق نموذج المجموعات"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -440,19 +455,20 @@ const CustomerGroupsView: React.FC<CustomerGroupsViewProps> = ({ storeData, setS
                   <div>
                     <Label htmlFor="color">لون المجموعة</Label>
                     <div className="flex gap-2">
-                      {[
-                        '#3B82F6', '#10B981', '#8B5CF6', '#F59E0B',
-                        '#EF4444', '#EC4899', '#6366F1', '#14B8A6'
-                      ].map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => setGroupForm({ ...groupForm, color })}
-                          className={`w-8 h-8 rounded-full border-2 ${
-                            groupForm.color === color ? 'border-gray-800' : 'border-gray-300'
-                          }`}
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
+                      {COLOR_OPTIONS.map((color) => {
+                        const backgroundClass = getBackgroundClass(color);
+                        return (
+                          <button
+                            key={color}
+                            type="button"
+                            onClick={() => setGroupForm({ ...groupForm, color })}
+                            aria-label={`اختيار اللون ${color}`}
+                            className={`w-8 h-8 rounded-full border-2 ${backgroundClass} ${
+                              groupForm.color === color ? 'border-gray-800' : 'border-gray-300'
+                            }`}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
                 </div>

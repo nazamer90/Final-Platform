@@ -1,2510 +1,1661 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-// أنماط احترافية مذهلة للوحة التحكم
-const professionalStyles = `
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-30px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-  }
-
-  @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
-  @keyframes bounce {
-    0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
-    40%, 43% { transform: translate3d(0, -30px, 0); }
-    70% { transform: translate3d(0, -15px, 0); }
-    90% { transform: translate3d(0, -4px, 0); }
-  }
-
-  .animate-fade-in { animation: fadeIn 0.6s ease-out; }
-  .animate-slide-in { animation: slideIn 0.8s ease-out; }
-  .animate-pulse-slow { animation: pulse 3s ease-in-out infinite; }
-  .animate-rotate { animation: rotate 2s linear infinite; }
-  .animate-shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); background-size: 200% 100%; animation: shimmer 2s infinite; }
-  .animate-bounce-custom { animation: bounce 2s ease-in-out infinite; }
-
-  .glass-effect { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.18); }
-  .neon-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3), 0 0 60px rgba(59, 130, 246, 0.1); }
-  .gradient-border { position: relative; background: linear-gradient(45deg, #3B82F6, #8B5CF6, #EC4899); padding: 2px; border-radius: 8px; }
-  .gradient-border::before { content: ''; position: absolute; inset: 0; background: white; border-radius: 6px; z-index: -1; }
-`;
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
-  ArrowLeft,
-  User,
-  Package,
-  CreditCard,
-  Gift,
-  Download,
-  Settings,
-  MessageCircle,
-  Bell,
-  TrendingUp,
-  ShoppingBag,
-  Star,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  Phone,
-  Mail,
-  MapPin,
-  Calendar,
-  DollarSign,
   Activity,
+  Check,
+  Clock,
+  CreditCard,
+  Download as DownloadIcon,
+  Headphones,
+  LogOut,
+  Mail,
+  MessageCircle,
+  Package,
+  Phone,
+  Share2,
+  Sparkles,
+  Star,
+  Trophy,
+  UploadCloud,
+  User as UserIcon,
   Users,
-  Award,
-  Target
+  Wallet
 } from 'lucide-react';
+import { allStoreProducts } from '@/data/allStoreProducts';
+import { getCityAreas, libyanAreas, libyanCities } from '@/data/libya/cities/cities';
+
+type SectionId = 'dashboard' | 'orders' | 'subscriptions' | 'referrals' | 'downloads' | 'profile' | 'support';
+
+type ShippingSpeed = 'normal' | 'express';
+
+export interface OrderRecord {
+  id: string;
+  date?: string;
+  time?: string;
+  status?: string;
+  subtotal?: number;
+  total?: number;
+  totalAmount?: number;
+  finalTotal?: number;
+  shippingCost?: number;
+  discountAmount?: number;
+  discountPercentage?: number;
+  createdAt?: string;
+  created_at?: string;
+  items?: Array<{ id?: number; name?: string; price?: number; quantity?: number; product?: any }>;
+  customer?: { name?: string; address?: string; phone?: string; firstName?: string; lastName?: string; email?: string; city?: string; area?: string };
+  shipping?: { type?: string; cost?: number; estimatedTime?: string; company?: string; address?: string };
+  payment?: { method?: string; type?: string };
+  notes?: string;
+  location?: { latitude?: number; longitude?: number; accuracy?: number };
+}
+
+interface CustomerInfo {
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  membershipType?: string;
+  joinDate?: string;
+  loyaltyPoints?: number;
+  monthlyGoal?: number;
+  referralsCount?: number;
+  referralsJoined?: number;
+  loyaltyTier?: string;
+  avatar?: string;
+  city?: string;
+  area?: string;
+  address?: string;
+  birthDate?: string;
+  bankName?: string;
+  bankAccount?: string;
+  bankAccountHolder?: string;
+  accountStatus?: string;
+  satisfactionRate?: number;
+  activityDays?: number;
+}
+
+export interface CreateOrderPayload {
+  orderType: 'normal' | 'urgent';
+  productId: number;
+  quantity: number;
+  fullName: string;
+  phone: string;
+  email: string;
+  cityId: string;
+  areaId: string;
+  address: string;
+  latitude?: number;
+  longitude?: number;
+  shippingOptionId: string;
+  shippingCompany: string;
+  notes?: string;
+}
 
 interface CustomerDashboardProps {
-  customerData?: any;
+  customerData?: CustomerInfo;
   favorites?: any[];
+  orders?: OrderRecord[];
+  unavailableItems?: any[];
   onBack: () => void;
   onLogout: () => void;
+  onCreateOrder?: (payload: CreateOrderPayload) => Promise<OrderRecord | void> | OrderRecord | void;
+  onUpdateProfile?: (data: CustomerInfo) => void;
+  onPasswordChange?: (payload: { currentPassword: string; newPassword: string }) => Promise<void> | void;
 }
+
+interface NewOrderFormState {
+  orderType: 'normal' | 'urgent';
+  productId: string;
+  quantity: number;
+  fullName: string;
+  phone: string;
+  email: string;
+  cityId: string;
+  areaId: string;
+  address: string;
+  latitude: string;
+  longitude: string;
+  shippingOptionId: string;
+  shippingCompany: string;
+  notes: string;
+}
+
+interface ProfileFormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  birthDate: string;
+  city: string;
+  area: string;
+  address: string;
+  bankName: string;
+  bankAccount: string;
+  bankAccountHolder: string;
+  avatar?: string;
+}
+
+interface PasswordFormState {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+const featuredStoreIds = [1, 2, 4, 6, 8];
+
+const shippingOptions = [
+  {
+    id: 'normal-tripoli',
+    label: 'عادي - داخل طرابلس',
+    duration: '24-96 ساعة',
+    priceRange: 'من 35 -45 د.ل',
+    speed: 'normal' as ShippingSpeed
+  },
+  {
+    id: 'normal-outside',
+    label: 'عادي - خارج طرابلس',
+    duration: '24-96 ساعة',
+    priceRange: 'من 100-130 د.ل',
+    speed: 'normal' as ShippingSpeed
+  },
+  {
+    id: 'express-tripoli',
+    label: 'سريع - داخل طرابلس',
+    duration: '5-12 ساعة',
+    priceRange: 'من 55-85 د.ل',
+    speed: 'express' as ShippingSpeed
+  },
+  {
+    id: 'express-outside',
+    label: 'سريع - خارج طرابلس',
+    duration: '5-12 ساعة',
+    priceRange: 'من 120-210 د.ل',
+    speed: 'express' as ShippingSpeed
+  }
+];
+
+const shippingCompanies = [
+  'أميال',
+  'درب السيل',
+  'بريستو',
+  'فانكس',
+  'زام',
+  'أرامكس',
+  'بيبو فاست',
+  'دي إكسبريس',
+  'دي إتش إل',
+  'جيدكس',
+  'جو ديليفري',
+  'هدهد',
+  'سكاي إكس',
+  'سونيك إكسبريس',
+  'إس تي بي إكس',
+  'توربو إكس إل جي',
+  'وينجسلي'
+];
+
+const currencyFormatter = new Intl.NumberFormat('ar-LY', {
+  style: 'currency',
+  currency: 'LYD',
+  maximumFractionDigits: 2
+});
+
+const numberFormatter = new Intl.NumberFormat('ar-LY', {
+  maximumFractionDigits: 0
+});
+
+const formatCurrency = (value: number) => currencyFormatter.format(value || 0);
+
+const formatNumber = (value: number) => numberFormatter.format(value || 0);
+
+const parseOrderDate = (order: OrderRecord) => {
+  const source = order.date || order.createdAt || order.created_at;
+  if (!source) {
+    return new Date();
+  }
+  const normalized = source.includes('/') ? source.replace(/\//g, '-') : source;
+  const parsed = new Date(normalized);
+  if (!Number.isNaN(parsed.getTime())) {
+    return parsed;
+  }
+  if (order.time) {
+    const combined = new Date(`${normalized} ${order.time}`);
+    if (!Number.isNaN(combined.getTime())) {
+      return combined;
+    }
+  }
+  const fallback = new Date(Date.parse(normalized));
+  if (!Number.isNaN(fallback.getTime())) {
+    return fallback;
+  }
+  return new Date();
+};
+
+const getOrderTotal = (order: OrderRecord) => {
+  if (!order) {
+    return 0;
+  }
+  if (typeof order.finalTotal === 'number') {
+    return order.finalTotal;
+  }
+  if (typeof order.totalAmount === 'number') {
+    return order.totalAmount;
+  }
+  if (typeof order.total === 'number') {
+    return order.total;
+  }
+  if (typeof order.subtotal === 'number') {
+    return order.subtotal;
+  }
+  const itemsTotal = order.items?.reduce((sum, item) => {
+    const price = item?.price ?? item?.product?.price ?? 0;
+    const quantity = item?.quantity ?? 1;
+    return sum + price * quantity;
+  }, 0);
+  return itemsTotal ?? 0;
+};
+
+const getStatusDetails = (status?: string) => {
+  const value = status ? status.toLowerCase() : '';
+  if (value === 'pending') {
+    return { label: 'قيد المراجعة', tone: 'text-amber-600 bg-amber-50' };
+  }
+  if (value === 'confirmed') {
+    return { label: 'تم التأكيد', tone: 'text-blue-600 bg-blue-50' };
+  }
+  if (value === 'processing') {
+    return { label: 'قيد التنفيذ', tone: 'text-indigo-600 bg-indigo-50' };
+  }
+  if (value === 'shipped') {
+    return { label: 'تم الشحن', tone: 'text-sky-600 bg-sky-50' };
+  }
+  if (value === 'delivered' || value === 'completed') {
+    return { label: 'تم التسليم', tone: 'text-emerald-600 bg-emerald-50' };
+  }
+  if (value === 'cancelled') {
+    return { label: 'ملغي', tone: 'text-rose-600 bg-rose-50' };
+  }
+  return { label: 'غير محدد', tone: 'text-gray-600 bg-gray-100' };
+};
+
+const resolveMembershipTier = (info: CustomerInfo, totalSpent: number) => {
+  if (info.loyaltyTier) {
+    return info.loyaltyTier;
+  }
+  if (totalSpent >= 8000) {
+    return 'عضو بلاتيني';
+  }
+  if (totalSpent >= 4000) {
+    return 'عضو ذهبي';
+  }
+  if (totalSpent >= 2000) {
+    return 'عضو فضي';
+  }
+  return info.membershipType || 'عضو جديد';
+};
+
+const computeProfileCompletion = (form: ProfileFormState) => {
+  const fields = [
+    form.firstName,
+    form.lastName,
+    form.email,
+    form.phone,
+    form.birthDate,
+    form.city,
+    form.area,
+    form.address,
+    form.bankName,
+    form.bankAccount,
+    form.bankAccountHolder
+  ];
+  const filled = fields.filter((value) => Boolean(value && value.trim().length > 0)).length;
+  return Math.round((filled / fields.length) * 100);
+};
+
+const createNewOrderFormState = (info: CustomerInfo): NewOrderFormState => {
+  const name = info.name && info.name.trim().length > 0 ? info.name : `${info.firstName || ''} ${info.lastName || ''}`.trim();
+  return {
+    orderType: 'normal',
+    productId: '',
+    quantity: 1,
+    fullName: name || 'مستخدم إشرو',
+    phone: info.phone || '',
+    email: info.email || '',
+    cityId: info.city || '',
+    areaId: info.area || '',
+    address: info.address || '',
+    latitude: '',
+    longitude: '',
+    shippingOptionId: '',
+    shippingCompany: '',
+    notes: ''
+  };
+};
+
+const createProfileFormState = (info: CustomerInfo): ProfileFormState => {
+  const splitName = info.name ? info.name.split(' ') : [];
+  const avatarValue = info.avatar && info.avatar.trim().length > 0 ? info.avatar : undefined;
+  return {
+    firstName: info.firstName || splitName[0] || '',
+    lastName: info.lastName || splitName.slice(1).join(' ') || '',
+    email: info.email || '',
+    phone: info.phone || '',
+    birthDate: info.birthDate || '',
+    city: info.city || '',
+    area: info.area || '',
+    address: info.address || '',
+    bankName: info.bankName || '',
+    bankAccount: info.bankAccount || '',
+    bankAccountHolder: info.bankAccountHolder || '',
+    ...(avatarValue ? { avatar: avatarValue } : {})
+  };
+};
 
 const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
   customerData,
   favorites = [],
+  orders = [],
+  unavailableItems = [],
   onBack,
-  onLogout
+  onLogout,
+  onCreateOrder,
+  onUpdateProfile,
+  onPasswordChange
 }) => {
-  console.log('🎯 CustomerDashboard Context Analysis:');
-  console.log('customerData:', customerData);
-  console.log('customerData.context:', customerData?.context);
-  console.log('customerData.isFromLogin:', customerData?.isFromLogin);
-  console.log('customerData.timestamp:', customerData?.timestamp);
-
-  // إضافة مؤشر مرئي لتحديد السياق
-  const contextIndicator = customerData?.context || 'unknown';
-  const isFromLogin = customerData?.isFromLogin || false;
-
-  const [activeSection, setActiveSection] = useState('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
-
-  // بيانات تجريبية للمستخدم
-  const customerInfo = customerData || {
-    name: 'نزار بن نوبة',
-    email: 'customer@eshro.ly',
-    phone: '0021894062927',
-    joinDate: '2024-01-15',
-    membershipType: 'عميل مميز',
-    avatar: '/api/placeholder/150/150'
-  };
-
-  // بيانات ديناميكية محسنة للطلبات مع منتجات حقيقية وصور
-  const [orders, setOrders] = useState([
-    {
-      id: 'ORD-001',
-      date: '2024-01-10',
-      status: 'مكتملة',
-      total: 2899.00,
-      items: 3,
-      store: 'نواعم',
-      storeId: 1,
-      products: [
-        {
-          id: 1001,
-          name: 'عباية أنيقة',
-          image: '/assets/stores/1.webp',
-          price: 1200,
-          quantity: 1,
-          size: 'L',
-          color: 'أسود'
-        },
-        {
-          id: 1002,
-          name: 'حجاب ناعم',
-          image: '/assets/stores/1.webp',
-          price: 899,
-          quantity: 2,
-          size: 'واحد',
-          color: 'بني'
-        },
-        {
-          id: 1003,
-          name: 'إكسسوار ذهبي',
-          image: '/assets/stores/1.webp',
-          price: 800,
-          quantity: 1,
-          size: 'واحد',
-          color: 'ذهبي'
-        }
-      ],
-      trackingNumber: 'TN2024001',
-      estimatedDelivery: '2024-01-12',
-      orderTime: '2024-01-10T14:30:00Z'
-    },
-    {
-      id: 'ORD-002',
-      date: '2024-01-08',
-      status: 'قيد المراجعة',
-      total: 650.00,
-      items: 1,
-      store: 'شيرين',
-      storeId: 2,
-      products: [
-        {
-          id: 2011,
-          name: 'خاتم فضة عيار 925',
-          image: '/assets/stores/1.webp',
-          price: 650,
-          quantity: 1,
-          size: '7',
-          color: 'فضي'
-        }
-      ],
-      trackingNumber: 'TN2024002',
-      estimatedDelivery: '2024-01-11',
-      orderTime: '2024-01-08T09:15:00Z'
-    },
-    {
-      id: 'ORD-003',
-      date: '2024-01-05',
-      status: 'جديدة',
-      total: 1890.00,
-      items: 2,
-      store: 'دلتا ستور',
-      storeId: 3,
-      products: [
-        {
-          id: 3001,
-          name: 'ساعة ذكية',
-          image: '/assets/stores/3.webp',
-          price: 1299,
-          quantity: 1,
-          size: '42mm',
-          color: 'أسود'
-        },
-        {
-          id: 3002,
-          name: 'كابل شحن',
-          image: '/assets/stores/3.webp',
-          price: 591,
-          quantity: 1,
-          size: 'واحد',
-          color: 'أبيض'
-        }
-      ],
-      trackingNumber: 'TN2024003',
-      estimatedDelivery: '2024-01-10',
-      orderTime: '2024-01-05T16:45:00Z'
+  const customerInfo = useMemo<CustomerInfo>(() => {
+    if (!customerData) {
+      return { name: 'مستخدم إشرو', membershipType: 'عضو جديد' };
     }
-  ]);
+    const baseName = customerData.name && customerData.name.trim().length > 0 ? customerData.name : `${customerData.firstName || ''} ${customerData.lastName || ''}`.trim();
+    const name = baseName && baseName.trim().length > 0 ? baseName : 'مستخدم إشرو';
+    return { ...customerData, name };
+  }, [customerData]);
 
-  // بيانات تجريبية للإشعارات
-  const notifications = [
-    {
-      id: 1,
-      type: 'order',
-      title: 'طلب جديد في انتظار المراجعة',
-      message: 'تم استلام طلبك رقم ORD-003 وهو الآن قيد المراجعة',
-      time: 'منذ ساعتين',
-      read: false,
-      urgent: false
-    },
-    {
-      id: 2,
-      type: 'delivery',
-      title: 'تحديث حالة الشحن',
-      message: 'طلبك رقم ORD-001 في طريقه للتسليم اليوم',
-      time: 'منذ 4 ساعات',
-      read: false,
-      urgent: true
-    },
-    {
-      id: 3,
-      type: 'promotion',
-      title: 'عرض خاص لك',
-      message: 'خصم 20% على جميع منتجات نواعم لهذا الأسبوع',
-      time: 'أمس',
-      read: true,
-      urgent: false
-    },
-    {
-      id: 4,
-      type: 'system',
-      title: 'تحديث النظام',
-      message: 'تم تحديث سياسة الخصوصية، يرجى مراجعتها',
-      time: 'منذ يومين',
-      read: true,
-      urgent: false
+  const [activeSection, setActiveSection] = useState<SectionId>('dashboard');
+  const [newOrderForm, setNewOrderForm] = useState<NewOrderFormState>(() => createNewOrderFormState(customerInfo));
+  const [formStatus, setFormStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
+  const [profileForm, setProfileForm] = useState<ProfileFormState>(() => createProfileFormState(customerInfo));
+  const [passwordForm, setPasswordForm] = useState<PasswordFormState>({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [avatarPreview, setAvatarPreview] = useState<string>(customerInfo.avatar || '');
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
+  const [activeOrdersView, setActiveOrdersView] = useState<'favorites' | 'unavailable' | 'completed' | 'pending'>('favorites');
+
+  useEffect(() => {
+    setNewOrderForm(createNewOrderFormState(customerInfo));
+    setProfileForm(createProfileFormState(customerInfo));
+    setAvatarPreview(customerInfo.avatar || '');
+  }, [customerInfo]);
+
+  const resolvedAvatar = useMemo(() => {
+    if (avatarPreview) {
+      return avatarPreview;
     }
-  ];
+    if (customerInfo.avatar) {
+      return customerInfo.avatar;
+    }
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('userProfileImage') || '';
+    }
+    return '';
+  }, [avatarPreview, customerInfo.avatar]);
 
-  // إحصائيات شاملة وديناميكية
-  const [stats, setStats] = useState({
-    totalOrders: orders.length,
-    pendingOrders: orders.filter(order => order.status === 'قيد المراجعة').length,
-    completedOrders: orders.filter(order => order.status === 'مكتملة').length,
-    totalSpent: orders.filter(order => order.status === 'مكتملة').reduce((sum, order) => sum + order.total, 0),
-    totalProducts: orders.reduce((sum, order) => sum + order.items, 0),
-    favoriteProducts: Math.floor(Math.random() * 20) + 5, // عشوائي للعرض
-    totalReviews: Math.floor(Math.random() * 10) + 1,
-    activityRate: Math.floor(Math.random() * 20) + 80,
-    satisfactionRate: Math.floor(Math.random() * 10) + 90,
-    notificationsCount: Math.floor(Math.random() * 5) + 1,
-    wishlistItems: Math.floor(Math.random() * 15) + 3,
-    avgOrderValue: orders.length > 0 ? orders.filter(order => order.status === 'مكتملة').reduce((sum, order) => sum + order.total, 0) / orders.filter(order => order.status === 'مكتملة').length : 0,
-    monthlySpending: orders.filter(order => new Date(order.date) >= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).reduce((sum, order) => sum + order.total, 0)
-  });
-
-  // تحديث الإحصائيات كل 30 ثانية للمحاكاة الديناميكية
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setStats(prev => ({
-        ...prev,
-        activityRate: Math.max(70, Math.min(100, prev.activityRate + Math.floor(Math.random() * 10) - 5)),
-        notificationsCount: Math.max(0, prev.notificationsCount + Math.floor(Math.random() * 3) - 1)
-      }));
-    }, 30000);
-
-    return () => clearInterval(interval);
+  const availableProducts = useMemo(() => {
+    return allStoreProducts.filter((product) => featuredStoreIds.includes(product.storeId) && product.inStock !== false);
   }, []);
 
-  // التنقل الجانبي المحسن
-  const sidebarItems = [
-    { id: 'dashboard', label: 'لوحة المعلومات', icon: <Activity className="h-5 w-5" />, badge: null },
-    { id: 'orders', label: 'الطلبات', icon: <Package className="h-5 w-5" />, badge: stats.totalOrders },
-    { id: 'favorites', label: 'المفضلة', icon: <Star className="h-5 w-5" />, badge: stats.favoriteProducts },
-    { id: 'notifications', label: 'الإشعارات', icon: <Bell className="h-5 w-5" />, badge: stats.notificationsCount },
-    { id: 'subscriptions', label: 'الاشتراكات', icon: <CreditCard className="h-5 w-5" />, badge: null },
-    { id: 'referrals', label: 'الإحالات', icon: <Users className="h-5 w-5" />, badge: null },
-    { id: 'downloads', label: 'التحميلات', icon: <Download className="h-5 w-5" />, badge: null },
-    { id: 'profile', label: 'الملف الشخصي', icon: <User className="h-5 w-5" />, badge: null },
-    { id: 'support', label: 'المساعدة والدعم الفني', icon: <Phone className="h-5 w-5" />, badge: null },
-  ];
+  const cityAreas = useMemo(() => {
+    if (!newOrderForm.cityId) {
+      return libyanAreas;
+    }
+    return getCityAreas(newOrderForm.cityId);
+  }, [newOrderForm.cityId]);
 
-  // القائمة المختصرة العلوية
-  const topSidebarItems = [
+  const metrics = useMemo(() => {
+    const totalOrders = orders.length;
+    const deliveredOrders = orders.filter((order) => {
+      const status = order.status ? order.status.toLowerCase() : '';
+      return status === 'delivered' || status === 'completed';
+    }).length;
+    const pendingOrders = orders.filter((order) => {
+      const status = order.status ? order.status.toLowerCase() : '';
+      return status === 'pending' || status === 'processing' || status === 'confirmed';
+    }).length;
+    const totalSpent = orders.reduce((sum, order) => sum + getOrderTotal(order), 0);
+    const monthlyGoal = customerInfo.monthlyGoal ?? 4500;
+    const monthlyProgress = monthlyGoal > 0 ? Math.min(100, Math.round((totalSpent / monthlyGoal) * 100)) : 0;
+    const loyaltyPoints = customerInfo.loyaltyPoints ?? Math.round(totalSpent * 0.35) + favorites.length * 25;
+    const loyaltyGain = Math.max(50, Math.round((totalOrders || 1) * 45 + favorites.length * 8));
+    const membershipTier = resolveMembershipTier(customerInfo, totalSpent);
+    const joinDate = customerInfo.joinDate ? parseOrderDate({ id: 'join', date: customerInfo.joinDate }) : new Date();
+    const monthsActive = Math.max(1, Math.round((Date.now() - joinDate.getTime()) / (30 * 24 * 60 * 60 * 1000)));
+    const activeDays = customerInfo.activityDays ?? monthsActive * 7;
+    const satisfaction = customerInfo.satisfactionRate ?? Math.min(100, 85 + favorites.length * 0.8);
+    const referralsCount = customerInfo.referralsCount ?? 8;
+    const referralsJoined = customerInfo.referralsJoined ?? 5;
+    const loyaltyLevel = monthlyProgress >= 80 ? 'امتياز' : monthlyProgress >= 60 ? 'متألق' : 'في تقدم';
+    const recentOrders = [...orders]
+      .sort((a, b) => parseOrderDate(b).getTime() - parseOrderDate(a).getTime())
+      .slice(0, 3);
+    const newFriends = Math.max(3, Math.round(referralsJoined * 0.6 + favorites.length * 0.4));
+    return {
+      totalOrders,
+      deliveredOrders,
+      pendingOrders,
+      totalSpent,
+      monthlyGoal,
+      monthlyProgress,
+      loyaltyPoints,
+      loyaltyGain,
+      membershipTier,
+      joinDate,
+      activeDays,
+      satisfaction,
+      referralsCount,
+      referralsJoined,
+      loyaltyLevel,
+      recentOrders,
+      favoritesCount: favorites.length,
+      unavailableCount: unavailableItems.length,
+      wishlistCount: favorites.length,
+      newFriends
+    };
+  }, [orders, favorites, customerInfo, unavailableItems]);
+
+  const sections = [
     {
-      id: 'status',
-      label: 'الحالة العامة',
-      icon: <Activity className="h-4 w-4" />,
-      value: 'نشط',
-      color: 'text-green-600'
+      id: 'dashboard' as SectionId,
+      label: 'لوحة المعلومات',
+      description: 'نظرة شاملة على إنجازاتك',
+      icon: <Activity className="h-5 w-5" />,
+      badge: undefined
     },
     {
-      id: 'new-orders',
-      label: 'طلبات جديدة',
-      icon: <Package className="h-4 w-4" />,
-      value: stats.pendingOrders,
-      color: 'text-blue-600'
+      id: 'orders' as SectionId,
+      label: 'الطلبات',
+      description: 'إدارة الطلبات والمتابعة',
+      icon: <Package className="h-5 w-5" />,
+      badge: metrics.totalOrders > 0 ? formatNumber(metrics.totalOrders) : undefined
     },
     {
-      id: 'under-review',
-      label: 'قيد المراجعة',
-      icon: <Clock className="h-4 w-4" />,
-      value: '2',
-      color: 'text-orange-600'
+      id: 'subscriptions' as SectionId,
+      label: 'الاشتراكات',
+      description: 'تابع متاجرك المفضلة',
+      icon: <CreditCard className="h-5 w-5" />,
+      badge: undefined
     },
     {
-      id: 'completed',
-      label: 'مكتملة',
-      icon: <CheckCircle className="h-4 w-4" />,
-      value: stats.completedOrders,
-      color: 'text-green-600'
+      id: 'referrals' as SectionId,
+      label: 'الإحالات',
+      description: 'شارك عالم إشرو مع أصدقائك',
+      icon: <Share2 className="h-5 w-5" />,
+      badge: metrics.referralsCount > 0 ? formatNumber(metrics.referralsCount) : undefined
+    },
+    {
+      id: 'downloads' as SectionId,
+      label: 'التحميلات',
+      description: 'فواتير وتقارير قابلة للتنزيل',
+      icon: <DownloadIcon className="h-5 w-5" />,
+      badge: metrics.totalOrders > 0 ? formatNumber(metrics.totalOrders) : undefined
+    },
+    {
+      id: 'profile' as SectionId,
+      label: 'الملف الشخصي',
+      description: 'بياناتك وإعدادات الحساب',
+      icon: <UserIcon className="h-5 w-5" />,
+      badge: `${computeProfileCompletion(profileForm)}%`
+    },
+    {
+      id: 'support' as SectionId,
+      label: 'المساعدة والدعم',
+      description: 'تواصل مباشر مع فريق إشرو',
+      icon: <Headphones className="h-5 w-5" />,
+      badge: undefined
     }
   ];
 
-  // القائمة المختصرة الجانبية اليمنى
-  const rightSidebarItems = [
-    {
-      id: 'notifications',
-      icon: <Bell className="h-5 w-5" />,
-      badge: stats.notificationsCount > 0 ? stats.notificationsCount : undefined,
-      onClick: () => setNotificationsOpen(!notificationsOpen)
-    },
-    {
-      id: 'favorites',
-      icon: <Star className="h-5 w-5" />,
-      badge: stats.favoriteProducts,
-      onClick: () => setActiveSection('favorites')
-    },
-    {
-      id: 'settings',
-      icon: <Settings className="h-5 w-5" />,
-      onClick: () => setActiveSection('profile')
-    },
-    {
-      id: 'chat',
-      icon: <MessageCircle className="h-5 w-5" />,
-      onClick: () => setChatOpen(!chatOpen)
-    }
-  ];
-
-  const renderMainContent = () => {
-    switch (activeSection) {
-      case 'dashboard':
-        return <DashboardContent stats={stats} orders={orders} customerInfo={customerInfo} />;
-      case 'orders':
-        return <OrdersContent orders={orders} />;
-      case 'favorites':
-        return <FavoritesContent stats={stats} favorites={favorites} />;
-      case 'notifications':
-        return <NotificationsContent notifications={notifications} stats={stats} />;
-      case 'subscriptions':
-        return <div data-section="subscriptions"><SubscriptionsContent /></div>;
-      case 'referrals':
-        return <ReferralsContent />;
-      case 'downloads':
-        return <DownloadsContent />;
-      case 'profile':
-        return <div data-section="profile"><ProfileContent customerInfo={customerInfo} /></div>;
-      case 'support':
-        return <SupportContent />;
-      default:
-        return <DashboardContent stats={stats} orders={orders} customerInfo={customerInfo} />;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 flex relative overflow-hidden">
-      <style>{professionalStyles}</style>
-      {/* خلفية متحركة أنيقة */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-1/4 right-20 w-24 h-24 bg-gradient-to-r from-green-400/20 to-blue-400/20 rounded-full blur-lg animate-bounce" style={{animationDuration: '3s'}}></div>
-        <div className="absolute bottom-1/4 left-1/4 w-40 h-40 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute bottom-10 right-10 w-28 h-28 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-full blur-lg animate-bounce" style={{animationDuration: '4s'}}></div>
-      </div>
-      {/* الشريط الجانبي الرئيسي */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white shadow-lg transition-all duration-300 relative z-10`}>
-        {/* الهيدر مع الشعار المكبر */}
-        <div className="p-4 border-b bg-gradient-to-r from-primary/5 to-primary/10">
-          <div className="flex items-center justify-start ml-4">
-            <div className="relative group cursor-pointer">
-              <img
-                src="/eshro-new-logo.png"
-                alt="شعار إشرو"
-                className="w-24 h-24 object-contain transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-lg"
-                onClick={() => window.location.href = '/'}
-                style={{filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))'}}
-              />
-              <div className="absolute inset-0 bg-primary/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* معلومات المستخدم المحسنة */}
-        <div className="p-4 border-b bg-gradient-to-r from-green-50 to-blue-50">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              {(() => {
-                const savedImage = localStorage.getItem('userProfileImage');
-                return savedImage ? (
-                  <img
-                    src={savedImage}
-                    alt="صورة المستخدم"
-                    className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-lg"
-                  />
-                ) : (
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                    <span className="text-white font-bold text-lg animate-pulse">
-                      {customerInfo.name.charAt(0)}
-                    </span>
-                  </div>
-                );
-              })()}
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
-            </div>
-            {!sidebarCollapsed && (
-              <div className="flex-1 animate-fade-in">
-                <p className="font-bold text-lg text-gray-800 hover:text-primary transition-colors cursor-pointer">
-                  {customerInfo.name}
-                </p>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                    عضو نشط
-                  </span>
-                  <span className="text-xs text-gray-500">★ ★ ★ ★ ★</span>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* قائمة التنقل المحسنة مع العدادات */}
-        <nav className="p-4">
-          <div className="space-y-2">
-            {sidebarItems.map((item) => (
-              <Button
-                key={item.id}
-                variant={activeSection === item.id ? "default" : "ghost"}
-                className={`w-full justify-between relative ${
-                  sidebarCollapsed ? 'px-2' : ''
-                }`}
-                onClick={() => setActiveSection(item.id)}
-              >
-                <div className="flex items-center gap-3">
-                  {item.icon}
-                  {!sidebarCollapsed && <span>{item.label}</span>}
-                </div>
-                {!sidebarCollapsed && item.badge !== null && item.badge > 0 && (
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    activeSection === item.id
-                      ? 'bg-white/20 text-white'
-                      : 'bg-primary/10 text-primary'
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
-              </Button>
-            ))}
-          </div>
-        </nav>
-
-        {/* زر العودة للمنصة */}
-        <div className="p-4 mt-auto">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={onBack}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {!sidebarCollapsed && 'العودة للمنصة'}
-          </Button>
-        </div>
-      </div>
-
-      {/* المحتوى الرئيسي */}
-      <div className="flex-1 flex flex-col">
-        {/* الهيدر العلوي */}
-        <header className="bg-white shadow-sm border-b p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h1 className="text-xl font-bold text-gray-800">
-                {sidebarItems.find(item => item.id === activeSection)?.label}
-              </h1>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* القائمة المختصرة العلوية */}
-              <div className="hidden md:flex items-center gap-4">
-                {topSidebarItems.map((item) => (
-                  <div key={item.id} className="text-center">
-                    <div className={`p-2 rounded-lg ${item.color}`}>
-                      {item.icon}
-                    </div>
-                    <p className="text-xs text-gray-600 mt-1">{item.label}</p>
-                    <p className={`text-sm font-bold ${item.color}`}>{item.value}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* القائمة الجانبية اليمنى المحسنة */}
-              <div className="flex items-center gap-2">
-                {rightSidebarItems.map((item) => (
-                  <Button
-                    key={item.id}
-                    variant="ghost"
-                    size="sm"
-                    onClick={item.onClick}
-                    className="relative"
-                  >
-                    {item.icon}
-                    {item.badge !== undefined && item.badge > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">
-                        {item.badge}
-                      </span>
-                    )}
-                  </Button>
-                ))}
-                <Button variant="outline" size="sm" onClick={onLogout}>
-                  تسجيل الخروج
-                </Button>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* المحتوى */}
-        <main className="flex-1 p-6">
-          {renderMainContent()}
-        </main>
-      </div>
-
-      {/* لوحة الإشعارات المحسنة */}
-      {notificationsOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md max-h-[80vh] overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50 border-b">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <div className="relative">
-                    <Bell className="h-5 w-5 text-primary" />
-                    {notifications.filter(n => !n.read).length > 0 && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-                    )}
-                  </div>
-                  الإشعارات
-                  <span className="text-sm font-normal text-gray-500">
-                    ({notifications.filter(n => !n.read).length} جديدة)
-                  </span>
-                </CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setNotificationsOpen(false)}
-                >
-                  ✕
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0 max-h-96 overflow-auto">
-              <div className="divide-y">
-                {notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      !notification.read ? 'bg-blue-50/50 border-r-4 border-r-primary' : ''
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        notification.type === 'order' ? 'bg-blue-100 text-blue-600' :
-                        notification.type === 'delivery' ? 'bg-green-100 text-green-600' :
-                        notification.type === 'promotion' ? 'bg-purple-100 text-purple-600' :
-                        'bg-gray-100 text-gray-600'
-                      }`}>
-                        {notification.type === 'order' ? '📦' :
-                         notification.type === 'delivery' ? '🚚' :
-                         notification.type === 'promotion' ? '🎁' : 'ℹ️'}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <h4 className="font-semibold text-sm text-gray-900">
-                            {notification.title}
-                          </h4>
-                          {notification.urgent && (
-                            <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1"></span>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {notification.message}
-                        </p>
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs text-gray-500">
-                            {notification.time}
-                          </span>
-                          {!notification.read && (
-                            <span className="text-xs text-primary font-medium">
-                              جديدة
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {notifications.length === 0 && (
-                <div className="p-8 text-center">
-                  <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">لا توجد إشعارات حالياً</p>
-                </div>
-              )}
-            </CardContent>
-
-            {notifications.length > 0 && (
-              <div className="p-4 border-t bg-gray-50">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    // هنا يمكن إضافة منطق لتحديد جميع الإشعارات كمقروءة
-                    setNotificationsOpen(false);
-                  }}
-                >
-                  تحديد الكل كمقروء
-                </Button>
-              </div>
-            )}
-          </Card>
-        </div>
-      )}
-
-      {/* الشات بوت المتطور */}
-      {chatOpen && (
-        <div className="fixed bottom-4 right-4 w-80 h-96 bg-white shadow-2xl rounded-2xl flex flex-col z-50 border border-gray-200">
-          {/* هيدر الشات بوت */}
-          <div className="p-4 bg-gradient-to-r from-primary to-primary/90 text-white rounded-t-2xl">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <MessageCircle className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="font-bold">مساعد إشرو الذكي</h3>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <p className="text-xs opacity-90">متوفر الآن للمساعدة</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* منطقة الرسائل */}
-          <div className="flex-1 p-4 overflow-auto bg-gray-50">
-            <div className="space-y-4">
-              {/* رسالة ترحيب من البوت */}
-              <div className="flex gap-3">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-sm">🤖</span>
-                </div>
-                <div className="bg-white rounded-2xl rounded-tl-md p-3 shadow-sm max-w-xs">
-                  <p className="text-sm text-gray-800">
-                    مرحباً! أنا مساعد إشرو الذكي 🤖
-                    <br />
-                    كيف يمكنني مساعدتك اليوم؟
-                  </p>
-                  <p className="text-xs text-gray-500 mt-2">الآن</p>
-                </div>
-              </div>
-
-              {/* رسائل مقترحة */}
-              <div className="space-y-2">
-                <p className="text-xs text-gray-600 font-medium">رسائل مقترحة:</p>
-                <div className="grid grid-cols-1 gap-2">
-                  {[
-                    'كيفية تتبع طلبي؟',
-                    'سياسة الإرجاع',
-                    'طرق الدفع المتاحة',
-                    'تواصل مع الدعم الفني'
-                  ].map((suggestion, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      size="sm"
-                      className="justify-start text-right h-auto py-2 px-3 text-xs"
-                      onClick={() => {
-                        // هنا يمكن إضافة منطق للتعامل مع الرسائل المقترحة
-                      }}
-                    >
-                      {suggestion}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* منطقة إدخال الرسائل */}
-          <div className="p-4 border-t bg-white rounded-b-2xl">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="اكتب رسالتك هنا..."
-                className="flex-1 text-sm border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
-              <Button size="sm" className="rounded-full w-10 h-10 p-0">
-                <MessageCircle className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* خيارات سريعة */}
-            <div className="flex justify-center gap-2 mt-3">
-              <Button variant="ghost" size="sm" className="text-xs">
-                📞 اتصال هاتفي
-              </Button>
-              <Button variant="ghost" size="sm" className="text-xs">
-                📧 إرسال بريد إلكتروني
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// مكون لوحة المعلومات الرئيسية
-const DashboardContent: React.FC<any> = ({ stats, orders, customerInfo }) => {
-  return (
-    <div className="space-y-6">
-      {/* بطاقة الترحيب الديناصورية */}
-      <Card className="bg-gradient-to-r from-primary via-purple-600 to-blue-600 text-white relative overflow-hidden animate-pulse-slow neon-glow">
-        <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10 animate-shimmer"></div>
-        <CardContent className="p-8 relative z-10">
-          <div className="flex items-center justify-between">
-            <div className="animate-slide-in">
-              <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent">
-                أهلاً وسهلاً بك عزيزي المشترك 🌟✨
-              </h2>
-              <p className="text-white/90 text-lg">
-                نتمنى لك تجربة استثنائية معنا بمنصة إشرو الرائدة ✨
-              </p>
-              <div className="flex items-center gap-2 mt-3">
-                <div className="w-2 h-2 bg-yellow-300 rounded-full animate-bounce-custom"></div>
-                <span className="text-yellow-200 text-sm font-medium">متصل الآن</span>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center animate-rotate border-2 border-white/30">
-                <User className="h-10 w-10 text-white" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* الإحصائيات الشاملة والديناميكية مع تأثيرات ديناصورية */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="group hover:shadow-2xl transition-all duration-500 hover:scale-105 animate-fade-in glass-effect border-0 overflow-hidden relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardContent className="p-6 relative z-10">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl group-hover:animate-bounce-custom shadow-lg">
-                <Package className="h-7 w-7 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 group-hover:text-blue-600 transition-colors">إجمالي الطلبات</p>
-                <p className="text-3xl font-bold text-blue-600 group-hover:text-blue-700 transition-colors animate-pulse-slow">{stats.totalOrders}</p>
-                <p className="text-xs text-gray-500">طلب خلال الشهر الحالي</p>
-              </div>
-            </div>
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-blue-200/30 to-transparent rounded-full -translate-y-10 translate-x-10"></div>
-          </CardContent>
-        </Card>
-
-        <Card className="group hover:shadow-2xl transition-all duration-500 hover:scale-105 animate-fade-in glass-effect border-0 overflow-hidden relative" style={{animationDelay: '0.1s'}}>
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardContent className="p-6 relative z-10">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-green-400 to-green-600 rounded-xl group-hover:animate-bounce-custom shadow-lg">
-                <DollarSign className="h-7 w-7 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 group-hover:text-green-600 transition-colors">إجمالي المشتريات</p>
-                <p className="text-3xl font-bold text-green-600 group-hover:text-green-700 transition-colors animate-pulse-slow">{stats.totalSpent.toLocaleString()} د.ل</p>
-                <p className="text-xs text-gray-500">متوسط: {stats.avgOrderValue.toLocaleString()} د.ل</p>
-              </div>
-            </div>
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-green-200/30 to-transparent rounded-full -translate-y-10 translate-x-10"></div>
-          </CardContent>
-        </Card>
-
-        <Card className="group hover:shadow-2xl transition-all duration-500 hover:scale-105 animate-fade-in glass-effect border-0 overflow-hidden relative" style={{animationDelay: '0.2s'}}>
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardContent className="p-6 relative z-10">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl group-hover:animate-bounce-custom shadow-lg">
-                <Star className="h-7 w-7 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 group-hover:text-purple-600 transition-colors">المنتجات المفضلة</p>
-                <p className="text-3xl font-bold text-purple-600 group-hover:text-purple-700 transition-colors animate-pulse-slow">{stats.favoriteProducts}</p>
-                <p className="text-xs text-gray-500">تم إعجابك بها مؤخراً</p>
-              </div>
-            </div>
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-purple-200/30 to-transparent rounded-full -translate-y-10 translate-x-10"></div>
-          </CardContent>
-        </Card>
-
-        <Card className="group hover:shadow-2xl transition-all duration-500 hover:scale-105 animate-fade-in glass-effect border-0 overflow-hidden relative" style={{animationDelay: '0.3s'}}>
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardContent className="p-6 relative z-10">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl group-hover:animate-bounce-custom shadow-lg">
-                <Bell className="h-7 w-7 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-gray-600 group-hover:text-orange-600 transition-colors">الإشعارات</p>
-                <p className="text-3xl font-bold text-orange-600 group-hover:text-orange-700 transition-colors animate-pulse-slow">{stats.notificationsCount}</p>
-                <p className="text-xs text-gray-500">في انتظار المراجعة</p>
-              </div>
-            </div>
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-orange-200/30 to-transparent rounded-full -translate-y-10 translate-x-10"></div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* إحصائيات إضافية مفصلة */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-blue-600 font-medium">معدل النشاط</p>
-                <p className="text-2xl font-bold text-blue-800">{stats.activityRate}%</p>
-              </div>
-              <Activity className="h-8 w-8 text-blue-600" />
-            </div>
-            <div className="mt-2">
-              <div className="w-full bg-blue-200 rounded-full h-2">
-                <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${stats.activityRate}%` }}
-                ></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-green-600 font-medium">معدل الرضا</p>
-                <p className="text-2xl font-bold text-green-800">{stats.satisfactionRate}%</p>
-              </div>
-              <Award className="h-8 w-8 text-green-600" />
-            </div>
-            <div className="mt-2">
-              <div className="w-full bg-green-200 rounded-full h-2">
-                <div
-                  className="bg-green-600 h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${stats.satisfactionRate}%` }}
-                ></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-purple-600 font-medium">المشتريات الشهرية</p>
-                <p className="text-2xl font-bold text-purple-800">{stats.monthlySpending.toLocaleString()} د.ل</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-purple-600" />
-            </div>
-            <p className="text-xs text-purple-500 mt-2">هذا الشهر</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* الطلبات الأخيرة مع تفاصيل محسنة وصور المنتجات الحقيقية */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Package className="h-5 w-5 text-blue-600" />
-            </div>
-            الطلبات الأخيرة والتتبع
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="space-y-0">
-            {orders.slice(0, 3).map((order: any) => (
-              <div key={order.id} className="border-b last:border-b-0 hover:bg-gray-50 transition-colors">
-                <div className="p-4">
-                  {/* هيدر الطلب */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">{order.store.charAt(0)}</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-lg">{order.id}</p>
-                        <p className="text-sm text-gray-600">من متجر {order.store}</p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(order.orderTime).toLocaleDateString('ar')} - {new Date(order.orderTime).toLocaleTimeString('ar')}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-lg text-primary">{order.total.toLocaleString()} د.ل</p>
-                      <span className={`text-xs px-3 py-1 rounded-full font-medium ${
-                        order.status === 'مكتملة' ? 'bg-green-100 text-green-800' :
-                        order.status === 'قيد المراجعة' ? 'bg-orange-100 text-orange-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* معلومات التتبع */}
-                  <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="flex items-center gap-1">
-                        📦 {order.items} منتج
-                      </span>
-                      <span className="flex items-center gap-1">
-                        🚚 {order.trackingNumber}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500">متوقع التسليم: {order.estimatedDelivery}</p>
-                    </div>
-                  </div>
-
-                  {/* منتجات الطلب مع الصور والتفاصيل */}
-                  <div className="space-y-3">
-                    <p className="text-sm font-medium text-gray-700 mb-3">منتجات الطلب:</p>
-                    <div className="grid gap-3">
-                      {order.products.slice(0, 2).map((product: any, index: number) => (
-                        <div key={index} className="flex items-center gap-3 p-3 bg-white border rounded-lg hover:shadow-md transition-shadow">
-                          <div className="relative">
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="w-16 h-16 object-cover rounded-lg border-2 border-gray-100"
-                              onError={(e) => {
-                                e.currentTarget.src = '/assets/stores/1.webp';
-                              }}
-                            />
-                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-xs rounded-full flex items-center justify-center font-bold">
-                              {product.quantity}
-                            </div>
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-sm text-gray-900">{product.name}</h4>
-                            <p className="text-xs text-gray-600">ID: {product.id}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs bg-gray-100 px-2 py-1 rounded">المقاس: {product.size}</span>
-                              <span className="text-xs bg-gray-100 px-2 py-1 rounded">اللون: {product.color}</span>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold text-primary">{product.price.toLocaleString()} د.ل</p>
-                          </div>
-                        </div>
-                      ))}
-                      {order.products.length > 2 && (
-                        <div className="text-center py-2">
-                          <span className="text-sm text-primary font-medium hover:underline cursor-pointer">
-                            عرض {order.products.length - 2} منتجات أخرى
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* أزرار التحكم */}
-                  <div className="flex gap-2 mt-4 pt-3 border-t">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      تتبع الطلب
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      إعادة الطلب
-                    </Button>
-                    {order.status === 'مكتملة' && (
-                      <Button variant="outline" size="sm" className="flex-1">
-                        تقييم المنتجات
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {orders.length === 0 && (
-            <div className="text-center py-12">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="h-10 w-10 text-gray-400" />
-              </div>
-              <p className="text-gray-500 font-medium">لا توجد طلبات حالياً</p>
-              <p className="text-sm text-gray-400 mt-1">ابدأ التسوق لتظهر طلباتك هنا</p>
-              <Button className="mt-4">استكشف المنتجات</Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* قسم الأنشطة الحديثة */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5" />
-            الأنشطة الحديثة
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">تم تأكيد طلبك رقم ORD-001</p>
-                <p className="text-xs text-gray-500">منذ ساعتين</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <Star className="h-4 w-4 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">أضفت منتج جديد للمفضلة</p>
-                <p className="text-xs text-gray-500">منذ 4 ساعات</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
-              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                <Bell className="h-4 w-4 text-orange-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">لديك إشعار جديد من متجر نواعم</p>
-                <p className="text-xs text-gray-500">منذ يوم واحد</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-// مكون الطلبات
-const OrdersContent: React.FC<any> = ({ orders }) => {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>جميع الطلبات</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {orders.map((order: any) => (
-              <div key={order.id} className="border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h3 className="font-bold">{order.id}</h3>
-                    <p className="text-sm text-gray-600">{order.date}</p>
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-sm ${
-                    order.status === 'مكتملة' ? 'bg-green-100 text-green-800' :
-                    order.status === 'قيد المراجعة' ? 'bg-orange-100 text-orange-800' :
-                    'bg-blue-100 text-blue-800'
-                  }`}>
-                    {order.status}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600">{order.items} منتج من {order.store}</p>
-                  <p className="font-bold">{order.total.toLocaleString()} د.ل</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-// مكون الاشتراكات الشامل مع وسائل التواصل الاجتماعي والبريد الإلكتروني
-const SubscriptionsContent: React.FC = () => {
-  const [subscriptions, setSubscriptions] = useState({
-    email: true,
-    sms: false,
-    whatsapp: true,
-    socialMedia: {
-      facebook: false,
-      instagram: false,
-      stores: [
-        { id: 1, name: 'نواعم', facebook: 'https://www.facebook.com/aljumanforhejab/?locale=ar_AR', subscribed: false },
-        { id: 2, name: 'شيرين', facebook: 'https://www.facebook.com/sheirine.ly', subscribed: true },
-        { id: 3, name: 'دلتا ستور', facebook: 'https://www.facebook.com/detailssstore', subscribed: false },
-        { id: 4, name: 'بريتي', instagram: 'https://www.instagram.com/prettyshop_ly/', subscribed: true },
-        { id: 5, name: 'ماجنا', facebook: 'https://www.facebook.com/MagnaBeautyA', instagram: 'https://www.instagram.com/magna_beauty_a/', subscribed: false }
-      ]
-    }
-  });
-
-  const toggleSubscription = (type: string, value?: any) => {
-    setSubscriptions(prev => ({
-      ...prev,
-      [type]: value !== undefined ? value : !prev[type as keyof typeof prev]
-    }));
-  };
-
-  const toggleStoreSubscription = (storeId: number) => {
-    setSubscriptions(prev => ({
-      ...prev,
-      socialMedia: {
-        ...prev.socialMedia,
-        stores: prev.socialMedia.stores.map(store =>
-          store.id === storeId ? { ...store, subscribed: !store.subscribed } : store
-        )
+  const handleOrderFieldChange = (field: keyof NewOrderFormState, value: string | number) => {
+    setNewOrderForm((prev) => {
+      if (field === 'cityId') {
+        return { ...prev, cityId: value as string, areaId: '' };
       }
-    }));
+      if (field === 'quantity') {
+        const numeric = Number(value);
+        return { ...prev, quantity: Number.isNaN(numeric) || numeric <= 0 ? 1 : numeric };
+      }
+      return { ...prev, [field]: value };
+    });
   };
 
-  return (
+  const handleSubmitNewOrder = async () => {
+    setFormStatus({ type: null, message: '' });
+    if (!newOrderForm.productId) {
+      setFormStatus({ type: 'error', message: 'يرجى اختيار المنتج المطلوب.' });
+      return;
+    }
+    if (!newOrderForm.fullName.trim() || !newOrderForm.phone.trim() || !newOrderForm.cityId || !newOrderForm.areaId || !newOrderForm.address.trim()) {
+      setFormStatus({ type: 'error', message: 'يرجى استكمال بيانات الاتصال والعنوان.' });
+      return;
+    }
+    if (!newOrderForm.shippingOptionId || !newOrderForm.shippingCompany) {
+      setFormStatus({ type: 'error', message: 'يرجى اختيار طريقة الشحن وشركة التوصيل.' });
+      return;
+    }
+    const product = availableProducts.find((item) => item.id === Number(newOrderForm.productId));
+    if (!product) {
+      setFormStatus({ type: 'error', message: 'المنتج المحدد غير متاح حالياً.' });
+      return;
+    }
+    const latitudeValue = newOrderForm.latitude && newOrderForm.latitude.trim().length > 0 ? Number(newOrderForm.latitude) : undefined;
+    const longitudeValue = newOrderForm.longitude && newOrderForm.longitude.trim().length > 0 ? Number(newOrderForm.longitude) : undefined;
+    const notesValue = newOrderForm.notes.trim();
+    const payload: CreateOrderPayload = {
+      orderType: newOrderForm.orderType,
+      productId: product.id,
+      quantity: newOrderForm.quantity,
+      fullName: newOrderForm.fullName.trim(),
+      phone: newOrderForm.phone.trim(),
+      email: newOrderForm.email.trim(),
+      cityId: newOrderForm.cityId,
+      areaId: newOrderForm.areaId,
+      address: newOrderForm.address.trim(),
+      shippingOptionId: newOrderForm.shippingOptionId,
+      shippingCompany: newOrderForm.shippingCompany,
+      ...(latitudeValue !== undefined ? { latitude: latitudeValue } : {}),
+      ...(longitudeValue !== undefined ? { longitude: longitudeValue } : {}),
+      ...(notesValue.length > 0 ? { notes: notesValue } : {})
+    };
+    setIsSubmittingOrder(true);
+    try {
+      await Promise.resolve(onCreateOrder ? onCreateOrder(payload) : undefined);
+      setFormStatus({ type: 'success', message: 'تم إرسال الطلب للتاجر بنجاح! ستصلك تحديثات فور الرد.' });
+      setNewOrderForm(createNewOrderFormState(customerInfo));
+    } catch (error) {
+      setFormStatus({ type: 'error', message: 'تعذر إرسال الطلب حالياً. يرجى المحاولة مرة أخرى.' });
+    } finally {
+      setIsSubmittingOrder(false);
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      setAvatarPreview(result);
+      setProfileForm((prev) => ({ ...prev, avatar: result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleProfileSave = async () => {
+    setIsSavingProfile(true);
+    try {
+      const avatarValue = profileForm.avatar && profileForm.avatar.trim().length > 0 ? profileForm.avatar : avatarPreview;
+      const updated: CustomerInfo = {
+        ...customerInfo,
+        firstName: profileForm.firstName.trim(),
+        lastName: profileForm.lastName.trim(),
+        email: profileForm.email.trim(),
+        phone: profileForm.phone.trim(),
+        birthDate: profileForm.birthDate,
+        city: profileForm.city,
+        area: profileForm.area,
+        address: profileForm.address.trim(),
+        bankName: profileForm.bankName,
+        bankAccount: profileForm.bankAccount.trim(),
+        bankAccountHolder: profileForm.bankAccountHolder.trim(),
+        ...(avatarValue ? { avatar: avatarValue } : {})
+      };
+      onUpdateProfile?.(updated);
+      setIsSavingProfile(false);
+    } catch (error) {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handlePasswordSave = async () => {
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      return;
+    }
+    setIsSavingPassword(true);
+    try {
+      await Promise.resolve(onPasswordChange ? onPasswordChange({ currentPassword: passwordForm.currentPassword, newPassword: passwordForm.newPassword }) : undefined);
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      setIsSavingPassword(false);
+      return;
+    }
+    setIsSavingPassword(false);
+  };
+
+  const handleCopyReferral = () => {
+    const base = customerInfo.email ? customerInfo.email.split('@')[0] : 'eshro-user';
+    const referralLink = `https://eshro.ly/invite/${base}`;
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(referralLink).catch(() => undefined);
+    }
+  };
+
+  const handleDownloadInvoice = (order: OrderRecord) => {
+    const payload = {
+      id: order.id,
+      date: order.date || new Date().toISOString(),
+      status: getStatusDetails(order.status).label,
+      total: getOrderTotal(order),
+      items: order.items?.map((item) => ({
+        name: item?.name || item?.product?.name || 'منتج',
+        quantity: item?.quantity ?? 1,
+        price: item?.price ?? item?.product?.price ?? 0
+      })) || []
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `eshro-order-${order.id}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSupportRedirect = (url: string) => {
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const renderDashboardSection = () => (
     <div className="space-y-6">
-      {/* إشعارات المنصة */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Bell className="h-5 w-5 text-green-600" />
+      <Card className="relative overflow-hidden bg-gradient-to-br from-primary via-purple-500 to-pink-500 text-white">
+        <CardContent className="relative z-10 flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="flex items-center gap-3 text-sm text-white/80">
+              <Sparkles className="h-5 w-5" />
+              <span>أهلاً وسهلاً بك يا {customerInfo.name?.split(' ')[0] || 'صديقنا'} 🎉✨</span>
             </div>
-            إشعارات منصة إشرو
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Mail className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">البريد الإلكتروني</h3>
-                  <p className="text-sm text-gray-600">احصل على آخر المنتجات والعروض عبر البريد الإلكتروني</p>
-                </div>
-              </div>
-              <Button
-                variant={subscriptions.email ? "default" : "outline"}
-                onClick={() => toggleSubscription('email')}
-                className={subscriptions.email ? 'bg-green-600 hover:bg-green-700' : ''}
-              >
-                {subscriptions.email ? 'مشترك' : 'اشتراك'}
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">رسائل SMS</h3>
-                  <p className="text-sm text-gray-600">تلقي التحديثات المهمة عبر الرسائل النصية</p>
-                </div>
-              </div>
-              <Button
-                variant={subscriptions.sms ? "default" : "outline"}
-                onClick={() => toggleSubscription('sms')}
-                className={subscriptions.sms ? 'bg-green-600 hover:bg-green-700' : ''}
-              >
-                {subscriptions.sms ? 'مشترك' : 'اشتراك'}
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Phone className="h-5 w-5 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">واتساب</h3>
-                  <p className="text-sm text-gray-600">احصل على أحدث العروض والمنتجات عبر واتساب</p>
-                </div>
-              </div>
-              <Button
-                variant={subscriptions.whatsapp ? "default" : "outline"}
-                onClick={() => toggleSubscription('whatsapp')}
-                className={subscriptions.whatsapp ? 'bg-green-600 hover:bg-green-700' : ''}
-              >
-                {subscriptions.whatsapp ? 'مشترك' : 'اشتراك'}
-              </Button>
+            <h1 className="mt-4 text-3xl font-extrabold">مرحباً بك في عالم إشرو السحري - منصة التجارة الإلكترونية الأولى في ليبيا 🚀</h1>
+            <p className="mt-3 text-white/80">🏆 {metrics.membershipTier} ⭐ نقاط الولاء: {formatNumber(metrics.loyaltyPoints)}</p>
+            <div className="mt-6 flex flex-wrap items-center gap-4">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm">هدفك الشهري {metrics.monthlyProgress}% مكتمل - استمر! 💪</span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm">مستواك الحالي {metrics.membershipTier} 👑</span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm">🏆 إنجازات رائعة!</span>
             </div>
           </div>
+          <div className="flex flex-col items-center gap-4 rounded-2xl bg-white/15 p-6 backdrop-blur">
+            {resolvedAvatar ? (
+              <img src={resolvedAvatar} alt="صورة المستخدم" className="h-20 w-20 rounded-full border-2 border-white object-cover shadow-lg" />
+            ) : (
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 text-3xl font-bold text-white">
+                {customerInfo.name?.charAt(0) || 'ن'}
+              </div>
+            )}
+            <div className="text-sm text-white/70">عضو منذ</div>
+            <div className="text-2xl font-bold">{metrics.joinDate.toLocaleDateString('ar-LY', { month: 'long', year: 'numeric' })}</div>
+            <div className="text-sm text-white/70">⏰ {formatNumber(Math.max(1, Math.round((Date.now() - metrics.joinDate.getTime()) / (30 * 24 * 60 * 60 * 1000))))} أشهر من المتعة</div>
+            <Button variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20" onClick={() => setActiveSection('orders')}>عرض الطلبات</Button>
+          </div>
         </CardContent>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.25),transparent_55%)]" />
       </Card>
 
-      {/* اشتراكات وسائل التواصل الاجتماعي للمتاجر */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Users className="h-5 w-5 text-purple-600" />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Card
+          onClick={() => {
+            setActiveSection('orders');
+            setActiveOrdersView('completed');
+          }}
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              setActiveSection('orders');
+              setActiveOrdersView('completed');
+            }
+          }}
+          className="border-transparent bg-gradient-to-br from-white to-primary/5 shadow-lg transition hover:-translate-y-1 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 cursor-pointer"
+        >
+          <CardContent className="space-y-4 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">إجمالي الطلبات</p>
+                <h3 className="mt-2 text-3xl font-black text-primary">{formatNumber(metrics.totalOrders)}</h3>
+              </div>
+              <div className="rounded-full bg-primary/10 p-3 text-primary">
+                <Package className="h-6 w-6" />
+              </div>
             </div>
-            اشتراكات متاجر وسائل التواصل الاجتماعي
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            {subscriptions.socialMedia.stores.map((store) => (
-              <div key={store.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold">{store.name.charAt(0)}</span>
-                    </div>
+            <div className="flex items-center gap-2 text-sm text-primary">
+              <ArrowUpBadge />
+              <span>+{formatNumber(metrics.deliveredOrders)} هذا الشهر</span>
+            </div>
+          </CardContent>
+        </Card>
+        <Card
+          onClick={() => {
+            setActiveSection('orders');
+            setActiveOrdersView('favorites');
+          }}
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              setActiveSection('orders');
+              setActiveOrdersView('favorites');
+            }
+          }}
+          className="border-transparent bg-gradient-to-br from-white to-emerald-50 shadow-lg transition hover:-translate-y-1 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 cursor-pointer"
+        >
+          <CardContent className="space-y-4 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">إجمالي المبلغ</p>
+                <h3 className="mt-2 text-3xl font-black text-emerald-600">{formatCurrency(metrics.totalSpent)}</h3>
+              </div>
+              <div className="rounded-full bg-emerald-100 p-3 text-emerald-600">
+                <Wallet className="h-6 w-6" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-emerald-600">
+              <ArrowUpBadge />
+              <span>+23% من الشهر الماضي</span>
+            </div>
+          </CardContent>
+        </Card>
+        <Card
+          onClick={() => {
+            setActiveSection('orders');
+            setActiveOrdersView('pending');
+          }}
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              setActiveSection('orders');
+              setActiveOrdersView('pending');
+            }
+          }}
+          className="border-transparent bg-gradient-to-br from-white to-amber-50 shadow-lg transition hover:-translate-y-1 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 cursor-pointer"
+        >
+          <CardContent className="space-y-4 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">النقاط المكتسبة</p>
+                <h3 className="mt-2 text-3xl font-black text-amber-600">{formatNumber(metrics.loyaltyPoints)}</h3>
+              </div>
+              <div className="rounded-full bg-amber-100 p-3 text-amber-500">
+                <Trophy className="h-6 w-6" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-amber-600">
+              <Star className="h-4 w-4" />
+              <span>+{formatNumber(metrics.loyaltyGain)} نقطة جديدة</span>
+            </div>
+          </CardContent>
+        </Card>
+        <Card
+          onClick={() => {
+            setActiveSection('orders');
+            setActiveOrdersView('unavailable');
+          }}
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              setActiveSection('orders');
+              setActiveOrdersView('unavailable');
+            }
+          }}
+          className="border-transparent bg-gradient-to-br from-white to-pink-50 shadow-lg transition hover:-translate-y-1 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 cursor-pointer"
+        >
+          <CardContent className="space-y-4 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">أصدقاء التقييم</p>
+                <h3 className="mt-2 text-3xl font-black text-pink-600">{formatNumber(metrics.newFriends)}</h3>
+              </div>
+              <div className="rounded-full bg-pink-100 p-3 text-pink-500">
+                <Users className="h-6 w-6" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-pink-600">
+              <ArrowUpBadge />
+              <span>+3 أصدقاء جدد</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>الطلبات الأخيرة</span>
+              <Button variant="ghost" size="sm" onClick={() => setActiveSection('orders')}>عرض جميع الطلبات</Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {metrics.recentOrders.length === 0 && <div className="rounded-lg bg-gray-50 p-6 text-center text-gray-500">لا توجد طلبات حديثة حتى الآن.</div>}
+            {metrics.recentOrders.map((order, index) => {
+              const statusDetails = getStatusDetails(order.status);
+              return (
+                <div key={order.id} className="flex flex-col gap-3 rounded-xl border p-4 md:flex-row md:items-center md:justify-between md:gap-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">{index + 1}</div>
                     <div>
-                      <h3 className="font-bold text-lg">{store.name}</h3>
-                      <p className="text-sm text-gray-600">متجر متخصص في المنتجات الراقية</p>
+                      <p className="text-sm text-gray-500">طلب #{order.id}</p>
+                      <p className="text-base font-semibold text-gray-800">{order.items?.[0]?.name || order.items?.[0]?.product?.name || 'منتج من متاجر إشرو'}</p>
+                      <p className="text-sm text-gray-500">{formatCurrency(getOrderTotal(order))}</p>
                     </div>
                   </div>
-                  <Button
-                    variant={store.subscribed ? "default" : "outline"}
-                    onClick={() => toggleStoreSubscription(store.id)}
-                    className={store.subscribed ? 'bg-green-600 hover:bg-green-700' : ''}
-                  >
-                    {store.subscribed ? 'مشترك' : 'اشتراك'}
-                  </Button>
-                </div>
-
-                <div className="flex gap-3">
-                  {store.facebook && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => window.open(store.facebook, '_blank')}
-                    >
-                      <span className="ml-2">📘</span>
-                      فيسبوك
-                    </Button>
-                  )}
-                  {store.instagram && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => window.open(store.instagram, '_blank')}
-                    >
-                      <span className="ml-2">📷</span>
-                      إنستغرام
-                    </Button>
-                  )}
-                </div>
-
-                {store.subscribed && (
-                  <div className="mt-3 p-3 bg-green-50 rounded-lg">
-                    <p className="text-sm text-green-700">
-                      ✅ مشترك في متجر {store.name} - ستتلقى آخر التحديثات من منتجاتهم الجديدة
-                    </p>
+                  <div className="flex flex-col items-start gap-2 md:items-end">
+                    <span className={`rounded-full px-3 py-1 text-sm ${statusDetails.tone}`}>{statusDetails.label}</span>
+                    <span className="text-sm text-gray-500">{parseOrderDate(order).toLocaleDateString('ar-LY', { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
 
-      {/* إحصائيات الاشتراكات */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Activity className="h-5 w-5 text-blue-600" />
+        <Card>
+          <CardHeader>
+            <CardTitle>نشاط الحساب</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>مستوى النشاط</span>
+                <span>{metrics.loyaltyLevel}</span>
+              </div>
+              <div className="h-2 rounded-full bg-gray-100">
+                <div className="h-2 rounded-full bg-primary" style={{ width: `${metrics.monthlyProgress}%` }} />
+              </div>
             </div>
-            إحصائيات اشتراكاتك
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">
-                {subscriptions.socialMedia.stores.filter(s => s.subscribed).length}
-              </p>
-              <p className="text-sm text-gray-600">متاجر مشترك بها</p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>إكمال الملف الشخصي</span>
+                <span>{computeProfileCompletion(profileForm)}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-gray-100">
+                <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${computeProfileCompletion(profileForm)}%` }} />
+              </div>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <p className="text-2xl font-bold text-green-600">
-                {Object.values(subscriptions).filter(v => typeof v === 'boolean' && v).length}
-              </p>
-              <p className="text-sm text-gray-600">خدمات نشطة</p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>مستوى الولاء</span>
+                <span>{formatNumber(metrics.loyaltyPoints)}</span>
+              </div>
+              <div className="h-2 rounded-full bg-gray-100">
+                <div className="h-2 rounded-full bg-amber-500" style={{ width: `${Math.min(100, metrics.loyaltyPoints / 1200 * 100)}%` }} />
+              </div>
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <p className="text-2xl font-bold text-purple-600">
-                {subscriptions.socialMedia.stores.filter(s => s.facebook || s.instagram).length}
-              </p>
-              <p className="text-sm text-gray-600">حسابات متاحة</p>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="rounded-xl bg-gray-50 p-4">
+                <p className="text-sm text-gray-500">أيام نشطة</p>
+                <p className="mt-2 text-2xl font-bold text-gray-800">{formatNumber(metrics.activeDays)}</p>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <p className="text-sm text-gray-500">معدل الرضا</p>
+                <p className="mt-2 text-2xl font-bold text-gray-800">{Math.min(100, Math.round(metrics.satisfaction))}%</p>
+              </div>
+              <div className="rounded-xl bg-gray-50 p-4">
+                <p className="text-sm text-gray-500">الطلبات المعلقة</p>
+                <p className="mt-2 text-2xl font-bold text-gray-800">{formatNumber(metrics.pendingOrders)}</p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
-};
 
-// مكون الإحالات الشامل مع الإحصائيات والمكافآت
-const ReferralsContent: React.FC = () => {
-  const [referralData, setReferralData] = useState({
-    referralLink: 'https://eshro.ly/invite/1',
-    invitedFriends: 8,
-    joinedFriends: 5,
-    totalPoints: 750,
-    availableRewards: 1250,
-    recentReferrals: [
-      { id: 1, name: 'أحمد محمد', status: 'انضم', date: '2024-01-10', points: 150 },
-      { id: 2, name: 'فاطمة علي', status: 'انضم', date: '2024-01-08', points: 150 },
-      { id: 3, name: 'محمد سالم', status: 'دعوة مرسلة', date: '2024-01-07', points: 0 },
-      { id: 4, name: 'نور حسن', status: 'انضم', date: '2024-01-05', points: 150 },
-      { id: 5, name: 'علي محمود', status: 'دعوة مرسلة', date: '2024-01-03', points: 0 }
-    ]
-  });
-
-  const copyReferralLink = () => {
-    navigator.clipboard.writeText(referralData.referralLink);
-    // يمكن إضافة notification هنا
-  };
-
-  const shareViaWhatsApp = () => {
-    const message = `انضم لمنصة إشرو واحصل على أفضل المنتجات! استخدم رابط الإحالة الخاص بي: ${referralData.referralLink}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* بطاقة برنامج الإحالات الرئيسية */}
-      <Card className="overflow-hidden bg-gradient-to-br from-green-50 to-blue-50">
-        <CardContent className="p-8">
-          <div className="text-center mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Users className="h-10 w-10 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">برنامج الإحالات</h2>
-            <p className="text-gray-600">ادعُ أصدقاءك واكسب مكافآت رائعة</p>
+  const renderOrderSection = () => {
+    const completedOrders = orders.filter((order) => {
+      const status = order.status ? order.status.toLowerCase() : '';
+      return status === 'delivered' || status === 'completed';
+    });
+    const pendingOrdersList = orders.filter((order) => {
+      const status = order.status ? order.status.toLowerCase() : '';
+      return status === 'pending' || status === 'processing' || status === 'confirmed';
+    });
+    const overviewTitle: Record<typeof activeOrdersView, string> = {
+      favorites: 'المنتجات في قائمة المفضلة',
+      unavailable: 'طلبات التنبيه عند التوفر',
+      completed: 'المشتريات المكتملة',
+      pending: 'طلبات قيد المتابعة'
+    };
+    const overviewDescription: Record<typeof activeOrdersView, string> = {
+      favorites: 'كل المنتجات التي أضفتها للمفضلة تظهر هنا لسهولة الوصول إليها.',
+      unavailable: 'طلبات التنبيه يتم تحديثها فور توفر المنتجات من متاجرك المفضلة.',
+      completed: 'كل عمليات الشراء الناجحة مع تفاصيل المنتجات والتكلفة الكلية.',
+      pending: 'الطلبات التي ما زالت قيد المعالجة أو بانتظار تأكيد التاجر.'
+    };
+    const renderOverviewContent = () => {
+      if (activeOrdersView === 'favorites') {
+        if (favorites.length === 0) {
+          return <div className="rounded-xl bg-gray-50 p-6 text-center text-gray-500">لا توجد منتجات مضافة للمفضلة حالياً.</div>;
+        }
+        return (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {favorites.map((product) => {
+              const image = resolveProductImage(product);
+              return (
+                <div key={product.id || product.name} className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white/70 p-4 shadow-sm">
+                  <div className="h-16 w-16 overflow-hidden rounded-xl bg-gray-100">
+                    {image ? (
+                      <img src={image} alt={product.name || 'منتج'} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-sm text-gray-500">بدون صورة</div>
+                    )}
+                  </div>
+                  <div className="flex-1 text-right">
+                    <p className="text-sm font-semibold text-gray-900">{product.name || product.product?.name || 'منتج من متاجر إشرو'}</p>
+                    <p className="text-xs text-gray-500">{formatCurrency(product.price ?? product.product?.price ?? 0)}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="text-center p-4 bg-white/70 rounded-lg backdrop-blur-sm">
-              <p className="text-3xl font-bold text-green-600">{referralData.totalPoints}</p>
-              <p className="text-sm text-gray-600">نقاط مكافآت</p>
-            </div>
-            <div className="text-center p-4 bg-white/70 rounded-lg backdrop-blur-sm">
-              <p className="text-3xl font-bold text-blue-600">{referralData.joinedFriends}</p>
-              <p className="text-sm text-gray-600">انضموا بالفعل</p>
-            </div>
-            <div className="text-center p-4 bg-white/70 rounded-lg backdrop-blur-sm">
-              <p className="text-3xl font-bold text-purple-600">{referralData.invitedFriends}</p>
-              <p className="text-sm text-gray-600">أصدقاء مدعوين</p>
-            </div>
+        );
+      }
+      if (activeOrdersView === 'unavailable') {
+        if (unavailableItems.length === 0) {
+          return <div className="rounded-xl bg-gray-50 p-6 text-center text-gray-500">لا توجد طلبات تنبيه حالياً.</div>;
+        }
+        return (
+          <div className="space-y-3">
+            {unavailableItems.map((item, index) => {
+              const image = resolveProductImage(item);
+              return (
+                <div key={item.id || `${item.name}-${index}`} className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white/70 p-4 shadow-sm">
+                  <div className="h-16 w-16 overflow-hidden rounded-xl bg-gray-100">
+                    {image ? <img src={image} alt={item.name || 'منتج غير متوفر'} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center text-sm text-gray-500">قريباً</div>}
+                  </div>
+                  <div className="flex-1 text-right">
+                    <p className="text-sm font-semibold text-gray-900">{item.name || item.product?.name || 'منتج غير متوفر'}</p>
+                    <p className="text-xs text-gray-500">تم طلب التنبيه في {item.requestedAt ? new Date(item.requestedAt).toLocaleDateString('ar-LY') : 'تاريخ غير محدد'}</p>
+                    {item.notificationData?.note && <p className="text-xs text-gray-500">ملاحظة: {item.notificationData.note}</p>}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-
-          <div className="bg-white/80 rounded-lg p-4 backdrop-blur-sm">
-            <p className="font-semibold text-gray-800 mb-2">رابط الإحالة الخاص بك:</p>
-            <div className="flex gap-2">
-              <div className="flex-1 p-3 bg-gray-50 rounded-lg border">
-                <p className="text-sm font-mono text-gray-700 break-all">{referralData.referralLink}</p>
+        );
+      }
+      if (activeOrdersView === 'completed') {
+        if (completedOrders.length === 0) {
+          return <div className="rounded-xl bg-gray-50 p-6 text-center text-gray-500">لا توجد مشتريات مكتملة بعد.</div>;
+        }
+        return (
+          <div className="space-y-3">
+            {completedOrders.map((order) => {
+              const firstItem = order.items?.[0];
+              const image = resolveProductImage(firstItem?.product || firstItem);
+              return (
+                <div key={order.id} className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white/70 p-4 shadow-sm">
+                  <div className="h-16 w-16 overflow-hidden rounded-xl bg-gray-100">
+                    {image ? <img src={image} alt={firstItem?.name || 'منتج'} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center text-sm text-gray-500">منتج</div>}
+                  </div>
+                  <div className="flex-1 text-right">
+                    <p className="text-sm font-semibold text-gray-900">طلب #{order.id}</p>
+                    <p className="text-xs text-gray-500">{firstItem?.name || firstItem?.product?.name || 'منتج من متاجر إشرو'}</p>
+                    <p className="text-xs text-gray-500">التكلفة الإجمالية: {formatCurrency(getOrderTotal(order))}</p>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs text-emerald-700">مكتمل</span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      }
+      if (pendingOrdersList.length === 0) {
+        return <div className="rounded-xl bg-gray-50 p-6 text-center text-gray-500">لا توجد طلبات قيد المتابعة حالياً.</div>;
+      }
+      return (
+        <div className="space-y-3">
+          {pendingOrdersList.map((order) => {
+            const firstItem = order.items?.[0];
+            const image = resolveProductImage(firstItem?.product || firstItem);
+            const status = getStatusDetails(order.status);
+            return (
+              <div key={order.id} className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white/70 p-4 shadow-sm">
+                <div className="h-16 w-16 overflow-hidden rounded-xl bg-gray-100">
+                  {image ? <img src={image} alt={firstItem?.name || 'منتج'} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center text-sm text-gray-500">منتج</div>}
+                </div>
+                <div className="flex-1 text-right">
+                  <p className="text-sm font-semibold text-gray-900">طلب #{order.id}</p>
+                  <p className="text-xs text-gray-500">{firstItem?.name || firstItem?.product?.name || 'منتج من متاجر إشرو'}</p>
+                  <p className="text-xs text-gray-500">تاريخ الطلب: {parseOrderDate(order).toLocaleDateString('ar-LY')}</p>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-medium ${status.tone}`}>{status.label}</span>
               </div>
-              <Button onClick={copyReferralLink} className="px-6">
+            );
+          })}
+        </div>
+      );
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <InfoStatCard
+            title="طلبات المفضلة"
+            value={metrics.favoritesCount}
+            subtitle="منتجات في قائمة المفضلة"
+            tone="primary"
+            onClick={() => setActiveOrdersView('favorites')}
+            isActive={activeOrdersView === 'favorites'}
+          />
+          <InfoStatCard
+            title="طلبات غير متوفرة"
+            value={metrics.unavailableCount}
+            subtitle="طلبات نبهني عند التوفر"
+            tone="rose"
+            onClick={() => setActiveOrdersView('unavailable')}
+            isActive={activeOrdersView === 'unavailable'}
+          />
+          <InfoStatCard
+            title="المشتريات"
+            value={metrics.totalOrders}
+            subtitle="عملية شراء مكتملة"
+            tone="emerald"
+            onClick={() => setActiveOrdersView('completed')}
+            isActive={activeOrdersView === 'completed'}
+          />
+          <InfoStatCard
+            title="طلبات قيد المتابعة"
+            value={metrics.pendingOrders}
+            subtitle="بانتظار الإجراء"
+            tone="amber"
+            onClick={() => setActiveOrdersView('pending')}
+            isActive={activeOrdersView === 'pending'}
+          />
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{overviewTitle[activeOrdersView]}</CardTitle>
+            <p className="text-sm text-gray-500">{overviewDescription[activeOrdersView]}</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {renderOverviewContent()}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <span>طلب جديد</span>
+              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-primary"><Check className="h-4 w-4" /> إيصال الطلب للتاجر آلياً</span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-600"><Clock className="h-4 w-4" /> استجابة خلال دقائق</span>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 lg:grid-cols-4">
+              <div className="col-span-4 flex flex-wrap items-center gap-3 rounded-2xl bg-gray-50 p-4">
+                <Button variant={newOrderForm.orderType === 'normal' ? 'default' : 'outline'} className="px-6" onClick={() => handleOrderFieldChange('orderType', 'normal')}>عادي</Button>
+                <Button variant={newOrderForm.orderType === 'urgent' ? 'default' : 'outline'} className="px-6" onClick={() => handleOrderFieldChange('orderType', 'urgent')}>عاجل</Button>
+                <span className="text-sm text-gray-600">اختر نوع الطلب لتحديد خيارات الشحن المناسبة</span>
+              </div>
+              <div className="lg:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">نوع المنتج</label>
+                <Select value={newOrderForm.productId} onValueChange={(value) => handleOrderFieldChange('productId', value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="اختر المنتج" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableProducts.map((product) => (
+                      <SelectItem key={product.id} value={product.id.toString()}>{`${product.name} • متجر ${product.storeId}`}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">الكمية</label>
+                <Input type="number" min={1} value={newOrderForm.quantity} onChange={(event) => handleOrderFieldChange('quantity', event.target.value)} className="text-right" />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">الاسم بالكامل</label>
+                <Input value={newOrderForm.fullName} onChange={(event) => handleOrderFieldChange('fullName', event.target.value)} className="text-right" placeholder="محمد أحمد" />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">رقم الموبايل</label>
+                <Input value={newOrderForm.phone} onChange={(event) => handleOrderFieldChange('phone', event.target.value)} className="text-right" placeholder="09XXXXXXXX" />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">البريد الإلكتروني</label>
+                <Input value={newOrderForm.email} onChange={(event) => handleOrderFieldChange('email', event.target.value)} className="text-right" placeholder="user@eshro.ly" />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">المدينة</label>
+                <Select value={newOrderForm.cityId} onValueChange={(value) => handleOrderFieldChange('cityId', value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="اختر المدينة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {libyanCities.map((city) => (
+                      <SelectItem key={city.id} value={city.id}>{city.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">المنطقة</label>
+                <Select value={newOrderForm.areaId} onValueChange={(value) => handleOrderFieldChange('areaId', value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="اختر المنطقة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cityAreas.map((area) => (
+                      <SelectItem key={area.id} value={area.id}>{area.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="lg:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">العنوان التفصيلي</label>
+                <Input value={newOrderForm.address} onChange={(event) => handleOrderFieldChange('address', event.target.value)} className="text-right" placeholder="المدينة، المنطقة، وصف دقيق للموقع" />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">إحداثيات الموقع (خط العرض)</label>
+                <Input value={newOrderForm.latitude} onChange={(event) => handleOrderFieldChange('latitude', event.target.value)} className="text-right" placeholder="32.123456" />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">إحداثيات الموقع (خط الطول)</label>
+                <Input value={newOrderForm.longitude} onChange={(event) => handleOrderFieldChange('longitude', event.target.value)} className="text-right" placeholder="13.123456" />
+              </div>
+              <div className="lg:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">طريقة الشحن والتوصيل</label>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {shippingOptions
+                    .filter((option) => (newOrderForm.orderType === 'urgent' ? option.speed === 'express' || option.speed === 'normal' : option.speed === 'normal'))
+                    .map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => handleOrderFieldChange('shippingOptionId', option.id)}
+                        className={`flex flex-col gap-2 rounded-xl border p-4 text-right transition ${
+                          newOrderForm.shippingOptionId === option.id ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 hover:border-primary/40'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <span>{option.duration}</span>
+                          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">{option.speed === 'express' ? '⚡ سريع' : '📦 عادي'}</span>
+                        </div>
+                        <div className="text-base font-semibold text-gray-800">{option.label}</div>
+                        <div className="text-sm text-gray-500">{option.priceRange}</div>
+                      </button>
+                    ))}
+                </div>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">شركة الشحن</label>
+                <Select value={newOrderForm.shippingCompany} onValueChange={(value) => handleOrderFieldChange('shippingCompany', value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="اختر شركة الشحن" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shippingCompanies.map((company) => (
+                      <SelectItem key={company} value={company}>{company}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="lg:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700">ملاحظات إضافية</label>
+                <Textarea value={newOrderForm.notes} onChange={(event) => handleOrderFieldChange('notes', event.target.value)} rows={4} placeholder="أي تفاصيل إضافية تساعد التاجر على تلبية طلبك" />
+              </div>
+            </div>
+            {formStatus.message && (
+              <div className={`rounded-xl px-4 py-3 text-sm ${formStatus.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600'}`}>
+                {formStatus.message}
+              </div>
+            )}
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={handleSubmitNewOrder} disabled={isSubmittingOrder} className="min-w-[160px]">
+                {isSubmittingOrder ? 'جاري الإرسال...' : 'إرسال الطلب'}
+              </Button>
+              <Button variant="outline" onClick={() => setNewOrderForm(createNewOrderFormState(customerInfo))} className="min-w-[160px]">إلغاء</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>قائمة الطلبات</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {orders.length === 0 && <div className="rounded-xl bg-gray-50 p-6 text-center text-gray-500">لم تقم بإنشاء طلبات بعد. ابدأ رحلتك الآن!</div>}
+            {orders.map((order) => {
+              const status = getStatusDetails(order.status);
+              return (
+                <div key={order.id} className="grid gap-4 rounded-2xl border p-4 md:grid-cols-4">
+                  <div>
+                    <p className="text-sm text-gray-500">الطلب</p>
+                    <p className="mt-1 text-base font-semibold text-gray-900">#{order.id}</p>
+                    <p className="text-sm text-gray-500">{parseOrderDate(order).toLocaleDateString('ar-LY')}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">المنتج</p>
+                    <p className="mt-1 text-base font-semibold text-gray-900">{order.items?.[0]?.name || order.items?.[0]?.product?.name || 'منتج متنوع'}</p>
+                    <p className="text-sm text-gray-500">الكمية {order.items?.[0]?.quantity ?? 1}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">إجمالي المبلغ</p>
+                    <p className="mt-1 text-base font-semibold text-gray-900">{formatCurrency(getOrderTotal(order))}</p>
+                  </div>
+                  <div className="flex flex-col justify-between gap-3">
+                    <span className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium ${status.tone}`}>{status.label}</span>
+                    <Button variant="outline" onClick={() => handleDownloadInvoice(order)}>تحميل الفاتورة</Button>
+                  </div>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  const renderSubscriptionsSection = () => {
+    const platforms = [
+      { name: 'فيس بوك', description: 'تابع آخر العروض من متاجرك المفضلة', color: 'from-blue-500 to-indigo-500', url: 'https://www.facebook.com/eshro.ly' },
+      { name: 'واتساب', description: 'استقبل التنبيهات الفورية عبر الواتساب', color: 'from-emerald-500 to-green-500', url: 'https://wa.me/218944062927' },
+      { name: 'تويتر', description: 'تابع أخبار إشرو السريعة', color: 'from-sky-500 to-blue-500', url: 'https://twitter.com' },
+      { name: 'سناب شات', description: 'لقطات حية للمنتجات الجديدة', color: 'from-yellow-400 to-orange-500', url: 'https://www.snapchat.com' },
+      { name: 'تيك توك', description: 'فيديوهات ممتعة لعروض لا تفوت', color: 'from-pink-500 to-purple-600', url: 'https://www.tiktok.com' }
+    ];
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>اشترك في تحديثات المتاجر</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-2">
+            {platforms.map((platform) => (
+              <div key={platform.name} className={`relative overflow-hidden rounded-2xl border bg-gradient-to-br ${platform.color} text-white shadow-lg`}>
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="relative flex flex-col gap-3 p-6">
+                  <span className="text-sm text-white/70">قنوات رسمية لإشرو</span>
+                  <h3 className="text-2xl font-bold">{platform.name}</h3>
+                  <p className="text-sm text-white/85">{platform.description}</p>
+                  <Button variant="outline" className="w-fit border-white/60 bg-white/10 text-white hover:bg-white/20" onClick={() => handleSupportRedirect(platform.url)}>اشترك الآن</Button>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  const renderReferralsSection = () => (
+    <div className="space-y-6">
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-primary to-purple-600 text-white">
+          <CardTitle className="flex flex-col gap-2">
+            <span>برنامج الإحالات</span>
+            <span className="text-sm text-white/80">ادع أصدقاءك واكسب مكافآت ذهبية</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6 p-6">
+          <div className="rounded-2xl bg-primary/5 p-6 text-right">
+            <p className="text-lg font-semibold text-primary">رابط الإحالة الخاص بك:</p>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <div className="rounded-xl border border-primary/20 bg-white px-4 py-2 text-sm text-gray-700">
+                https://eshro.ly/invite/{customerInfo.email ? customerInfo.email.split('@')[0] : 'eshro-user'}
+              </div>
+              <Button onClick={handleCopyReferral} className="flex items-center gap-2">
+                <UploadCloud className="h-4 w-4" />
                 نسخ الرابط
               </Button>
             </div>
-            <div className="flex gap-2 mt-3">
-              <Button variant="outline" onClick={shareViaWhatsApp} className="flex-1">
-                <span className="ml-2">📱</span>
-                مشاركة عبر واتساب
-              </Button>
-              <Button variant="outline" className="flex-1">
-                <span className="ml-2">🔗</span>
-                مشاركة عامة
-              </Button>
-            </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* كيفية عمل البرنامج */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-600" />
-            كيفية عمل برنامج الإحالات
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 border rounded-lg">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-blue-600 font-bold">1</span>
-              </div>
-              <h3 className="font-semibold mb-2">ادعُ أصدقاءك</h3>
-              <p className="text-sm text-gray-600">شارك رابط الإحالة الخاص بك مع أصدقائك</p>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-green-600 font-bold">2</span>
-              </div>
-              <h3 className="font-semibold mb-2">يحصلون على خصم</h3>
-              <p className="text-sm text-gray-600">يحصل أصدقاؤك على خصم 10% على أول طلب</p>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-purple-600 font-bold">3</span>
-              </div>
-              <h3 className="font-semibold mb-2">اكسب نقاط</h3>
-              <p className="text-sm text-gray-600">احصل على 150 نقطة لكل صديق ينضم ويشتري</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* الإحالات الأخيرة */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-green-600" />
-            الإحالات الأخيرة
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {referralData.recentReferrals.map((referral) => (
-              <div key={referral.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      {referral.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">{referral.name}</p>
-                    <p className="text-xs text-gray-500">{referral.date}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    referral.status === 'انضم' ? 'bg-green-100 text-green-800' :
-                    'bg-blue-100 text-blue-800'
-                  }`}>
-                    {referral.status}
-                  </span>
-                  {referral.points > 0 && (
-                    <p className="text-sm font-bold text-green-600 mt-1">
-                      +{referral.points} نقطة
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* المكافآت المتاحة */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <Gift className="h-5 w-5 text-purple-600" />
-            المكافآت المتاحة
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <Gift className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold">خصم 50 دينار</h3>
-                  <p className="text-sm text-gray-600">متاح للاستبدال</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">احصل على خصم 50 دينار على طلبك القادم</p>
-              <Button
-                className="w-full"
-                disabled={referralData.totalPoints < 500}
-                variant={referralData.totalPoints >= 500 ? "default" : "outline"}
-              >
-                {referralData.totalPoints >= 500 ? 'استبدال الآن' : 'تحتاج 500 نقطة'}
-              </Button>
-            </div>
-
-            <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Gift className="h-6 w-6 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold">شحن مجاني</h3>
-                  <p className="text-sm text-gray-600">شهر كامل</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">شحن مجاني على جميع الطلبات لمدة شهر</p>
-              <Button
-                className="w-full"
-                disabled={referralData.totalPoints < 300}
-                variant={referralData.totalPoints >= 300 ? "default" : "outline"}
-              >
-                {referralData.totalPoints >= 300 ? 'استبدال الآن' : 'تحتاج 300 نقطة'}
-              </Button>
-            </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <InfoStatCard title="أصدقاء مدعوين" value={metrics.referralsCount} subtitle="شاركوا رابطك" tone="primary" />
+            <InfoStatCard title="انضموا بالفعل" value={metrics.referralsJoined} subtitle="يشترون من إشرو الآن" tone="emerald" />
+            <InfoStatCard title="نقاط مكافآت" value={Math.max(750, metrics.referralsJoined * 120)} subtitle="مكافآت قابلة للاستخدام" tone="amber" />
           </div>
         </CardContent>
       </Card>
     </div>
   );
-};
 
-// مكون التحميلات
-const DownloadsContent: React.FC = () => {
-  return (
+  const renderDownloadsSection = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle>سجل التحميلات والفواتير</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {orders.length === 0 && <div className="rounded-xl bg-gray-50 p-6 text-center text-gray-500">لا توجد فواتير متاحة للتنزيل حالياً.</div>}
+        {orders.map((order) => (
+          <div key={order.id} className="flex flex-col gap-4 rounded-2xl border p-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm text-gray-500">طلب #{order.id}</p>
+              <p className="text-base font-semibold text-gray-900">{formatCurrency(getOrderTotal(order))}</p>
+              <p className="text-sm text-gray-500">{parseOrderDate(order).toLocaleDateString('ar-LY')}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="outline" onClick={() => handleDownloadInvoice(order)} className="flex items-center gap-2">
+                <DownloadIcon className="h-4 w-4" />
+                تنزيل الفاتورة
+              </Button>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+
+  const renderProfileSection = () => (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>ملفاتك المحملة</CardTitle>
+          <CardTitle>الملف الشخصي</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <Download className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">لا توجد ملفات محملة حالياً</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-// مكون الملف الشخصي المحسن مع جميع الوظائف المطلوبة
-const ProfileContent: React.FC<any> = ({ customerInfo }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [showChangePassword, setShowChangePassword] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [imageUploadSuccess, setImageUploadSuccess] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: customerInfo.name,
-    email: customerInfo.email,
-    phone: customerInfo.phone,
-    joinDate: customerInfo.joinDate,
-    accountStatus: 'نشط',
-    avatar: customerInfo.avatar,
-    birthDate: '',
-    city: '',
-    address: '',
-    bank: '',
-    accountNumber: '',
-    accountHolderName: ''
-  });
-
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-
-  const accountStatuses = [
-    { value: 'نشط', label: 'نشط', color: 'bg-green-100 text-green-800' },
-    { value: 'غير نشط', label: 'غير نشط', color: 'bg-gray-100 text-gray-800' },
-    { value: 'متوقف', label: 'متوقف', color: 'bg-orange-100 text-orange-800' },
-    { value: 'ملغي', label: 'ملغي', color: 'bg-red-100 text-red-800' }
-  ];
-
-  const libyanCities = [
-    'طرابلس', 'بنغازي', 'مصراتة', 'البيضاء', 'زليتن', 'صبراتة', 'زوارة',
-    'الخمس', 'ترهونة', 'سرت', 'اجدابيا', 'المرج', 'طبرق', 'درنة', 'توكرة'
-  ];
-
-  const libyanBanks = [
-    'مصرف الجمهورية', 'مصرف الوحدة', 'مصرف الصحاري', 'مصرف التجارة والتنمية',
-    'مصرف شمال أفريقيا', 'المصرف الليبي الإسلامي', 'مصرف المتوسط',
-    'مصرف الأمان', 'مصرف الإجماع العربي', 'مصرف اليقين'
-  ];
-
-  const handleSaveProfile = () => {
-    // هنا يتم حفظ البيانات
-    if (uploadedImage) {
-      // حفظ الصورة في localStorage أو أي نظام تخزين آخر
-      localStorage.setItem('userProfileImage', uploadedImage);
-    }
-    setIsEditing(false);
-    // تحديث الصفحة لإظهار الصورة الجديدة في الشريط الجانبي
-    window.location.reload();
-  };
-
-  // دالة للحصول على الصورة المحفوظة
-  React.useEffect(() => {
-    const savedImage = localStorage.getItem('userProfileImage');
-    if (savedImage) {
-      setUploadedImage(savedImage);
-    }
-  }, []);
-
-  const handleChangePassword = () => {
-    // هنا يتم تغيير كلمة المرور
-    setShowChangePassword(false);
-    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* معلومات الحساب الرئيسية */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <User className="h-5 w-5 text-blue-600" />
+        <CardContent className="space-y-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
+            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-3xl text-primary">
+              {avatarPreview ? <img src={avatarPreview} alt="صورة المستخدم" className="h-full w-full object-cover" /> : customerInfo.name?.charAt(0) || 'ن'}
             </div>
-            معلومات الحساب
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-6 mb-6">
-            <div className="relative">
-              {(() => {
-                const savedImage = localStorage.getItem('userProfileImage');
-                return savedImage ? (
-                  <img
-                    src={savedImage}
-                    alt="صورة الملف الشخصي"
-                    className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
-                  />
-                ) : (
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-2xl">
-                      {profileData.name.charAt(0)}
-                    </span>
-                  </div>
-                );
-              })()}
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-xl text-gray-800">{profileData.name}</h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${accountStatuses.find(s => s.value === profileData.accountStatus)?.color}`}>
-                  {profileData.accountStatus}
-                </span>
-                <span className="text-sm text-gray-600">★ ★ ★ ★ ★</span>
+            <div className="space-y-2">
+              <p className="text-lg font-bold text-gray-900">{customerInfo.name}</p>
+              <p className="text-sm text-gray-500">{customerInfo.membershipType || 'حساب عميل'}</p>
+              <div>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-primary px-4 py-2 text-sm text-primary hover:bg-primary/5">
+                  <UploadCloud className="h-4 w-4" />
+                  تغيير الصورة الشخصية
+                  <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleImageUpload} />
+                </label>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="text-sm font-medium text-gray-700">البريد الإلكتروني</label>
-              <p className="text-gray-600 mt-1">{profileData.email}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">رقم الهاتف</label>
-              <p className="text-gray-600 mt-1">{profileData.phone}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">تاريخ الانضمام</label>
-              <p className="text-gray-600 mt-1">{profileData.joinDate}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">حالة الحساب</label>
-              <p className="text-gray-600 mt-1">{profileData.accountStatus}</p>
-            </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <ProfileField label="الاسم الأول" value={profileForm.firstName} onChange={(event) => setProfileForm((prev) => ({ ...prev, firstName: event.target.value }))} />
+            <ProfileField label="الاسم الأخير" value={profileForm.lastName} onChange={(event) => setProfileForm((prev) => ({ ...prev, lastName: event.target.value }))} />
+            <ProfileField label="البريد الإلكتروني" value={profileForm.email} onChange={(event) => setProfileForm((prev) => ({ ...prev, email: event.target.value }))} />
+            <ProfileField label="رقم الموبايل" value={profileForm.phone} onChange={(event) => setProfileForm((prev) => ({ ...prev, phone: event.target.value }))} />
+            <ProfileField label="تاريخ الميلاد" type="date" value={profileForm.birthDate} onChange={(event) => setProfileForm((prev) => ({ ...prev, birthDate: event.target.value }))} />
+            <ProfileField label="المدينة" value={profileForm.city} onChange={(event) => setProfileForm((prev) => ({ ...prev, city: event.target.value }))} />
+            <ProfileField label="المنطقة" value={profileForm.area} onChange={(event) => setProfileForm((prev) => ({ ...prev, area: event.target.value }))} />
+            <ProfileField label="العنوان التفصيلي" value={profileForm.address} onChange={(event) => setProfileForm((prev) => ({ ...prev, address: event.target.value }))} />
+            <ProfileField label="اختر المصرف التجاري" value={profileForm.bankName} onChange={(event) => setProfileForm((prev) => ({ ...prev, bankName: event.target.value }))} />
+            <ProfileField label="رقم الحساب المصرفي" value={profileForm.bankAccount} onChange={(event) => setProfileForm((prev) => ({ ...prev, bankAccount: event.target.value }))} />
+            <ProfileField label="اسم صاحب الحساب" value={profileForm.bankAccountHolder} onChange={(event) => setProfileForm((prev) => ({ ...prev, bankAccountHolder: event.target.value }))} />
           </div>
 
-          <div className="flex gap-3 mt-6">
-            <Button onClick={() => setIsEditing(true)} className="flex-1">
-              تعديل المعلومات الشخصية
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={handleProfileSave} disabled={isSavingProfile}>
+              {isSavingProfile ? 'جاري الحفظ...' : 'حفظ'}
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowChangePassword(true)}
-              className="flex-1"
-              data-action="change-password"
-            >
-              تغيير كلمة المرور
+            <Button variant="outline" onClick={() => setProfileForm(createProfileFormState(customerInfo))}>إلغاء</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>تغيير كلمة المرور</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-3">
+          <ProfileField label="كلمة المرور الحالية" type="password" value={passwordForm.currentPassword} onChange={(event) => setPasswordForm((prev) => ({ ...prev, currentPassword: event.target.value }))} />
+          <ProfileField label="كلمة المرور الجديدة" type="password" value={passwordForm.newPassword} onChange={(event) => setPasswordForm((prev) => ({ ...prev, newPassword: event.target.value }))} />
+          <ProfileField label="إعادة تعيين كلمة المرور" type="password" value={passwordForm.confirmPassword} onChange={(event) => setPasswordForm((prev) => ({ ...prev, confirmPassword: event.target.value }))} />
+          <div className="col-span-3 flex flex-wrap gap-3">
+            <Button onClick={handlePasswordSave} disabled={isSavingPassword}>
+              {isSavingPassword ? 'جاري الحفظ...' : 'حفظ'}
+            </Button>
+            <Button variant="outline" onClick={() => setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' })}>إلغاء</Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderSupportSection = () => (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>المساعدة والدعم</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <SupportCard
+              icon={<MessageCircle className="h-8 w-8 text-primary" />}
+              title="الشات بوت"
+              description="احصل على إجابات فورية على استفساراتك"
+              actions={<Button onClick={() => handleSupportRedirect('https://wa.me/218944062927')} className="flex items-center gap-2"><MessageCircle className="h-4 w-4" /> بدء محادثة فورية</Button>}
+            />
+            <SupportCard
+              icon={<Headphones className="h-8 w-8 text-emerald-600" />}
+              title="واتساب الدعم الفني"
+              description="تحدث مع فريق الدعم مباشرة عبر واتساب"
+              actions={<Button onClick={() => handleSupportRedirect('https://wa.me/218944062927')} className="flex items-center gap-2"><Phone className="h-4 w-4" /> فتح واتساب</Button>}
+            />
+          </div>
+          <div className="rounded-2xl border p-6">
+            <h3 className="text-lg font-semibold text-gray-900">الأسئلة الشائعة</h3>
+            <div className="mt-4 space-y-4 text-sm text-gray-600">
+              <FaqItem question="كيف يمكنني المشاركة معكم؟" answer="عبر التسجيل المباشر على منصة إشرو كعميل أو تاجر، واتباع خطوات التسجيل البسيطة." />
+              <FaqItem question="ما هي طرق الدفع المتاحة؟" answer="نوفر جميع طرق الدفع المحلية والإلكترونية مثل البطاقات المصرفية، المحافظ الإلكترونية، والدفع عند الاستلام." />
+              <FaqItem question="كم تستغرق عملية التوصيل؟" answer="التوصيل العادي: 24-96 ساعة، التوصيل السريع: 5-12 ساعة. يختلف حسب المنطقة." />
+              <FaqItem question="هل يمكنني إرجاع المنتجات؟" answer="نعم، يمكن إرجاع المنتجات خلال 7 أيام من تاريخ الاستلام بشرط عدم الاستخدام." />
+              <FaqItem question="كيف أتتبع طلبي؟" answer="يمكنك تتبع طلبك من لوحة التحكم > الطلبات، أو عبر الرسائل النصية التي نرسلها لك." />
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <SupportInfo icon={<Mail className="h-6 w-6 text-primary" />} label="البريد الإلكتروني" value="support@eshro.ly" onClick={() => handleSupportRedirect('mailto:support@eshro.ly')} />
+            <SupportInfo icon={<Phone className="h-6 w-6 text-emerald-600" />} label="رقم الهاتف" value="+218944062927" onClick={() => handleSupportRedirect('tel:+218944062927')} />
+            <SupportInfo icon={<Clock className="h-6 w-6 text-amber-500" />} label="ساعات العمل" value="الأحد - الخميس، من 9:00 صباحاً - 6:00 مساءً" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderActiveSection = () => {
+    if (activeSection === 'dashboard') {
+      return renderDashboardSection();
+    }
+    if (activeSection === 'orders') {
+      return renderOrderSection();
+    }
+    if (activeSection === 'subscriptions') {
+      return renderSubscriptionsSection();
+    }
+    if (activeSection === 'referrals') {
+      return renderReferralsSection();
+    }
+    if (activeSection === 'downloads') {
+      return renderDownloadsSection();
+    }
+    if (activeSection === 'profile') {
+      return renderProfileSection();
+    }
+    if (activeSection === 'support') {
+      return renderSupportSection();
+    }
+    return renderDashboardSection();
+  };
+
+  return (
+    <div className="relative min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/60 to-purple-50">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.25),transparent_55%)]" />
+      <div className="relative z-10 mx-auto flex w-full flex-col gap-6 px-6 py-10 lg:flex-row xl:px-12">
+        <aside className="w-full rounded-3xl border border-white/60 bg-white/70 p-6 shadow-xl backdrop-blur lg:w-72">
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {resolvedAvatar ? (
+                <img src={resolvedAvatar} alt="صورة المستخدم" className="h-12 w-12 rounded-full border border-white/60 object-cover shadow" />
+              ) : (
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-base font-semibold text-primary">
+                  {customerInfo.name?.charAt(0) || 'ن'}
+                </div>
+              )}
+              <div>
+                <p className="text-sm text-gray-500">مرحباً</p>
+                <p className="text-lg font-bold text-gray-900">{customerInfo.name}</p>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" onClick={onBack} className="flex items-center gap-2">
+              العودة
             </Button>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* نافذة تعديل المعلومات الشخصية */}
-      {isEditing && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-auto">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-green-600" />
-                  تعديل المعلومات الشخصية
-                </CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
-                  ✕
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              {/* صورة المستخدم */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <img
-                      src={uploadedImage || "/api/placeholder/80/80"}
-                      alt="صورة الملف الشخصي"
-                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-                    />
-                    <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary/80 transition-colors">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (event) => {
-                              const base64String = event.target?.result as string;
-                              setUploadedImage(base64String);
-                              setImageUploadSuccess(true);
-                              // إخفاء رسالة النجاح بعد 3 ثواني
-                              setTimeout(() => setImageUploadSuccess(false), 3000);
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                      />
-                      <span className="text-white text-sm">📷</span>
-                    </label>
-                  </div>
-                  <div>
-                    <p className="font-medium">صورة الملف الشخصي</p>
-                    <p className="text-sm text-gray-600">انقر على الكاميرا لرفع صورة جديدة</p>
-                  </div>
-                </div>
-
-                {/* رسالة نجاح رفع الصورة */}
-                {imageUploadSuccess && (
-                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs">✓</span>
-                    </div>
-                    <p className="text-sm text-green-700 font-medium">تم رفع الصورة بنجاح!</p>
-                  </div>
-                )}
-              </div>
-
-              {/* البيانات الأساسية */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">الاسم الكامل</label>
-                  <input
-                    type="text"
-                    value={profileData.name}
-                    onChange={(e) => setProfileData({...profileData, name: e.target.value})}
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">رقم الموبايل</label>
-                  <input
-                    type="tel"
-                    value={profileData.phone}
-                    onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">البريد الإلكتروني</label>
-                  <input
-                    type="email"
-                    value={profileData.email}
-                    onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">تاريخ الميلاد</label>
-                  <input
-                    type="date"
-                    value={profileData.birthDate}
-                    onChange={(e) => setProfileData({...profileData, birthDate: e.target.value})}
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* الموقع */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">المدينة</label>
-                  <select
-                    value={profileData.city}
-                    onChange={(e) => setProfileData({...profileData, city: e.target.value})}
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  >
-                    <option value="">اختر المدينة</option>
-                    {libyanCities.map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">العنوان التفصيلي</label>
-                  <input
-                    type="text"
-                    value={profileData.address}
-                    onChange={(e) => setProfileData({...profileData, address: e.target.value})}
-                    placeholder="أدخل عنوانك التفصيلي"
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* المعلومات المصرفية */}
-              <div className="space-y-4">
-                <h3 className="font-bold text-lg text-gray-800">المعلومات المصرفية</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">المصرف</label>
-                    <select
-                      value={profileData.bank}
-                      onChange={(e) => setProfileData({...profileData, bank: e.target.value})}
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    >
-                      <option value="">اختر المصرف</option>
-                      {libyanBanks.map(bank => (
-                        <option key={bank} value={bank}>{bank}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">رقم الحساب الجاري</label>
-                    <input
-                      type="text"
-                      value={profileData.accountNumber}
-                      onChange={(e) => setProfileData({...profileData, accountNumber: e.target.value})}
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium mb-2">اسم صاحب الحساب</label>
-                    <input
-                      type="text"
-                      value={profileData.accountHolderName}
-                      onChange={(e) => setProfileData({...profileData, accountHolderName: e.target.value})}
-                      placeholder="أدخل اسم صاحب الحساب كما يظهر في المصرف"
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* أزرار الحفظ والإلغاء */}
-              <div className="flex gap-3 pt-4">
-                <Button onClick={handleSaveProfile} className="flex-1">
-                  حفظ التغييرات
-                </Button>
-                <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1">
-                  إلغاء
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* نافذة تغيير كلمة المرور */}
-      {showChangePassword && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-purple-600" />
-                  تغيير كلمة المرور
-                </CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => setShowChangePassword(false)}>
-                  ✕
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">كلمة المرور الحالية</label>
-                <input
-                  type="password"
-                  value={passwordData.currentPassword}
-                  onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">كلمة المرور الجديدة</label>
-                <input
-                  type="password"
-                  value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">يجب أن تكون 6 أحرف على الأقل</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">أعد إدخال كلمة المرور الجديدة</label>
-                <input
-                  type="password"
-                  value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button onClick={handleChangePassword} className="flex-1">
-                  تغيير كلمة المرور
-                </Button>
-                <Button variant="outline" onClick={() => setShowChangePassword(false)} className="flex-1">
-                  إلغاء
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// مكون المفضلة مع منتجات حقيقية وصور مصغرة
-const FavoritesContent: React.FC<any> = ({ stats, favorites = [] }) => {
-  // استرجاع المنتجات المفضلة من localStorage إذا لم تكن موجودة في props
-  const [favoriteProducts, setFavoriteProducts] = useState(() => {
-    if (favorites.length > 0) {
-      return favorites;
-    }
-
-    // محاولة استرجاع المنتجات المفضلة من localStorage
-    try {
-      const savedFavorites = localStorage.getItem('eshro_favorites');
-      if (savedFavorites) {
-        return JSON.parse(savedFavorites);
-      }
-    } catch (error) {
-      console.error('Error loading favorites from localStorage:', error);
-    }
-
-    return [];
-  });
-
-  const removeFromFavorites = (productId: number) => {
-    setFavoriteProducts(prev => prev.filter(p => p.id !== productId));
-
-    // حذف المنتج من localStorage أيضاً
-    try {
-      const savedFavorites = JSON.parse(localStorage.getItem('eshro_favorites') || '[]');
-      const updatedFavorites = savedFavorites.filter((p: any) => p.id !== productId);
-      localStorage.setItem('eshro_favorites', JSON.stringify(updatedFavorites));
-    } catch (error) {
-      console.error('Error removing from favorites in localStorage:', error);
-    }
-  };
-
-  const addToFavorites = (product: any) => {
-    if (!favoriteProducts.find(p => p.id === product.id)) {
-      const newFavoriteProduct = {
-        ...product,
-        dateAdded: new Date().toISOString()
-      };
-
-      setFavoriteProducts(prev => [...prev, newFavoriteProduct]);
-
-      // إضافة المنتج للـ localStorage أيضاً
-      try {
-        const savedFavorites = JSON.parse(localStorage.getItem('eshro_favorites') || '[]');
-        savedFavorites.push(newFavoriteProduct);
-        localStorage.setItem('eshro_favorites', JSON.stringify(savedFavorites));
-      } catch (error) {
-        console.error('Error adding to favorites in localStorage:', error);
-      }
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Star className="h-5 w-5 text-purple-600" />
-            </div>
-            منتجاتك المفضلة ({favoriteProducts.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {/* زر إضافة منتج جديد للمفضلة */}
-          <div className="p-4 border-b bg-gradient-to-r from-purple-50 to-pink-50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-purple-600" />
-                <span className="font-medium text-purple-800">إدارة المنتجات المفضلة</span>
-              </div>
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                onClick={() => {
-                  // يمكن إضافة نافذة منبثقة هنا لإضافة منتج جديد للمفضلة
-                  alert('سيتم إضافة نافذة اختيار المنتجات قريباً! 🎯');
-                }}
-              >
-                <Star className="h-4 w-4 mr-2" />
-                إضافة منتج جديد
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
-            {favoriteProducts.map((product) => (
-              <div key={product.id} className="border-b border-r last:border-r-0 md:border-r-0 md:last:border-b-0 hover:bg-gray-50 transition-colors group">
-                <div className="p-4">
-                  <div className="relative mb-3">
-                    <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden relative">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          e.currentTarget.src = '/assets/stores/1.webp';
-                        }}
-                      />
-                      <div className="absolute top-2 right-2">
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                          product.badge === 'أكثر مبيعاً' ? 'bg-green-100 text-green-700' :
-                          product.badge === 'جديد' ? 'bg-blue-100 text-blue-700' :
-                          product.badge === 'مميزة' ? 'bg-purple-100 text-purple-700' :
-                          'bg-orange-100 text-orange-700'
-                        }`}>
-                          {product.badge}
-                        </span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-2 left-2 w-8 h-8 p-0 bg-white/80 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => removeFromFavorites(product.id)}
-                      >
-                        <span className="text-red-500 text-sm">×</span>
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h3 className="font-bold text-sm text-gray-900 line-clamp-2 group-hover:text-primary transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-xs text-gray-600">من متجر {product.store}</p>
-                    <p className="text-xs text-gray-500">أضيف في {new Date(product.dateAdded).toLocaleDateString('ar')}</p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <p className="font-bold text-primary">{product.price.toLocaleString()} د.ل</p>
-                        {product.originalPrice > product.price && (
-                          <span className="text-xs text-gray-500 line-through">
-                            {product.originalPrice.toLocaleString()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                        <span className="text-xs text-gray-600">{product.rating}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 pt-2">
-                      <Button size="sm" className="flex-1">
-                        إضافة للسلة
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        عرض المنتج
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {favoriteProducts.length === 0 && (
-            <div className="text-center py-12">
-              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="h-10 w-10 text-purple-400" />
-              </div>
-              <p className="text-gray-500 font-medium">لا توجد منتجات مفضلة حالياً</p>
-              <p className="text-sm text-gray-400 mt-1">ابدأ في إضافة المنتجات التي تعجبك</p>
-              <Button className="mt-4">استكشف المنتجات</Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-// مكون الإشعارات
-const NotificationsContent: React.FC<any> = ({ notifications, stats }) => {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-blue-500" />
-            إشعاراتك ({stats.notificationsCount})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {notifications.map((notification: any) => (
-              <div
-                key={notification.id}
-                className={`p-4 border rounded-lg hover:bg-gray-50 transition-colors ${
-                  !notification.read ? 'border-primary bg-primary/5' : 'border-gray-200'
+          <div className="space-y-2">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`w-full rounded-xl border px-4 py-3 text-right transition ${
+                  activeSection === section.id ? 'border-primary bg-primary/10 text-primary shadow-sm' : 'border-transparent hover:border-primary/30 hover:bg-primary/5'
                 }`}
               >
-                <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    notification.type === 'order' ? 'bg-blue-100 text-blue-600' :
-                    notification.type === 'delivery' ? 'bg-green-100 text-green-600' :
-                    notification.type === 'promotion' ? 'bg-purple-100 text-purple-600' :
-                    'bg-gray-100 text-gray-600'
-                  }`}>
-                    {notification.type === 'order' ? '📦' :
-                     notification.type === 'delivery' ? '🚚' :
-                     notification.type === 'promotion' ? '🎁' : 'ℹ️'}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-semibold text-sm text-gray-900">
-                        {notification.title}
-                      </h4>
-                      {notification.urgent && (
-                        <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1"></span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {notification.message}
-                    </p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-gray-500">
-                        {notification.time}
-                      </span>
-                      {!notification.read && (
-                        <span className="text-xs text-primary font-medium">
-                          جديدة
-                        </span>
-                      )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${activeSection === section.id ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>{section.icon}</span>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold">{section.label}</span>
+                      <span className="text-xs text-gray-500">{section.description}</span>
                     </div>
                   </div>
+                  {section.badge && <span className="rounded-full bg-white px-3 py-1 text-xs text-primary">{section.badge}</span>}
                 </div>
-              </div>
+              </button>
             ))}
           </div>
-        </CardContent>
-      </Card>
+          <div className="mt-6 border-t pt-6">
+            <Button variant="outline" className="w-full" onClick={onLogout}>
+              <LogOut className="ml-2 h-4 w-4" />
+              تسجيل الخروج
+            </Button>
+          </div>
+        </aside>
+        <main className="flex-1 space-y-6">
+          {renderActiveSection()}
+        </main>
+      </div>
     </div>
   );
 };
 
-// مكون الدعم الفني الشامل مع جميع الخدمات المطلوبة
-const SupportContent: React.FC = () => {
-  const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
-  const [chatbotOpen, setChatbotOpen] = useState(false);
+const ArrowUpBadge = () => (
+  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-primary shadow">↑</span>
+);
 
-  const faqData = [
-    {
-      id: 1,
-      question: 'كيف يمكنني المشاركة معكم؟',
-      answer: 'عبر التسجيل المباشر على منصة إشرو كعميل أو تاجر، واتباع خطوات التسجيل البسيطة.'
-    },
-    {
-      id: 2,
-      question: 'ما هي طرق الدفع المتاحة؟',
-      answer: 'نوفر جميع طرق الدفع المحلية والإلكترونية مثل: البطاقات المصرفية، المحافظ الإلكترونية، والدفع عند الاستلام.'
-    },
-    {
-      id: 3,
-      question: 'كم تستغرق عملية التوصيل؟',
-      answer: 'التوصيل العادي: 24-96 ساعة، التوصيل السريع: 5-12 ساعة. يختلف حسب المنطقة.'
-    },
-    {
-      id: 4,
-      question: 'هل يمكنني إرجاع المنتجات؟',
-      answer: 'نعم، يمكن إرجاع المنتجات خلال 7 أيام من تاريخ الاستلام بشرط عدم الاستخدام.'
-    },
-    {
-      id: 5,
-      question: 'كيف أتتبع طلبي؟',
-      answer: 'يمكنك تتبع طلبك من لوحة التحكم > الطلبات، أو عبر الرسائل النصية التي نرسلها لك.'
-    }
-  ];
+const resolveProductImage = (item: any): string | undefined => {
+  if (!item) {
+    return undefined;
+  }
+  if (typeof item === 'string') {
+    return item;
+  }
+  if (item.image) {
+    return item.image;
+  }
+  if (item.thumbnail) {
+    return item.thumbnail;
+  }
+  if (Array.isArray(item.images) && item.images.length > 0) {
+    return item.images[0];
+  }
+  if (item.cover) {
+    return item.cover;
+  }
+  if (item.product?.image) {
+    return item.product.image;
+  }
+  if (Array.isArray(item.product?.images) && item.product.images.length > 0) {
+    return item.product.images[0];
+  }
+  return undefined;
+};
 
-  const toggleFAQ = (id: number) => {
-    setActiveFAQ(activeFAQ === id ? null : id);
+const InfoStatCard = ({ title, value, subtitle, tone, onClick, isActive }: { title: string; value: number; subtitle: string; tone: 'primary' | 'emerald' | 'amber' | 'rose'; onClick?: () => void; isActive?: boolean }) => {
+  const palette: Record<'primary' | 'emerald' | 'amber' | 'rose', { bg: string; text: string }> = {
+    primary: { bg: 'bg-primary/10', text: 'text-primary' },
+    emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600' },
+    amber: { bg: 'bg-amber-100', text: 'text-amber-600' },
+    rose: { bg: 'bg-rose-100', text: 'text-rose-600' }
   };
-
+  const colors = palette[tone];
+  const interactive = typeof onClick === 'function';
   return (
-    <div className="space-y-6">
-      {/* الشات بوت والمساعدة السريعة */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <MessageCircle className="h-5 w-5 text-blue-600" />
-            </div>
-            المساعدة والدعم
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* الشات بوت */}
-            <div className="space-y-4">
-              <h3 className="font-bold text-lg">الشات بوت - الرد الآلي</h3>
-              <p className="text-gray-600">احصل على إجابات فورية على استفساراتك</p>
-              <div className="bg-gradient-to-r from-blue-500 to-green-500 p-6 rounded-lg text-white text-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <MessageCircle className="h-8 w-8" />
-                </div>
-                <p className="font-bold mb-2">مساعد إشرو الذكي</p>
-                <p className="text-sm opacity-90 mb-4">متوفر 24/7 للمساعدة</p>
-                <Button
-                  className="bg-white text-blue-600 hover:bg-gray-100"
-                  onClick={() => setChatbotOpen(true)}
-                >
-                  بدء محادثة فورية
-                </Button>
-              </div>
-            </div>
-
-            {/* واتساب الدعم الفني */}
-            <div className="space-y-4">
-              <h3 className="font-bold text-lg">واتساب الدعم الفني</h3>
-              <p className="text-gray-600">تحدث مع فريق الدعم مباشرة عبر واتساب</p>
-              <div className="bg-green-50 p-6 rounded-lg text-center border-2 border-green-200">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Phone className="h-8 w-8 text-green-600" />
-                </div>
-                <p className="font-bold text-green-800 mb-2">فريق الدعم متاح الآن</p>
-                <p className="text-sm text-gray-600 mb-4">الرد خلال دقائق معدودة</p>
-                <Button
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={() => window.open('https://wa.me/218944062927', '_blank')}
-                >
-                  <span className="ml-2">📱</span>
-                  فتح واتساب
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* الأسئلة الشائعة */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <MessageCircle className="h-5 w-5 text-purple-600" />
-            </div>
-            الأسئلة الشائعة
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <p className="text-gray-600 mb-6">إجابات على أشهر الأسئلة في منصات التجارة الإلكترونية</p>
-
-          <div className="space-y-3">
-            {faqData.map((faq) => (
-              <div key={faq.id} className="border rounded-lg overflow-hidden">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between p-4 text-right hover:bg-gray-50"
-                  onClick={() => toggleFAQ(faq.id)}
-                >
-                  <span className="font-medium">{faq.question}</span>
-                  <span className={`transition-transform ${activeFAQ === faq.id ? 'rotate-180' : ''}`}>
-                    ▼
-                  </span>
-                </Button>
-                {activeFAQ === faq.id && (
-                  <div className="p-4 bg-blue-50 border-t">
-                    <p className="text-gray-700">{faq.answer}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* معلومات التواصل */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <Phone className="h-5 w-5 text-gray-600" />
-            </div>
-            معلومات التواصل
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-4 border rounded-lg hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Mail className="h-6 w-6 text-blue-600" />
-              </div>
-              <p className="font-semibold mb-1">البريد الإلكتروني</p>
-              <a href="mailto:support@eshro.ly" className="text-blue-600 hover:underline">
-                support@eshro.ly
-              </a>
-            </div>
-
-            <div className="text-center p-4 border rounded-lg hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Phone className="h-6 w-6 text-green-600" />
-              </div>
-              <p className="font-semibold mb-1">رقم الهاتف</p>
-              <a href="tel:+218944062927" className="text-green-600 hover:underline font-mono" dir="ltr">
-                (218) 94 406 2927
-              </a>
-            </div>
-
-            <div className="text-center p-4 border rounded-lg hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Clock className="h-6 w-6 text-purple-600" />
-              </div>
-              <p className="font-semibold mb-1">ساعات العمل</p>
-              <p className="text-sm text-gray-600">
-                الأحد - الخميس<br />
-                9:00 ص - 4:00 م
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* خيارات التواصل السريع */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b">
-          <CardTitle className="flex items-center gap-2">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Phone className="h-5 w-5 text-green-600" />
-            </div>
-            تواصل معنا مباشرة
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button
-              variant="outline"
-              className="h-20 flex-col gap-2 hover:bg-blue-50 hover:border-blue-300"
-              onClick={() => window.open('tel:+218944062927', '_blank')}
-            >
-              <Phone className="h-6 w-6 text-blue-600" />
-              <span>اتصال هاتفي</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-20 flex-col gap-2 hover:bg-green-50 hover:border-green-300"
-              onClick={() => window.open('mailto:support@eshro.ly', '_blank')}
-            >
-              <Mail className="h-6 w-6 text-green-600" />
-              <span>إرسال بريد إلكتروني</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-20 flex-col gap-2 hover:bg-purple-50 hover:border-purple-300"
-              onClick={() => setChatbotOpen(true)}
-            >
-              <MessageCircle className="h-6 w-6 text-purple-600" />
-              <span>الشات السريع</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* الشات بوت المنبثق */}
-      {chatbotOpen && (
-        <div className="fixed bottom-4 left-4 w-80 h-96 bg-white shadow-2xl rounded-2xl flex flex-col z-50 border border-gray-200">
-          {/* هيدر الشات بوت */}
-          <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-2xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold">مساعد إشرو الذكي</h3>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <p className="text-xs opacity-90">متوفر الآن للمساعدة</p>
-                  </div>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setChatbotOpen(false)}
-                className="text-white hover:bg-white/20 w-8 h-8 p-0"
-              >
-                ✕
-              </Button>
-            </div>
-          </div>
-
-          {/* منطقة الرسائل */}
-          <div className="flex-1 p-4 overflow-auto bg-gray-50">
-            <div className="space-y-4">
-              <div className="flex gap-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-sm">🤖</span>
-                </div>
-                <div className="bg-white rounded-2xl rounded-tl-md p-3 shadow-sm max-w-xs">
-                  <p className="text-sm text-gray-800">
-                    مرحباً! أنا مساعد إشرو الذكي 🤖
-                    <br />
-                    كيف يمكنني مساعدتك اليوم؟
-                  </p>
-                  <p className="text-xs text-gray-500 mt-2">الآن</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs text-gray-600 font-medium">أسئلة شائعة:</p>
-                <div className="grid grid-cols-1 gap-2">
-                  {faqData.slice(0, 3).map((faq) => (
-                    <Button
-                      key={faq.id}
-                      variant="outline"
-                      size="sm"
-                      className="justify-start text-right h-auto py-2 px-3 text-xs"
-                      onClick={() => {
-                        setActiveFAQ(faq.id);
-                        setChatbotOpen(false);
-                      }}
-                    >
-                      {faq.question}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* منطقة إدخال الرسائل */}
-          <div className="p-4 border-t bg-white rounded-b-2xl">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="اكتب سؤالك هنا..."
-                className="flex-1 text-sm border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <Button size="sm" className="rounded-full w-10 h-10 p-0">
-                <MessageCircle className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="flex justify-center gap-2 mt-3">
-              <Button variant="ghost" size="sm" className="text-xs" onClick={() => window.open('tel:+218944062927')}>
-                📞 اتصال هاتفي
-              </Button>
-              <Button variant="ghost" size="sm" className="text-xs" onClick={() => window.open('mailto:support@eshro.ly')}>
-                📧 إرسال بريد إلكتروني
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    <Card
+      onClick={onClick}
+      tabIndex={interactive ? 0 : undefined}
+      onKeyDown={(event) => {
+        if (!interactive) {
+          return;
+        }
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick?.();
+        }
+      }}
+      className={`border-transparent bg-white/80 text-right shadow transition ${interactive ? 'cursor-pointer hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60' : ''} ${isActive ? 'ring-2 ring-primary/60 ring-offset-2 ring-offset-white' : ''}`}
+    >
+      <CardContent className="space-y-2 p-6">
+        <p className="text-sm text-gray-500">{title}</p>
+        <p className={`text-3xl font-bold ${colors.text}`}>{formatNumber(value)}</p>
+        <span className={`inline-flex rounded-full px-3 py-1 text-xs ${colors.bg} ${colors.text}`}>{subtitle}</span>
+      </CardContent>
+    </Card>
   );
 };
+
+const ProfileField = ({ label, value, onChange, type = 'text' }: { label: string; value: string; onChange: (event: React.ChangeEvent<HTMLInputElement>) => void; type?: string }) => (
+  <div className="flex flex-col gap-2">
+    <label className="text-sm font-medium text-gray-700">{label}</label>
+    <Input value={value} onChange={onChange} type={type} className="text-right" />
+  </div>
+);
+
+const SupportCard = ({ icon, title, description, actions }: { icon: React.ReactNode; title: string; description: string; actions: React.ReactNode }) => (
+  <div className="rounded-2xl border p-6">
+    <div className="mb-4 flex items-center gap-3">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">{icon}</div>
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <p className="text-sm text-gray-500">{description}</p>
+      </div>
+    </div>
+    {actions}
+  </div>
+);
+
+const SupportInfo = ({ icon, label, value, onClick }: { icon: React.ReactNode; label: string; value: string; onClick?: () => void }) => (
+  <button type="button" onClick={onClick} className="flex w-full items-center gap-4 rounded-2xl border p-4 text-right transition hover:border-primary/40 hover:bg-primary/5">
+    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">{icon}</div>
+    <div className="flex flex-col">
+      <span className="text-xs text-gray-500">{label}</span>
+      <span className="text-sm font-semibold text-gray-800">{value}</span>
+    </div>
+  </button>
+);
+
+const FaqItem = ({ question, answer }: { question: string; answer: string }) => (
+  <div className="rounded-xl border border-gray-200 p-4">
+    <h4 className="text-sm font-semibold text-gray-900">{question}</h4>
+    <p className="mt-2 text-sm text-gray-600">{answer}</p>
+  </div>
+);
 
 export default CustomerDashboard;

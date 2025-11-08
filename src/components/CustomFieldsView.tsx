@@ -1,37 +1,37 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Plus,
-  Search,
-  Edit,
-  Trash2,
-  Save,
-  X,
-  Type,
+  AlertCircle,
+  Building,
   Calendar,
-  Hash,
-  Image as ImageIcon,
-  Grid,
-  Settings,
+  CheckCircle,
+  ChevronDown,
+  Copy,
+  Database,
+  Edit,
   Eye,
   EyeOff,
-  Copy,
-  MoreVertical,
-  ChevronDown,
-  CheckCircle,
-  AlertCircle,
-  Info,
   FileText,
-  Database,
+  Globe,
+  Grid,
+  Hash,
+  Image as ImageIcon,
+  Info,
+  Layers,
+  MoreVertical,
+  Package,
+  Palette,
+  Plus,
+  Save,
+  Search,
+  Settings,
+  Tag as TagIcon,
   ToggleLeft,
   ToggleRight,
-  Layers,
+  Trash2,
+  Type,
   User,
-  Tag as TagIcon,
-  Building,
-  Globe,
-  Palette,
-  Package,
+  X,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -212,6 +212,8 @@ const CustomFieldsView: React.FC<CustomFieldsViewProps> = ({ storeData, setStore
   const handleSaveField = () => {
     if (!storeData) return;
 
+    const createdAt = editingField ? editingField.createdAt : new Date().toISOString().split('T')[0];
+
     const newField: CustomField = {
       id: editingField ? editingField.id : Date.now().toString(),
       nameAr: fieldForm.nameAr,
@@ -226,7 +228,7 @@ const CustomFieldsView: React.FC<CustomFieldsViewProps> = ({ storeData, setStore
       options: fieldForm.options,
       validation: fieldForm.validation,
       sortOrder: fieldForm.sortOrder,
-      createdAt: editingField ? editingField.createdAt : new Date().toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
+      createdAt,
     };
 
     if (editingField) {

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { openMoamalatLightbox, ensureMoamalatScript } from '@/lib/moamalat';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,18 +38,18 @@ interface PaymentMethod {
 }
 
 const paymentMethods: PaymentMethod[] = [
-  { id: 'moamalat', name: 'معاملات', icon: '/data/payment/moamalat.png', description: 'البوابة الوطنية للمدفوعات الإلكترونية' },
-  { id: 'sadad', name: 'سداد', icon: '/data/payment/sadad.png', description: 'خدمة الدفع الإلكتروني' },
-  { id: 'tadawul', name: 'تداول', icon: '/data/payment/tadawul.png', description: 'منصة التداول الإلكتروني' },
-  { id: 'mobicash', name: 'موبي كاش', icon: '/data/payment/mobicash.png', description: 'محفظة إلكترونية' },
-  { id: 'anis', name: 'أنيس', icon: '/data/payment/anis.png', description: 'خدمات مالية إلكترونية' },
-  { id: 'edfali', name: 'إدفعلي', icon: '/data/payment/edfali.png', description: 'حلول دفع إلكترونية' },
-  { id: '1pay', name: '1Pay', icon: '/data/payment/1Pay.png', description: 'منصة دفع متكاملة' },
-  { id: 'becom', name: 'Becom', icon: '/data/payment/Becom.png', description: 'خدمات دفع إلكترونية' },
-  { id: 'blueline', name: 'BlueLine', icon: '/data/payment/BlueLine.png', description: 'حلول دفع متقدمة' },
-  { id: 'debit', name: 'بطاقات الخصم', icon: '/data/payment/debit.png', description: 'بطاقات الخصم المباشر' },
-  { id: 'nab4pay', name: 'NAB4Pay', icon: '/data/payment/nab4pay.png', description: 'منصة دفع وطنية' },
-  { id: 'youssr', name: 'يوسر', icon: '/data/payment/youssr.png', description: 'خدمات مالية إلكترونية' },
+  { id: 'moamalat', name: 'معاملات', icon: '/assets/partners/payment/moamalat.png', description: 'البوابة الوطنية للمدفوعات الإلكترونية' },
+  { id: 'sadad', name: 'سداد', icon: '/assets/partners/payment/sadad.png', description: 'خدمة الدفع الإلكتروني' },
+  { id: 'tadawul', name: 'تداول', icon: '/assets/partners/payment/tadawul.png', description: 'منصة التداول الإلكتروني' },
+  { id: 'mobicash', name: 'موبي كاش', icon: '/assets/partners/payment/mobicash.png', description: 'محفظة إلكترونية' },
+  { id: 'anis', name: 'أنيس', icon: '/assets/partners/payment/anis.png', description: 'خدمات مالية إلكترونية' },
+  { id: 'edfali', name: 'إدفعلي', icon: '/assets/partners/payment/edfali.png', description: 'حلول دفع إلكترونية' },
+  { id: '1pay', name: '1Pay', icon: '/assets/partners/payment/1Pay.png', description: 'منصة دفع متكاملة' },
+  { id: 'becom', name: 'Becom', icon: '/assets/partners/payment/Becom.png', description: 'خدمات دفع إلكترونية' },
+  { id: 'blueline', name: 'BlueLine', icon: '/assets/partners/payment/BlueLine.png', description: 'حلول دفع متقدمة' },
+  { id: 'debit', name: 'بطاقات الخصم', icon: '/assets/partners/payment/debit.png', description: 'بطاقات الخصم المباشر' },
+  { id: 'nab4pay', name: 'NAB4Pay', icon: '/assets/partners/payment/nab4pay.png', description: 'منصة دفع وطنية' },
+  { id: 'youssr', name: 'يوسر', icon: '/assets/partners/payment/youssr.png', description: 'خدمات مالية إلكترونية' },
 ];
 
 function formatTrxDateTime(d: Date) {
@@ -98,7 +99,7 @@ export const SubscriptionCheckoutModal: React.FC<SubscriptionCheckoutModalProps>
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [scriptReady, setScriptReady] = useState(false);
+  const [isLaunchingMoamalat, setIsLaunchingMoamalat] = useState(false);
 
   const basePrice = selectedPackage ? (billingCycle === 'yearly' ? Math.floor(selectedPackage.yearlyPrice) : selectedPackage.monthlyPrice) : 0;
   const discount = selectedPackage && billingCycle === 'yearly' ? (selectedPackage.id === 'lite' ? basePrice * 0.01 : selectedPackage.id === 'growth' ? basePrice * 0.03 : basePrice * 0.05) : 0;
@@ -116,155 +117,68 @@ export const SubscriptionCheckoutModal: React.FC<SubscriptionCheckoutModalProps>
     if (selectedPaymentMethod === 'moamalat') setCurrentStep(3);
   };
 
-  const loadMoamalatScript = useCallback(async () => {
-    const env = (getPublicEnv('MOAMALAT_ENV') || 'sandbox').toLowerCase();
-    const src = getLightboxSrc(env);
-    if (document.querySelector(`script[data-moamalat="${src}"]`)) {
-      setScriptReady(true);
-      return;
-    }
-    await new Promise<void>((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = src;
-      s.async = true;
-      s.dataset.moamalat = src;
-      s.onload = () => {
-        console.log('[Moamalat] Lightbox script loaded:', src);
-        resolve();
-      };
-      s.onerror = () => reject(new Error('Failed to load Moamalat Lightbox script'));
-      document.head.appendChild(s);
-    });
-    const started = Date.now();
-    while (!(window as any).Lightbox || !(window as any).Lightbox.Checkout) {
-      if (Date.now() - started > 5000) throw new Error('Lightbox not available within timeout');
-      await new Promise(r => setTimeout(r, 100));
-    }
-    console.log('[Moamalat] Lightbox ready. Available methods:', Object.keys((window as any).Lightbox || {}), 'Checkout:', Object.keys((window as any).Lightbox.Checkout || {}));
-    setScriptReady(true);
-  }, []);
-
   useEffect(() => {
-    if (isOpen && selectedPaymentMethod === 'moamalat' && !scriptReady) {
-      loadMoamalatScript().catch((e) => {
-        console.error(e);
-        alert('تعذر تحميل سكربت بوابة معاملات. حاول مرة أخرى.');
+    if (!isOpen) return;
+    if (currentStep >= 2) {
+      ensureMoamalatScript().catch((error) => {
+        console.error('[Moamalat] preload failed:', error);
       });
     }
-  }, [isOpen, selectedPaymentMethod, scriptReady, loadMoamalatScript]);
+  }, [isOpen, currentStep]);
 
-  async function initializeMoamalatPayment() {
-    console.log('[Moamalat] Initializing payment...');
-    if (!scriptReady) await loadMoamalatScript();
-
-    let MID = getFirstEnv('MOAMALAT_MID', 'MOAMALATPAY_MID');
-    let TID = getFirstEnv('MOAMALAT_TID', 'MOAMALATPAY_TID');
-    let ENV = (() => {
-      const e = getPublicEnv('MOAMALAT_ENV');
-      if (e) return e.toLowerCase();
-      const prod = getPublicEnv('MOAMALATPAY_PRODUCTION');
-      return String(prod).toLowerCase() === 'true' ? 'production' : 'sandbox';
-    })();
-
-    if (!MID || !TID) {
-      try {
-        const resp = await fetch('/api/moamalat/public');
-        if (resp.ok) {
-          const data = await resp.json();
-          MID = data.MID || MID;
-          TID = data.TID || TID;
-          ENV = (data.ENV || ENV || 'sandbox').toLowerCase();
-          console.log('[Moamalat] Loaded MID/TID from server');
-        }
-      } catch (e) {
-        // ignore, fallback to throwing below if still missing
-      }
-    }
-
-    if (!MID || !TID) {
-      throw new Error('بيانات التاجر غير متوفرة (MID/TID)');
-    }
-
-    const AmountTrxn = String(Math.round(Number(finalPrice)));
-    const TrxDateTime = formatTrxDateTime(new Date());
-    const MerchantReference = `SUB-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-
-    const payloadForHash = { AmountTrxn, MerchantReference, TrxDateTime, MID, TID };
-    console.log('[Moamalat] Config (no hash):', {
-      ...payloadForHash,
-      CurrencyCode: '434',
-      MOAMALATPAY_PRODUCTION: ENV === 'production',
-      ReturnUrl: `${window.location.origin}/payment-success`,
-      CallbackUrl: `${window.location.origin}/payment-callback`,
+  useEffect(() => {
+    if (!isOpen || selectedPaymentMethod !== 'moamalat') return;
+    ensureMoamalatScript().catch((error) => {
+      console.error('[Moamalat] script load error:', error);
+      alert('تعذر تحميل سكربت بوابة معاملات. حاول مرة أخرى.');
     });
+  }, [isOpen, selectedPaymentMethod]);
 
-    const apiBase = '';
-    const res = await fetch(`${apiBase}/api/moamalat/hash`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payloadForHash),
-    });
-
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`فشل توليد التوقيع من الخادم: ${txt}`);
+  const launchMoamalatCheckout = useCallback(async () => {
+    setIsProcessing(true);
+    setIsLaunchingMoamalat(true);
+    try {
+      await ensureMoamalatScript();
+      await openMoamalatLightbox({
+        amountLYD: Number(finalPrice),
+        referencePrefix: 'SUB',
+        onComplete: () => {
+          setIsProcessing(false);
+          setIsLaunchingMoamalat(false);
+          onClose();
+          setTimeout(() => alert('تمت عملية الدفع بنجاح! سيتم تفعيل الاشتراك قريباً.'), 400);
+        },
+        onError: (err) => {
+          console.error('[Moamalat] error:', err);
+          setIsProcessing(false);
+          setIsLaunchingMoamalat(false);
+          alert('حدث خطأ في عملية الدفع: ' + (err?.error || err?.message || 'خطأ غير معروف'));
+        },
+        onCancel: () => {
+          setIsProcessing(false);
+          setIsLaunchingMoamalat(false);
+        },
+      });
+    } catch (error: any) {
+      console.error('[Moamalat] launch failed:', error);
+      setIsProcessing(false);
+      setIsLaunchingMoamalat(false);
+      alert('فشل في تهيئة بوابة الدفع: ' + (error?.message || 'خطأ غير معروف'));
     }
-    const { secureHash } = await res.json();
-    if (!secureHash) throw new Error('لم يتم استلام secureHash من الخادم');
-    console.log('[Moamalat] secureHash preview:', String(secureHash).slice(0, 6) + '…');
-
-    const config = {
-      MID,
-      TID,
-      AmountTrxn,
-      MerchantReference,
-      TrxDateTime,
-      SecureHash: secureHash,
-      CurrencyCode: '434',
-      MOAMALATPAY_PRODUCTION: ENV === 'production',
-      ReturnUrl: `${window.location.origin}/payment-success`,
-      CallbackUrl: `${window.location.origin}/payment-callback`,
-      completeCallback(data: any) {
-        console.log('[Moamalat] complete:', data);
-        setIsProcessing(false);
-        onClose();
-        setTimeout(() => alert('تمت عملية الدفع بنجاح! سيتم تفعيل الاشتراك قريباً.'), 400);
-      },
-      errorCallback(err: any) {
-        console.error('[Moamalat] error:', err);
-        setIsProcessing(false);
-        alert('حدث خطأ في عملية الدفع: ' + (err?.error || err?.message || 'خطأ غير معروف'));
-      },
-      cancelCallback() {
-        console.warn('[Moamalat] cancelled by user');
-        setIsProcessing(false);
-      },
-    } as any;
-
-    (window as any).Lightbox.Checkout.configure(config);
-    console.log('[Moamalat] Configured. Opening lightbox...');
-    (window as any).Lightbox.Checkout.showLightbox();
-    console.log('[Moamalat] showLightbox called');
-  }
+  }, [finalPrice, onClose, selectedPackage]);
 
   const handlePaymentComplete = async () => {
     if (selectedPaymentMethod === 'moamalat') {
-      setIsProcessing(true);
-      try {
-        await initializeMoamalatPayment();
-      } catch (error: any) {
-        console.error('[Moamalat] init failed:', error);
-        setIsProcessing(false);
-        alert('فشل في تهيئة بوابة الدفع: ' + (error?.message || 'خطأ غير معروف'));
-      }
-    } else {
-      setIsProcessing(true);
-      setTimeout(() => {
-        setIsProcessing(false);
-        onClose();
-        setTimeout(() => alert('تمت عملية الدفع بنجاح! سيتم تفعيل الاشتراك قريباً.'), 400);
-      }, 3000);
+      await launchMoamalatCheckout();
+      return;
     }
+
+    setIsProcessing(true);
+    setTimeout(() => {
+      setIsProcessing(false);
+      onClose();
+      setTimeout(() => alert('تمت عملية الدفع بنجاح! سيتم تفعيل الاشتراك قريباً.'), 400);
+    }, 3000);
   };
 
   const resetModal = () => {
@@ -273,6 +187,7 @@ export const SubscriptionCheckoutModal: React.FC<SubscriptionCheckoutModalProps>
     setAppliedCoupon(null);
     setSelectedPaymentMethod(null);
     setIsProcessing(false);
+    setIsLaunchingMoamalat(false);
   };
 
   useEffect(() => {
@@ -299,13 +214,14 @@ export const SubscriptionCheckoutModal: React.FC<SubscriptionCheckoutModalProps>
           onClick={(e) => e.stopPropagation()}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-700 rounded-3xl"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-48 translate-x-48 animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-br from-white/5 to-transparent rounded-full translate-y-32 -translate-x-32 animate-pulse"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full animate-pulse"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-48 translate-x-48"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-br from-white/5 to-transparent rounded-full translate-y-32 -translate-x-32"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full"></div>
 
           <button
             onClick={onClose}
             className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300"
+            aria-label="إغلاق نافذة الدفع"
           >
             <X className="h-5 w-5" />
           </button>
@@ -441,12 +357,23 @@ export const SubscriptionCheckoutModal: React.FC<SubscriptionCheckoutModalProps>
 
                     <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-8">
                       {paymentMethods.map((method) => (
-                        <motion.div key={method.id} whileHover={{ scale: 1.15 }} whileTap={{ scale: 0.85 }} className={`relative p-8 rounded-3xl cursor-pointer transition-all duration-300 ${
+                        <motion.div key={method.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }} className={`relative p-8 rounded-3xl cursor-pointer transition-all duration-300 ${
                           selectedPaymentMethod === method.id ? 'border-4 border-green-500 bg-green-50 shadow-2xl' : 'border-2 border-gray-200 hover:border-gray-400 hover:shadow-xl bg-white'
-                        }`} onClick={() => handlePaymentSelect(method.id)}>
+                        }`} onClick={() => handlePaymentSelect(method.id)} style={{ willChange: 'transform' }}>
                           <div className="text-center">
                             <div className="w-20 h-20 mx-auto bg-white rounded-3xl flex items-center justify-center shadow-lg border border-gray-100">
-                              <img src={method.icon} alt={method.name} className="w-16 h-16 object-contain" />
+                              <img
+                                src={method.icon}
+                                alt={method.name}
+                                loading="lazy"
+                                className="w-16 h-16 object-contain"
+                                onError={(e) => {
+                                  const target = e.currentTarget;
+                                  if (target.dataset.fallbackApplied === 'true') return;
+                                  target.dataset.fallbackApplied = 'true';
+                                  target.src = '/assets/payment/moamalat.png';
+                                }}
+                              />
                             </div>
                           </div>
                           {selectedPaymentMethod === method.id && (
@@ -484,7 +411,18 @@ export const SubscriptionCheckoutModal: React.FC<SubscriptionCheckoutModalProps>
                     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl border border-blue-200 shadow-xl">
                       <div className="text-center space-y-6">
                         <div className="w-24 h-24 mx-auto bg-white rounded-2xl flex items-center justify-center shadow-xl border border-blue-100">
-                          <img src="/data/payment/moamalat.png" alt="معاملات" className="w-16 h-16 object-contain" />
+                          <img
+                            src="/assets/partners/payment/moamalat.png"
+                            alt="معاملات"
+                            loading="lazy"
+                            className="w-16 h-16 object-contain"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              if (target.dataset.fallbackApplied === 'true') return;
+                              target.dataset.fallbackApplied = 'true';
+                              target.src = '/assets/payment/moamalat.png';
+                            }}
+                          />
                         </div>
                         <h3 className="text-2xl font-bold text-blue-900">معاملات</h3>
                         <p className="text-blue-700 text-lg">البوابة الوطنية الليبية للمدفوعات الإلكترونية</p>
@@ -521,7 +459,7 @@ export const SubscriptionCheckoutModal: React.FC<SubscriptionCheckoutModalProps>
                         {isProcessing ? (
                           <>
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            جاري المعالجة...
+                            {isLaunchingMoamalat ? 'جاري فتح بوابة معاملات...' : 'جاري المعالجة...'}
                           </>
                         ) : (
                           <>

@@ -1,16 +1,15 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { 
-  X, 
-  Gift, 
-  Sparkles, 
-  Star, 
-  Trophy,
+import {
   Crown,
-  Zap,
+  Gift,
+  Heart,
   PartyPopper,
-  Heart
+  Sparkles,
+  Star,
+  Trophy,
+  X,
+  Zap,
 } from 'lucide-react';
 
 interface CouponSuccessModalProps {
@@ -18,28 +17,24 @@ interface CouponSuccessModalProps {
   onClose: () => void;
 }
 
+const CONFETTI_CONFIGS = Array.from({ length: 30 }, (_, index) => ({
+  positionClass: `confetti-position-${(index % 10) + 1}`,
+  colorClass: `confetti-color-${(index % 6) + 1}`,
+  delayClass: `confetti-delay-${index % 5}`,
+  durationClass: `confetti-duration-${index % 3}`,
+}));
+
 const CouponSuccessModal: React.FC<CouponSuccessModalProps> = ({
   isOpen,
   onClose
 }) => {
-  // إنشاء مفرقعات احتفالية
-  const createConfetti = () => {
-    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#fd79a8'];
-    return Array.from({ length: 50 }, (_, i) => (
+  const createConfetti = () =>
+    CONFETTI_CONFIGS.map((config, index) => (
       <div
-        key={i}
-        className="absolute confetti-animation"
-        style={{
-          left: `${Math.random() * 100}%`,
-          backgroundColor: colors[Math.floor(Math.random() * colors.length)],
-          width: '10px',
-          height: '10px',
-          animationDelay: `${Math.random() * 3}s`,
-          animationDuration: `${3 + Math.random() * 2}s`
-        }}
+        key={index}
+        className={`absolute confetti-piece ${config.positionClass} ${config.colorClass} ${config.delayClass} ${config.durationClass}`}
       />
     ));
-  };
 
   if (!isOpen) return null;
 
@@ -50,6 +45,7 @@ const CouponSuccessModal: React.FC<CouponSuccessModalProps> = ({
         {/* زر الإغلاق */}
         <button
           onClick={onClose}
+          aria-label="إغلاق النافذة"
           className="absolute top-4 left-4 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center hover:bg-white transition-colors z-10"
         >
           <X className="h-4 w-4 text-gray-600" />
@@ -69,13 +65,13 @@ const CouponSuccessModal: React.FC<CouponSuccessModalProps> = ({
               <PartyPopper className="h-6 w-6 text-yellow-500 celebration-bounce" />
             </div>
             <div className="absolute top-8 right-12">
-              <Crown className="h-8 w-8 text-gold-500 celebration-bounce" style={{ animationDelay: '0.5s' }} />
+              <Crown className="h-8 w-8 text-gold-500 celebration-bounce celebration-delay-1" />
             </div>
             <div className="absolute top-6 right-6">
-              <Star className="h-5 w-5 text-yellow-600 celebration-bounce" style={{ animationDelay: '1s' }} />
+              <Star className="h-5 w-5 text-yellow-600 celebration-bounce celebration-delay-2" />
             </div>
             <div className="absolute bottom-20 left-6">
-              <Sparkles className="h-6 w-6 text-pink-500 celebration-bounce" style={{ animationDelay: '1.5s' }} />
+              <Sparkles className="h-6 w-6 text-pink-500 celebration-bounce celebration-delay-3" />
             </div>
           </div>
 
@@ -101,10 +97,10 @@ const CouponSuccessModal: React.FC<CouponSuccessModalProps> = ({
                     فزت معنا كوبون خصم
                   </h3>
                   <p className="text-lg font-semibold mb-4">
-                    بقيمة 1.5% من إجمالي مشترياتك
+                    خصم خرافي بقيمة 50% من إجمالي مشترياتك
                   </p>
                   <p className="text-white/90 text-base leading-relaxed">
-                    نتمنى لك التوفيق، مع إشرو تخليكم تشروا 
+                    صالح لمدة 24 ساعة على جميع المنتجات + الشحن والتوصيل مجاني!
                   </p>
                 </div>
               </div>

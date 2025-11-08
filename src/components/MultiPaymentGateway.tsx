@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import MoamalatOfficialLightbox from './MoamalatOfficialLightbox';
+import MoamalatRealLightbox from './MoamalatRealLightbox';
 
 interface MultiPaymentGatewayProps {
   isOpen: boolean;
@@ -24,29 +24,30 @@ const MultiPaymentGateway: React.FC<MultiPaymentGatewayProps> = ({
 }) => {
   const [selectedGateway, setSelectedGateway] = useState<string>('moamalat');
   const [showMoamalat, setShowMoamalat] = useState(false);
+  const [moamalatOrderData, setMoamalatOrderData] = useState<any>(null);
 
   // Payment gateways configuration
   const paymentGateways = [
     {
       id: 'moamalat',
-      name: 'معاملات',
-      nameAr: 'معاملات',
+      name: '',
+      nameAr: '',
       logo: '/assets/payment/moamalat.png',
-      description: 'البوابة الوطنية للدفع الإلكتروني في ليبيا',
+      description: '     ',
       supportedCards: ['Visa', 'Mastercard', 'Meeza'],
-      processingTime: 'فوري',
+      processingTime: '',
       fees: '2.5%',
       status: 'active',
       isNational: true
     },
     {
       id: 'fawry',
-      name: 'فوري',
-      nameAr: 'فوري',
+      name: '',
+      nameAr: '',
       logo: '/assets/payment/fawry.png',
-      description: 'نظام الدفع الإلكتروني المصري',
+      description: '   ',
       supportedCards: ['Visa', 'Mastercard'],
-      processingTime: '1-2 دقيقة',
+      processingTime: '1-2 ',
       fees: '2.75%',
       status: 'coming_soon',
       isNational: false
@@ -54,11 +55,11 @@ const MultiPaymentGateway: React.FC<MultiPaymentGatewayProps> = ({
     {
       id: 'paypal',
       name: 'PayPal',
-      nameAr: 'باي بال',
+      nameAr: ' ',
       logo: '/assets/payment/paypal.png',
-      description: 'منصة الدفع العالمية',
+      description: '  ',
       supportedCards: ['Visa', 'Mastercard', 'Amex'],
-      processingTime: 'فوري',
+      processingTime: '',
       fees: '3.5%',
       status: 'coming_soon',
       isNational: false
@@ -69,9 +70,10 @@ const MultiPaymentGateway: React.FC<MultiPaymentGatewayProps> = ({
     setSelectedGateway(gatewayId);
 
     if (gatewayId === 'moamalat') {
+      setMoamalatOrderData(orderData);
       setShowMoamalat(true);
     } else {
-      alert('هذه البوابة قيد التطوير وستكون متاحة قريباً');
+      alert('      ');
     }
   };
 
@@ -95,14 +97,14 @@ const MultiPaymentGateway: React.FC<MultiPaymentGatewayProps> = ({
           <CardHeader className="border-b">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-gray-900">
-                اختر بوابة الدفع
+                  
               </CardTitle>
               <Button variant="ghost" onClick={onClose} className="p-2">
-                <span className="text-2xl">×</span>
+                <span className="text-2xl"></span>
               </Button>
             </div>
             <p className="text-gray-600 mt-2">
-              اختر بوابة الدفع المناسبة لإتمام عملية الشراء بأمان
+                     
             </p>
           </CardHeader>
 
@@ -130,7 +132,7 @@ const MultiPaymentGateway: React.FC<MultiPaymentGatewayProps> = ({
                     />
                     <span className="text-sm">{gateway.nameAr}</span>
                     {gateway.isNational && (
-                      <Badge variant="secondary" className="text-xs">وطني</Badge>
+                      <Badge variant="secondary" className="text-xs"></Badge>
                     )}
                   </TabsTrigger>
                 ))}
@@ -160,21 +162,21 @@ const MultiPaymentGateway: React.FC<MultiPaymentGatewayProps> = ({
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-600">الوقت</div>
+                        <div className="text-sm text-gray-600"></div>
                         <div className="font-semibold text-gray-900">{gateway.processingTime}</div>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-600">العمولة</div>
+                        <div className="text-sm text-gray-600"></div>
                         <div className="font-semibold text-gray-900">{gateway.fees}</div>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-600">البطاقات</div>
+                        <div className="text-sm text-gray-600"></div>
                         <div className="font-semibold text-gray-900">{gateway.supportedCards.join(', ')}</div>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm text-gray-600">الحالة</div>
+                        <div className="text-sm text-gray-600"></div>
                         <div className="font-semibold text-green-600">
-                          {gateway.status === 'active' ? 'متاح' : 'قريباً'}
+                          {gateway.status === 'active' ? '' : ''}
                         </div>
                       </div>
                     </div>
@@ -184,11 +186,11 @@ const MultiPaymentGateway: React.FC<MultiPaymentGatewayProps> = ({
                         onClick={() => handleGatewaySelection(gateway.id)}
                         className="w-full bg-primary hover:bg-primary/90 text-white py-3"
                       >
-                        متابعة الدفع بـ {gateway.nameAr}
+                           {gateway.nameAr}
                       </Button>
                     ) : (
                       <Button disabled className="w-full bg-gray-300 text-gray-500 py-3">
-                        قريباً - {gateway.nameAr}
+                         - {gateway.nameAr}
                       </Button>
                     )}
                   </div>
@@ -199,11 +201,11 @@ const MultiPaymentGateway: React.FC<MultiPaymentGatewayProps> = ({
             {/* Security Notice */}
             <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex items-center gap-2 text-green-800">
-                <span className="text-lg">🔒</span>
-                <span className="font-semibold">جميع المعاملات آمنة ومشفرة</span>
+                <span className="text-lg"></span>
+                <span className="font-semibold">   </span>
               </div>
               <p className="text-sm text-green-700 mt-1">
-                نحن نستخدم أحدث تقنيات التشفير لحماية بياناتك وبيانات بطاقتك الائتمانية
+                         
               </p>
             </div>
           </CardContent>
@@ -211,11 +213,11 @@ const MultiPaymentGateway: React.FC<MultiPaymentGatewayProps> = ({
       </div>
 
       {/* Moamalat Lightbox */}
-      <MoamalatOfficialLightbox
+      <MoamalatRealLightbox
         isOpen={showMoamalat}
         onClose={() => setShowMoamalat(false)}
         amount={amount}
-        orderData={orderData}
+        orderData={moamalatOrderData}
         onPaymentSuccess={handleMoamalatSuccess}
         onPaymentError={handleMoamalatError}
       />

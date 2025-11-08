@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   ArrowLeft,
   ArrowRight,
-  Star,
   Crown,
-  Sparkles,
+  Eye,
   Heart,
   ShoppingCart,
-  Eye
+  Sparkles,
+  Star
 } from 'lucide-react';
 import type { Product } from '@/data/storeProducts';
 
@@ -21,6 +21,12 @@ interface PrettySliderProps {
   onToggleFavorite: (productId: number) => void;
   favorites: number[];
 }
+
+const SPARKLE_CONFIGS = Array.from({ length: 20 }, (_, index) => ({
+  positionClass: `sparkle-position-${(index % 10) + 1}`,
+  delayClass: `sparkle-delay-${index % 5}`,
+  durationClass: `sparkle-duration-${index % 4}`,
+}));
 
 const PrettySlider: React.FC<PrettySliderProps> = ({
   products,
@@ -137,16 +143,10 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
       <div className="absolute inset-0">
         <div className={`absolute inset-0 bg-gradient-to-r ${storeColors.accent}/20 via-current/10 to-current/20`}></div>
         <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
+          {SPARKLE_CONFIGS.map((config, index) => (
             <div
-              key={i}
-              className="absolute animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
-              }}
+              key={index}
+              className={`absolute animate-pulse ${config.positionClass} ${config.delayClass} ${config.durationClass}`}
             >
               <Sparkles className="h-4 w-4 text-rose-400/40" />
             </div>
@@ -174,10 +174,7 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
               key={slide.id}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
                 index === activeSlide ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{
-                filter: isDragging ? 'brightness(0.9)' : 'brightness(1)'
-              }}
+              } ${isDragging ? 'filter brightness-90' : 'filter brightness-100'}`}
             >
               <img
                 src={slide.image}
@@ -197,13 +194,17 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
       {allSlides.length > 1 && (
         <>
           <button
+            type="button"
             onClick={prevSlide}
+            aria-label="الشريحة السابقة"
             className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-rose-200 hover:border-rose-400 z-50"
           >
             <ArrowLeft className="h-6 w-6 text-gray-700" />
           </button>
           <button
+            type="button"
             onClick={nextSlide}
+            aria-label="الشريحة التالية"
             className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-rose-200 hover:border-rose-400 z-50"
           >
             <ArrowRight className="h-6 w-6 text-gray-700" />
@@ -217,7 +218,10 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
           {allSlides.map((_, index) => (
             <button
               key={index}
+              type="button"
               onClick={() => goToSlide(index)}
+              aria-label={`الانتقال إلى الشريحة ${index + 1}`}
+              aria-pressed={index === activeSlide ? 'true' : 'false'}
               className={`transition-all duration-300 rounded-full ${
                 index === activeSlide
                   ? 'w-10 h-3 bg-gradient-to-r from-rose-400 to-pink-500'
@@ -231,7 +235,10 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
       {/* مؤشر التشغيل التلقائي */}
       <div className="absolute top-4 left-4 z-20">
         <button
+          type="button"
           onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+          aria-label={isAutoPlaying ? 'إيقاف التشغيل التلقائي' : 'تشغيل السلايدر تلقائيًا'}
+          aria-pressed={isAutoPlaying ? 'true' : 'false'}
           className={`p-2 rounded-full backdrop-blur-sm border transition-all duration-300 ${
             isAutoPlaying
               ? 'bg-green-500/90 border-green-300 text-white'

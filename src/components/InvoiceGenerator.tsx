@@ -430,7 +430,7 @@ const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({
               <span>${invoice.shippingCost || 0} د.ل</span>
             </div>
             <div class="total-row discount">
-              <span>قيمة كوبون الخصم (${invoice.discountPercentage || 1.5}%)</span>
+              <span>قيمة كوبون الخصم (${invoice.discountPercentage || 50}%)</span>
               <span>- ${invoice.discountAmount || 0} د.ل</span>
             </div>
             <div class="total-row final-total">
@@ -838,7 +838,7 @@ const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({
               <span>${invoice.shippingCost || 0} د.ل</span>
             </div>
             <div class="total-row discount">
-              <span>قيمة كوبون الخصم (${invoice.discountPercentage || 1.5}%)</span>
+              <span>قيمة كوبون الخصم (${invoice.discountPercentage || 50}%)</span>
               <span>- ${invoice.discountAmount || 0} د.ل</span>
             </div>
             <div class="total-row final-total">

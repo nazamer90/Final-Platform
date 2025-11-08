@@ -139,13 +139,13 @@ export default function PartnersPage({ onBack }: { onBack: () => void }) {
         <FloatingCubes />
         
         <div className="container px-4 relative z-10">
-          <div className="text-center mb-16 fade-in-up">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+          <div className="flex items-center justify-center text-center mb-16 fade-in-up">
+            <h1 className="flex items-center justify-center text-4xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                 شركاء النجاح
               </span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-justify">
               نتعاون مع أفضل المؤسسات المالية والتقنية في ليبيا لنقدم لك خدمات التجارة الإلكترونية الأكثر تطوراً وأماناً
             </p>
           </div>
@@ -176,7 +176,7 @@ export default function PartnersPage({ onBack }: { onBack: () => void }) {
               <h3 className="text-2xl font-bold mb-3 text-primary">
                 {categories.find(c => c.id === activeCategory)?.title}
               </h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-justify">
                 {categories.find(c => c.id === activeCategory)?.description}
               </p>
             </div>
@@ -213,11 +213,13 @@ export default function PartnersPage({ onBack }: { onBack: () => void }) {
                       </div>
                     </div>
 
-                    {/* إزالة النصوص حسب الطلب - تظهر فقط للمصارف التجارية */}
+                    {/* عرض اسم الشريك */}
+                    <h4 className="text-sm font-medium text-gray-800 text-center">{partner.name}</h4>
+
+                    {/* مؤشرات الحالة - تظهر فقط للمصارف التجارية */}
                     {activeCategory === 'banks' && (
                       <>
-                        {/* مؤشرات الحالة */}
-                        <div className="flex justify-center gap-1 mt-3">
+                        <div className="flex justify-center gap-1 mt-2">
                           <div className="w-2 h-2 bg-green-500 rounded-full pulse-animation"></div>
                           <div className="w-2 h-2 bg-blue-500 rounded-full pulse-animation" style={{animationDelay: '0.5s'}}></div>
                           <div className="w-2 h-2 bg-primary rounded-full pulse-animation" style={{animationDelay: '1s'}}></div>
@@ -235,15 +237,15 @@ export default function PartnersPage({ onBack }: { onBack: () => void }) {
           {/* إحصائيات */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-primary/20">
-              <div className="text-3xl font-bold text-primary mb-2">12+</div>
+              <div className="text-3xl font-bold text-primary mb-2">16+</div>
               <div className="text-muted-foreground">مصرف تجاري</div>
             </div>
             <div className="text-center p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-primary/20">
-              <div className="text-3xl font-bold text-primary mb-2">10+</div>
+              <div className="text-3xl font-bold text-primary mb-2">12+</div>
               <div className="text-muted-foreground">شركة دفع إلكتروني</div>
             </div>
             <div className="text-center p-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-primary/20">
-              <div className="text-3xl font-bold text-primary mb-2">5+</div>
+              <div className="text-3xl font-bold text-primary mb-2">19+</div>
               <div className="text-muted-foreground">شركة شحن وتوصيل</div>
             </div>
           </div>
@@ -254,7 +256,7 @@ export default function PartnersPage({ onBack }: { onBack: () => void }) {
               <h3 className="text-2xl font-bold mb-4 text-primary">
                 انضم إلى شبكة شركائنا
               </h3>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground mb-6 text-justify">
                 هل تريد أن تكون جزءاً من منظومة إشرو للتجارة الإلكترونية؟
               </p>
               <Button className="bg-primary hover:bg-primary/90 px-8 py-3">

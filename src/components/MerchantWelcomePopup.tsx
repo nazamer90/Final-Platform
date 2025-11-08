@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
-  X,
-  CheckCircle,
-  TrendingUp,
-  Users,
-  Package,
-  DollarSign,
-  Star,
-  Gift,
+  Award,
   Bell,
   Calendar,
-  Target,
-  Zap,
-  Award,
-  Rocket,
+  CheckCircle,
+  DollarSign,
+  Gift,
   Heart,
-  Sparkles
+  Package,
+  Rocket,
+  Sparkles,
+  Star,
+  Target,
+  TrendingUp,
+  Users,
+  X,
+  Zap
 } from 'lucide-react';
 
 interface MerchantWelcomePopupProps {
@@ -38,7 +38,7 @@ const MerchantWelcomePopup: React.FC<MerchantWelcomePopupProps> = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  type Step = { title: string; subtitle: string; content: React.ReactNode };
+  interface Step { title: string; subtitle: string; content: React.ReactNode; }
 
   const steps: Step[] = [
     {
@@ -141,7 +141,7 @@ const MerchantWelcomePopup: React.FC<MerchantWelcomePopupProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.2s' }}>
+            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center animate-bounce delay-[200ms]">
               <span className="text-white font-bold text-lg">2</span>
             </div>
             <div className="flex-1">
@@ -151,7 +151,7 @@ const MerchantWelcomePopup: React.FC<MerchantWelcomePopupProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border border-purple-200 hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.4s' }}>
+            <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center animate-bounce delay-[400ms]">
               <span className="text-white font-bold text-lg">3</span>
             </div>
             <div className="flex-1">
@@ -217,7 +217,7 @@ const MerchantWelcomePopup: React.FC<MerchantWelcomePopupProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-            <Sparkles className="h-8 w-8 text-green-600 animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <Sparkles className="h-8 w-8 text-green-600 animate-pulse delay-[500ms]" />
             <div>
               <p className="font-bold text-green-900">أدوات تسويق مجانية </p>
               <p className="text-sm text-green-700">كوبونات وعروض لجذب العملاء</p>
@@ -330,6 +330,7 @@ const MerchantWelcomePopup: React.FC<MerchantWelcomePopupProps> = ({
         <CardHeader className="bg-gradient-to-r from-primary to-primary/80 text-white relative">
           <button
             onClick={onClose}
+            aria-label="إغلاق"
             className="absolute top-4 left-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors"
           >
             <X className="h-4 w-4" />

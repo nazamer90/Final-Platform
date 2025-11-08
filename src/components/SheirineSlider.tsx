@@ -187,13 +187,17 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
       {allSlides.length > 1 && (
         <>
           <button
+            type="button"
             onClick={prevSlide}
+            aria-label="الشريحة السابقة"
             className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-rose-200 hover:border-rose-400 z-50"
           >
             <ArrowLeft className="h-6 w-6 text-gray-700" />
           </button>
           <button
+            type="button"
             onClick={nextSlide}
+            aria-label="الشريحة التالية"
             className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-rose-200 hover:border-rose-400 z-50"
           >
             <ArrowRight className="h-6 w-6 text-gray-700" />
@@ -207,7 +211,10 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
           {allSlides.map((_, index) => (
             <button
               key={index}
+              type="button"
               onClick={() => goToSlide(index)}
+              aria-label={`الانتقال إلى الشريحة ${index + 1}`}
+              aria-pressed={index === activeSlide ? 'true' : 'false'}
               className={`transition-all duration-300 rounded-full ${
                 index === activeSlide
                   ? 'w-10 h-3 bg-gradient-to-r from-rose-400 to-pink-500'
@@ -221,7 +228,10 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
       {/* مؤشر التشغيل التلقائي */}
       <div className="absolute top-4 left-4 z-20">
         <button
+          type="button"
           onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+          aria-label={isAutoPlaying ? 'إيقاف التشغيل التلقائي' : 'تشغيل السلايدر تلقائيًا'}
+          aria-pressed={isAutoPlaying ? 'true' : 'false'}
           className={`p-2 rounded-full backdrop-blur-sm border transition-all duration-300 ${
             isAutoPlaying
               ? 'bg-green-500/90 border-green-300 text-white'

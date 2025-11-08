@@ -1,0 +1,5 @@
+/* Progress bar styles for CustomerReportsView */
+.progress-bar-fill {
+  height: 8px;
+  border-radius: 4px;
+}

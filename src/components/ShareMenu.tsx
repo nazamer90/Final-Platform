@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { 
-  Share2, 
-  Check, 
-  Copy, 
-  MessageCircle,
+import {
+  Check,
+  Copy,
+  Download,
   Facebook,
-  Twitter,
+  Instagram,
   Linkedin,
   Mail,
-  QrCode,
-  Instagram,
-  Send,
+  MessageCircle,
   MessageSquare,
   Phone,
-  Users,
-  Download
+  Send,
+  Share2,
+  Twitter,
+  Users
 } from 'lucide-react';
 import {
   Popover,
@@ -27,7 +26,7 @@ interface ShareMenuProps {
   url: string;
   title?: string;
   className?: string;
-  size?: "sm" | "default" | "lg";
+  size?: "icon" | "sm" | "md" | "lg";
   variant?: "ghost" | "outline" | "default";
   showLabel?: boolean;
 }
@@ -133,8 +132,8 @@ const ShareMenu: React.FC<ShareMenuProps> = ({
       // محاولة فتح جهات الاتصال أو إظهار رسالة
       if (navigator.share) {
         navigator.share({
-          title: title,
-          url: url
+          title,
+          url
         }).catch(() => {
           handleCopyLink();
         });

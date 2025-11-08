@@ -110,7 +110,7 @@ export const paymentMethods = {
       { name: "تداول", icon: "/assets/payment/tadawul.png" },
       { name: "موبي كاش", icon: "/assets/payment/mobicash.png" },
       { name: "1باي", icon: "/assets/payment/1Pay.png" },
-      { name: "أنيس", icon: "/assets/payment/anis.png" },
+      { name: "أنيس", icon: "/assets/partners/payment/anis.png" },
       { name: "بكم", icon: "/assets/payment/Becom.png" },
       { name: "بلو لاين", icon: "/assets/payment/BlueLine.png" },
       { name: "نابفور", icon: "/assets/payment/nab4pay.png" },
@@ -165,6 +165,7 @@ export const partnersData = {
     { name: 'بكم', logo: '/assets/partners/payment/Becom.png' },
     { name: 'بلو لاين', logo: '/assets/partners/payment/BlueLine.png' },
     { name: 'إدفعلي', logo: '/assets/partners/payment/edfali.png' },
+    { name: 'قصتلي', logo: '/assets/partners/payment/qasatli.png' },
     { name: 'إشرو', logo: '/assets/partners/payment/ishro.jpg' }
   ],
   transport: [
@@ -173,7 +174,20 @@ export const partnersData = {
     { name: 'درب السيل', logo: '/assets/partners/transport/darbsail.png' },
     { name: 'بريستو', logo: '/assets/partners/transport/presto.jpg' },
     { name: 'فانكس', logo: '/assets/partners/transport/vanex.png' },
-    { name: 'زام', logo: '/assets/partners/transport/ZAM.png' }
+    { name: 'زام', logo: '/assets/partners/transport/ZAM.png' },
+    { name: 'أرامكس', logo: '/assets/partners/transport/aramex.webp' },
+    { name: 'بيبو فاست', logo: '/assets/partners/transport/bebo_fast.webp' },
+    { name: 'دي إكسبريس', logo: '/assets/partners/transport/dexpress.webp' },
+    { name: 'دي إتش إل', logo: '/assets/partners/transport/dhl.png' },
+    { name: 'جيدكس', logo: '/assets/partners/transport/gedex.webp' },
+    { name: 'جو ديليفري', logo: '/assets/partners/transport/go-delivery.webp' },
+    { name: 'هدهد', logo: '/assets/partners/transport/hudhud.jpeg' },
+    { name: 'توصيل آخر', logo: '/assets/partners/transport/other_delivery.png' },
+    { name: 'سكاي إكس', logo: '/assets/partners/transport/skyex.webp' },
+    { name: 'سونيك إكسبريس', logo: '/assets/partners/transport/sonicexpress.webp' },
+    { name: 'إس تي بي إكس', logo: '/assets/partners/transport/stpx.webp' },
+    { name: 'توربو إكس إل جي', logo: '/assets/partners/transport/turboexlg.webp' },
+    { name: 'وينجسلي', logo: '/assets/partners/transport/wingsly.webp' }
   ]
 };
 

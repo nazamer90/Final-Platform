@@ -2,25 +2,25 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
+  Building,
+  Camera,
   CheckCircle,
   Edit,
   Eye,
   EyeOff,
+  GripVertical,
+  Image as ImageIcon,
+  MapPin,
+  MoreVertical,
   Package,
   Plus,
   Save,
   Search,
+  Settings,
   Tag,
   Trash2,
-  X,
-  Image as ImageIcon,
   Upload,
-  Camera,
-  MapPin,
-  Building,
-  Settings,
-  MoreVertical,
-  GripVertical,
+  X,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -318,7 +318,7 @@ const CategoriesView: React.FC<CategoriesViewProps> = ({ storeData, setStoreData
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="image">صورة التصنيف</Label>
+                    <Label htmlFor="category-image-input">صورة التصنيف</Label>
                     <div className="mt-1">
                       <div className="flex items-center gap-3">
                         <Button
@@ -342,6 +342,8 @@ const CategoriesView: React.FC<CategoriesViewProps> = ({ storeData, setStoreData
                         type="file"
                         accept="image/*"
                         className="hidden"
+                        aria-hidden="true"
+                        tabIndex={-1}
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
@@ -355,7 +357,7 @@ const CategoriesView: React.FC<CategoriesViewProps> = ({ storeData, setStoreData
                   </div>
 
                   <div>
-                    <Label htmlFor="backgroundImage">الصورة الخلفية للتصنيف</Label>
+                    <Label htmlFor="category-bg-input">الصورة الخلفية للتصنيف</Label>
                     <div className="mt-1">
                       <div className="flex items-center gap-3">
                         <Button
@@ -379,6 +381,8 @@ const CategoriesView: React.FC<CategoriesViewProps> = ({ storeData, setStoreData
                         type="file"
                         accept="image/*"
                         className="hidden"
+                        aria-hidden="true"
+                        tabIndex={-1}
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {

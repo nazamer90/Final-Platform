@@ -31,7 +31,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Badge } from './ui/badge';
-import { libyanCities } from '@/data/libyanCities';
+import { libyanCities } from '@/data/libya/cities/cities';
 
 interface Warehouse {
   id: string;
@@ -171,7 +171,7 @@ const WarehouseManagementView: React.FC<WarehouseManagementViewProps> = ({ store
       }
 
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY&loading=async`;
       script.async = true;
       script.defer = true;
 
@@ -812,8 +812,7 @@ const WarehouseManagementView: React.FC<WarehouseManagementViewProps> = ({ store
 
                 <div
                   ref={mapRef}
-                  className="w-full h-96 bg-gray-100 rounded-lg"
-                  style={{ minHeight: '400px' }}
+                  className="w-full h-96 min-h-[400px] bg-gray-100 rounded-lg"
                 />
 
                 {!mapLoaded && !isMapLoading && (

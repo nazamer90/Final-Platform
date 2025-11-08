@@ -1,0 +1,15 @@
+module.exports = {
+  name: "moamalat-hash-server",
+  version: "1.0.0",
+  main: "index.js",
+  type: "commonjs",
+  scripts: {
+    start: "node index.js",
+    "start:hash": "node server/index.js"
+  },
+  dependencies: {
+    cors: "^2.8.5",
+    dotenv: "^16.4.5",
+    express: "^4.19.2"
+  }
+};

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X, CreditCard } from 'lucide-react';
+import { CreditCard, X } from 'lucide-react';
 
 interface MoamalatOfficialLightboxProps {
   isOpen: boolean;
@@ -20,8 +20,8 @@ const MOAMALAT_CONFIG = {
   testMode: true,
   // Updated URLs based on Moamalat documentation
   lightboxURL: 'https://test.moamalat.net/api/v2/LightBox',
-  sdkURL: 'https://test.moamalat.net/lightbox/moamalat.lightbox.js',
-  productionURL: 'https://npg.moamalat.net/lightbox/moamalat.lightbox.js',
+  sdkURL: 'https://tnpg.moamalat.net:6006/js/lightbox.js',
+  productionURL: 'https://npg.moamalat.net:6006/js/lightbox.js',
   // API endpoints
   paymentEndpoint: 'https://test.moamalat.net/api/v2/Payment',
   refundEndpoint: 'https://test.moamalat.net/api/v2/Refund'
@@ -41,6 +41,7 @@ const MoamalatOfficialLightbox: React.FC<MoamalatOfficialLightboxProps> = ({
   const [emailAddress, setEmailAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showTestData, setShowTestData] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
 
   // Load test data helper - Updated with real Moamalat test cards
   const loadTestData = () => {
@@ -67,6 +68,9 @@ const MoamalatOfficialLightbox: React.FC<MoamalatOfficialLightboxProps> = ({
 
   // Initialize with test environment
   useEffect(() => {
+    if (isOpen) {
+      setLogoFailed(false);
+    }
     if (isOpen && MOAMALAT_CONFIG.testMode) {
       console.log('Moamalat Test Mode - Ready for integration');
       // In production, load real Moamalat SDK here
@@ -76,23 +80,48 @@ const MoamalatOfficialLightbox: React.FC<MoamalatOfficialLightboxProps> = ({
 
   const loadMoamalatLightboxSDK = async () => {
     try {
-      // Load Moamalat Lightbox SDK
-      if (!(window as any).MoamalatLightbox) {
-        const script = document.createElement('script');
-        script.src = MOAMALAT_CONFIG.testMode
-          ? 'https://test.moamalat.net/lightbox/moamalat.lightbox.js'
-          : 'https://npg.moamalat.net/lightbox/moamalat.lightbox.js';
-        
-        script.onload = () => {
-          console.log('Moamalat Lightbox SDK loaded successfully');
-        };
-        
-        script.onerror = () => {
-          console.warn('Failed to load Moamalat SDK, using simulation mode');
-        };
-        
-        document.head.appendChild(script);
+      const w = window as any;
+      if (w.MoamalatLightbox || w.Lightbox?.Checkout) {
+        if (!w.MoamalatLightbox && w.Lightbox) {
+          w.MoamalatLightbox = w.Lightbox;
+        }
+        return;
       }
+
+      const src = MOAMALAT_CONFIG.testMode ? MOAMALAT_CONFIG.sdkURL : MOAMALAT_CONFIG.productionURL;
+      const existing = document.querySelector<HTMLScriptElement>(`script[data-moamalat-sdk="${src}"]`) || document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
+      if (existing) {
+        existing.addEventListener('load', () => {
+          const globalLightbox = (window as any).Lightbox;
+          if (globalLightbox && !w.MoamalatLightbox) {
+            w.MoamalatLightbox = globalLightbox;
+          }
+        }, { once: true });
+        existing.addEventListener('error', () => {
+          console.warn('Failed to load Moamalat SDK, using simulation mode');
+        }, { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.defer = true;
+      script.dataset.moamalatSdk = src;
+
+      script.onload = () => {
+        const globalLightbox = (window as any).Lightbox;
+        if (globalLightbox && !w.MoamalatLightbox) {
+          w.MoamalatLightbox = globalLightbox;
+        }
+        console.log('Moamalat Lightbox SDK loaded successfully');
+      };
+
+      script.onerror = () => {
+        console.warn('Failed to load Moamalat SDK, using simulation mode');
+      };
+
+      document.head.appendChild(script);
     } catch (error) {
       console.warn('Moamalat SDK loading failed:', error);
     }
@@ -126,7 +155,7 @@ const MoamalatOfficialLightbox: React.FC<MoamalatOfficialLightboxProps> = ({
     const paymentData = {
       merchantId: MOAMALAT_CONFIG.merchantId,
       terminalId: MOAMALAT_CONFIG.terminalId,
-      merchantReference: merchantReference,
+      merchantReference,
       amount: amountInCents,
       currency: 'LYD',
       customerEmail: emailAddress,
@@ -180,7 +209,7 @@ const MoamalatOfficialLightbox: React.FC<MoamalatOfficialLightboxProps> = ({
         }
       }
 
-      let transactionData: any = {
+      const transactionData: any = {
         TxnDate: new Date().toISOString().replace(/[-:]/g, '').slice(0, 14),
         SystemReference: Math.floor(Math.random() * 9999999) + 1000000,
         NetworkReference: '506' + Math.floor(Math.random() * 999999999),
@@ -296,7 +325,7 @@ const MoamalatOfficialLightbox: React.FC<MoamalatOfficialLightboxProps> = ({
         }
       }
 
-      let transactionData: any = {
+      const transactionData: any = {
         TxnDate: new Date().toISOString().replace(/[-:]/g, '').slice(0, 14),
         SystemReference: Math.floor(Math.random() * 9999999) + 1000000,
         NetworkReference: '506' + Math.floor(Math.random() * 999999999),
@@ -399,12 +428,12 @@ const MoamalatOfficialLightbox: React.FC<MoamalatOfficialLightboxProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div 
-        className="bg-white rounded-lg shadow-2xl w-full max-w-lg relative"
-        style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#fafbfc' }}
+        className="rounded-lg shadow-2xl w-full max-w-lg relative font-sans bg-[#fafbfc]"
       >
         {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label="إغلاق"
           className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 z-10 w-5 h-5"
         >
           <X className="w-5 h-5" />
@@ -415,24 +444,19 @@ const MoamalatOfficialLightbox: React.FC<MoamalatOfficialLightboxProps> = ({
           <div className="flex items-center justify-start mb-6">
             {/* Moamalat Official Logo */}
             <div className="flex items-center">
-              <img 
-                src="/assets/payment/moamalat.png" 
-                alt="Moamalat" 
-                className="h-10 w-auto"
-                onError={(e) => {
-                  // Fallback to styled text logo that matches the design
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  const parent = (e.target as HTMLElement).parentElement;
-                  if (parent) {
-                    parent.innerHTML = `
-                      <div class="flex items-center">
-                        <div class="text-3xl font-bold" style="color: #F39C12">m</div>
-                        <div class="text-2xl font-normal" style="color: #666">oamalat</div>
-                      </div>
-                    `;
-                  }
-                }}
-              />
+              {logoFailed ? (
+                <div className="flex items-center">
+                  <div className="text-3xl font-bold text-[#F39C12]">m</div>
+                  <div className="text-2xl font-normal text-[#666666]">oamalat</div>
+                </div>
+              ) : (
+                <img 
+                  src="/assets/payment/moamalat.png" 
+                  alt="Moamalat" 
+                  className="h-10 w-auto"
+                  onError={() => setLogoFailed(true)}
+                />
+              )}
             </div>
           </div>
 

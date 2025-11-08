@@ -105,6 +105,41 @@ interface CompleteOrdersPageProps {
   onRemoveUnavailableItem: (index: number) => void;
 }
 
+const resolveProductImage = (product: any): string | undefined => {
+  if (!product) {
+    return undefined;
+  }
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    return product.images[0];
+  }
+  if (product.image) {
+    return product.image;
+  }
+  if (product.thumbnail) {
+    return product.thumbnail;
+  }
+  if (Array.isArray(product.product?.images) && product.product.images.length > 0) {
+    return product.product.images[0];
+  }
+  if (product.product?.image) {
+    return product.product.image;
+  }
+  return undefined;
+};
+
+const resolveProductKey = (product: any, index: number): string => {
+  if (product?.id !== undefined) {
+    return String(product.id);
+  }
+  if (product?.product?.id !== undefined) {
+    return String(product.product.id);
+  }
+  if (product?.productId !== undefined) {
+    return String(product.productId);
+  }
+  return `product-${index}`;
+};
+
 const CompleteOrdersPage: React.FC<CompleteOrdersPageProps> = ({
   orders = [],
   favorites = [],
@@ -153,17 +188,20 @@ const CompleteOrdersPage: React.FC<CompleteOrdersPageProps> = ({
     notificationTypes: [] as string[]
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [favoriteQuantities, setFavoriteQuantities] = useState<{[key: number]: number}>({});
+  const [favoriteQuantities, setFavoriteQuantities] = useState<Record<string, number>>({});
   const [notificationRequests, setNotificationRequests] = useState<NotificationRequest[]>([]);
   const [showRemoveConfirmModal, setShowRemoveConfirmModal] = useState<number | null>(null);
 
   // تهيئة كميات المفضلة
   React.useEffect(() => {
-    const initialQuantities: {[key: number]: number} = {};
-    favorites.forEach(product => {
-      initialQuantities[product.id] = 1;
+    setFavoriteQuantities((prev) => {
+      const next: Record<string, number> = {};
+      favorites.forEach((product, index) => {
+        const key = resolveProductKey(product, index);
+        next[key] = prev[key] || 1;
+      });
+      return next;
     });
-    setFavoriteQuantities(initialQuantities);
   }, [favorites]);
 
   // تتبع البيانات المحملة من localStorage وقراءتها مباشرة إذا لزم الأمر
@@ -184,11 +222,15 @@ const CompleteOrdersPage: React.FC<CompleteOrdersPageProps> = ({
   // استخدام البيانات من localStorage كمصدر واحد للحقيقة
   const displayUnavailableItems = localUnavailableItems;
 
-  const updateFavoriteQuantity = (productId: number, change: number) => {
-    setFavoriteQuantities(prev => ({
-      ...prev,
-      [productId]: Math.max(1, (prev[productId] || 1) + change)
-    }));
+  const updateFavoriteQuantity = (productKey: string, change: number) => {
+    setFavoriteQuantities((prev) => {
+      const current = prev[productKey] || 1;
+      const next = Math.max(1, current + change);
+      if (next === current) {
+        return prev;
+      }
+      return { ...prev, [productKey]: next };
+    });
   };
 
   const handleNotifySubmit = () => {
@@ -381,91 +423,105 @@ const CompleteOrdersPage: React.FC<CompleteOrdersPageProps> = ({
               </Card>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {favorites.map((product) => (
-                  <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-                    <div className="relative">
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-32 object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/assets/products/placeholder.png';
-                        }}
-                      />
-                      
-                      {/* أيقونة الإزالة */}
-                      <button
-                        onClick={() => onRemoveFavorite(product.id)}
-                        className="absolute top-2 left-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                      
-                      {/* أيقونة المشاركة */}
-                      <div className="absolute top-2 right-2">
-                        <ShareMenu 
-                          url={generateProductUrl(product)}
-                          title={`تحقق من هذا المنتج الرائع: ${product.name} - سعر مميز ${product.price} د.ل في متجر إشرو!`}
-                          className="w-8 h-8 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-                          size="sm"
-                          variant="default"
+                {favorites.map((product, index) => {
+                  const rawProduct: any = product;
+                  const productKey = resolveProductKey(rawProduct, index);
+                  const productImage = resolveProductImage(rawProduct);
+                  const productName = rawProduct.name || rawProduct.product?.name || 'منتج من متاجر إشرو';
+                  const productPrice = rawProduct.price ?? rawProduct.product?.price ?? 0;
+                  const productOriginalPrice = rawProduct.originalPrice ?? rawProduct.product?.originalPrice;
+                  const quantity = favoriteQuantities[productKey] || 1;
+                  const removableId = typeof rawProduct.id === 'number' ? rawProduct.id : typeof rawProduct.product?.id === 'number' ? rawProduct.product.id : undefined;
+                  const baseShareData = { ...rawProduct, id: removableId ?? rawProduct.id };
+                  const normalizedImages = Array.isArray(baseShareData.images) && baseShareData.images.length > 0 ? baseShareData.images : productImage ? [productImage] : [];
+                  const shareData = { ...baseShareData, images: normalizedImages } as Product;
+
+                  return (
+                    <Card key={productKey} className="overflow-hidden hover:shadow-lg transition-all duration-300">
+                      <div className="relative">
+                        <img
+                          src={productImage || '/assets/products/placeholder.png'}
+                          alt={productName}
+                          className="w-full h-32 object-cover"
+                          onError={(event) => {
+                            (event.target as HTMLImageElement).src = '/assets/products/placeholder.png';
+                          }}
                         />
-                      </div>
-                    </div>
-                    
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                        {product.name}
-                      </h3>
-                      
-                      {/* الأسعار */}
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-lg font-bold text-primary">
-                          {product.price} د.ل
-                        </span>
-                        {product.originalPrice > product.price && (
-                          <span className="text-sm text-gray-500 line-through">
-                            {product.originalPrice} د.ل
-                          </span>
-                        )}
-                      </div>
-                      
-                      {/* تحكم بالكمية */}
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm text-gray-600">الكمية:</span>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
+                        
+                        <button
+                          onClick={() => {
+                            if (removableId !== undefined) {
+                              onRemoveFavorite(removableId);
+                            }
+                          }}
+                          title="إزالة من المفضلة"
+                          className="absolute top-2 left-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                        
+                        <div className="absolute top-2 right-2">
+                          <ShareMenu 
+                            url={generateProductUrl(shareData)}
+                            title={`تحقق من هذا المنتج الرائع: ${productName} - سعر مميز ${productPrice} د.ل في متجر إشرو!`}
+                            className="w-8 h-8 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
                             size="sm"
-                            onClick={() => updateFavoriteQuantity(product.id, -1)}
-                            disabled={(favoriteQuantities[product.id] || 1) <= 1}
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="w-8 text-center font-semibold">
-                            {favoriteQuantities[product.id] || 1}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateFavoriteQuantity(product.id, 1)}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
+                            variant="default"
+                          />
                         </div>
                       </div>
                       
-                      {/* زر إضافة للسلة */}
-                      <Button
-                        onClick={() => onAddToCart(product)}
-                        className="w-full bg-primary hover:bg-primary/90 text-white"
-                      >
-                        <ShoppingCart className="h-4 w-4 mr-2" />
-                        أضف للسلة
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                      <CardContent className="p-4">
+                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                          {productName}
+                        </h3>
+                        
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-lg font-bold text-primary">
+                            {productPrice} د.ل
+                          </span>
+                          {productOriginalPrice !== undefined && productOriginalPrice > productPrice && (
+                            <span className="text-sm text-gray-500 line-through">
+                              {productOriginalPrice} د.ل
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-sm text-gray-600">الكمية:</span>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateFavoriteQuantity(productKey, -1)}
+                              disabled={quantity <= 1}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </Button>
+                            <span className="w-8 text-center font-semibold">
+                              {quantity}
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateFavoriteQuantity(productKey, 1)}
+                            >
+                              <Plus className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <Button
+                          onClick={() => onAddToCart(shareData)}
+                          className="w-full bg-primary hover:bg-primary/90 text-white"
+                        >
+                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          أضف للسلة
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </div>

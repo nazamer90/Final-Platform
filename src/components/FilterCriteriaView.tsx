@@ -1,30 +1,30 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Plus,
-  Search,
-  Filter,
+  AlertCircle,
+  CheckCircle,
+  ChevronDown,
+  Copy,
   Edit,
-  Trash2,
-  Save,
-  X,
-  Palette,
-  Type,
-  Image as ImageIcon,
-  Upload,
   Eye,
   EyeOff,
-  Settings,
-  Tag as TagIcon,
-  Copy,
-  MoreVertical,
-  ChevronDown,
-  CheckCircle,
-  AlertCircle,
+  FileText,
+  Filter,
+  Hash,
+  Image as ImageIcon,
   Info,
   Layers,
-  FileText,
-  Hash,
+  MoreVertical,
+  Palette,
+  Plus,
+  Save,
+  Search,
+  Settings,
+  Tag as TagIcon,
+  Trash2,
+  Type,
+  Upload,
+  X,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -200,6 +200,8 @@ const FilterCriteriaView: React.FC<FilterCriteriaViewProps> = ({ storeData, setS
   const handleSaveFilter = () => {
     if (!storeData) return;
 
+    const createdAt = editingFilter ? editingFilter.createdAt : new Date().toISOString().split('T')[0];
+
     const newFilter: FilterCriteria = {
       id: editingFilter ? editingFilter.id : Date.now().toString(),
       nameAr: filterForm.nameAr,
@@ -207,7 +209,7 @@ const FilterCriteriaView: React.FC<FilterCriteriaViewProps> = ({ storeData, setS
       type: filterForm.type,
       isActive: filterForm.isActive,
       sortOrder: filterForm.sortOrder,
-      createdAt: editingFilter ? editingFilter.createdAt : new Date().toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
+      createdAt,
       values: filterForm.values,
     };
 
@@ -296,10 +298,9 @@ const FilterCriteriaView: React.FC<FilterCriteriaViewProps> = ({ storeData, setS
       case 'colors':
         return (
           <div className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded-full border"
-              style={{ backgroundColor: value.colorCode }}
-            ></div>
+            <svg className="w-4 h-4" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="7" fill={value.colorCode || '#000000'} stroke="#D1D5DB" strokeWidth="1" />
+            </svg>
             <span>{value.nameAr}</span>
           </div>
         );

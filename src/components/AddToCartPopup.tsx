@@ -17,6 +17,12 @@ import {
   Sparkles,
   Tag
 } from 'lucide-react';
+import {
+  PRODUCT_IMAGE_FALLBACK_SRC,
+  advanceImageOnError,
+  buildProductMediaConfig,
+  getImageMimeType
+} from '@/lib/utils';
 
 interface ProductColorOption {
   name: string;
@@ -82,6 +88,11 @@ const AddToCartPopup: React.FC<AddToCartPopupProps> = ({
     }
     return ['أسود', 'أبيض', 'أخضر داكن'];
   }, [product.colors]);
+
+  const mediaConfig = useMemo(
+    () => buildProductMediaConfig(product, PRODUCT_IMAGE_FALLBACK_SRC),
+    [product]
+  );
 
   // إعادة تعيين الحالة عند فتح النافذة
   useEffect(() => {
@@ -149,14 +160,21 @@ const AddToCartPopup: React.FC<AddToCartPopupProps> = ({
             <CardContent className="p-4">
               <div className="flex gap-4">
                 <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                  <img
-                    src={product.image || product.images?.[0] || '/assets/products/dress-black-main.png'}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/assets/products/dress-black-main.png';
-                    }}
-                  />
+                  <picture>
+                    {mediaConfig.pictureSources.map((src) => {
+                      const type = getImageMimeType(src);
+                      return <source key={src} srcSet={src} {...(type ? { type } : {})} />;
+                    })}
+                    <img
+                      src={mediaConfig.primary}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                      data-image-sources={JSON.stringify(mediaConfig.datasetSources)}
+                      data-image-index="0"
+                      data-fallback-src={PRODUCT_IMAGE_FALLBACK_SRC}
+                      onError={advanceImageOnError}
+                    />
+                  </picture>
                 </div>
                 
                 <div className="flex-1 space-y-2">

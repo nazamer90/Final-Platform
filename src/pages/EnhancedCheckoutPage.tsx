@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,22 +17,32 @@ import {
   MapPin,
   PartyPopper,
   Phone,
+  Shield,
   Sparkles,
   Truck,
-  User
+  User,
+  Zap
 } from 'lucide-react';
 import CityAreaSelector from '@/components/CityAreaSelector';
 import { getAreaById, getCityById, libyanCities } from '@/data/libya/cities/cities';
-import { availableCoupons, generateOrderId, shippingData } from '@/data/ecommerceData';
+import { availableCoupons, generateOrderId } from '@/data/ecommerceData';
 import CouponMessageModal from '@/components/CouponMessageModal';
 import CouponSuccessModal from '@/components/CouponSuccessModal';
-import MultiPaymentGateway from '@/components/MultiPaymentGateway';
+import { openMoamalatLightbox, ensureMoamalatScript } from '@/lib/moamalat';
+import {
+  PRODUCT_IMAGE_FALLBACK_SRC,
+  advanceImageOnError,
+  buildProductMediaConfig,
+  getImageMimeType
+} from '@/lib/utils';
 
 interface Product {
   id: number;
   name: string;
   price: number;
   image?: string;
+  images?: string[];
+  thumbnail?: string;
   category?: string;
   brand?: string;
 }
@@ -149,7 +159,6 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
   const [couponModalMessage, setCouponModalMessage] = useState('');
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
   const [showCouponSuccessModal, setShowCouponSuccessModal] = useState(false);
-  const [showMoamalatGateway, setShowMoamalatGateway] = useState(false);
   const [orderReadyForPayment, setOrderReadyForPayment] = useState<OrderData | null>(null);
   const [showGuestRegistrationPrompt, setShowGuestRegistrationPrompt] = useState(false);
 
@@ -195,11 +204,20 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
     }
 
     // البحث عن الكوبون المحفوظ من واجهة الترحيب
-    const welcomeCouponData = localStorage.getItem('eshro_user_coupon');
-    let welcomeCoupon: Coupon | null = null;
-    if (welcomeCouponData) {
-      welcomeCoupon = JSON.parse(welcomeCouponData);
-    }
+    const storedRewardCoupon = localStorage.getItem('eshro_reward_coupon_data') || sessionStorage.getItem('eshro_reward_coupon_data');
+    const storedUserCoupon = localStorage.getItem('eshro_user_coupon') || sessionStorage.getItem('eshro_user_coupon');
+    const parseSafely = (raw: string | null): Coupon | null => {
+      if (!raw) {
+        return null;
+      }
+      try {
+        return JSON.parse(raw);
+      } catch (e) {
+        console.error('خطأ في قراءة كوبون الترحيب:', e);
+        return null;
+      }
+    };
+    const welcomeCoupon: Coupon | null = parseSafely(storedRewardCoupon) || parseSafely(storedUserCoupon);
     
     // البحث في الكوبونات المتاحة
     const availableCoupon = availableCoupons.find(c => c.code === couponCode);
@@ -234,7 +252,7 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
         setShowCouponSuccessModal(true);
       } else {
         setCouponModalType('success');
-        setCouponModalMessage('مبروك لقد فزت معنا بكوبون خصم!\nفزت معنا كوبون خصم بقيمة 1.5% من إجمالي مشترياتك\nنتمنى لك التوفيق، مع إشرو تخليكم تشروا');
+        setCouponModalMessage(`مبروك لقد فزت معنا بكوبون خصم!\nخصم خرافي بقيمة ${coupon.discount || 50}% من إجمالي مشترياتك\nنتمنى لك التوفيق، مع إشرو تخليكم تشروا`);
         setCouponMessageModal(true);
       }
     } else {
@@ -243,6 +261,51 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
       setCouponMessageModal(true);
     }
   };
+
+  useEffect(() => {
+    if (paymentMethod === 'immediate' && paymentType === 'moamalat') {
+      ensureMoamalatScript().catch((error) => {
+        console.error(error);
+        alert('تعذر تحميل سكربت بوابة معاملات. حاول مرة أخرى.');
+      });
+    }
+  }, [paymentMethod, paymentType]);
+
+  async function initializeMoamalatPayment(orderData: OrderData) {
+    console.log('[Moamalat] Initializing payment...');
+    try {
+      await openMoamalatLightbox({
+        amountLYD: Number(orderData.finalTotal ?? total),
+        referencePrefix: 'ORD',
+        orderId: orderData.id,
+        customerEmail: orderData.customer?.email,
+        customerMobile: orderData.customer?.phone,
+        additionalConfig: {
+          CustomerName: orderData.customer?.name,
+        },
+        onComplete: (data) => {
+          console.log('[Moamalat] Payment complete:', data);
+          setIsProcessingOrder(false);
+          onOrderComplete({ ...orderData, status: 'confirmed', paymentDetails: data });
+          setOrderReadyForPayment(null);
+          setTimeout(() => alert('تمت عملية الدفع بنجاح! سيتم تجهيز طلبك قريباً.'), 400);
+        },
+        onError: (err) => {
+          console.error('[Moamalat] Payment error:', err);
+          setIsProcessingOrder(false);
+          alert('حدث خطأ في عملية الدفع: ' + (err?.error || err?.message || 'خطأ غير معروف'));
+        },
+        onCancel: () => {
+          console.warn('[Moamalat] Payment cancelled by user');
+          setIsProcessingOrder(false);
+        },
+      });
+    } catch (error: any) {
+      console.error('[Moamalat] Error initializing lightbox:', error);
+      setIsProcessingOrder(false);
+      alert('فشل في تهيئة نظام الدفع: ' + (error?.message || 'خطأ غير معروف'));
+    }
+  }
 
   // معالج معاملات - فتح معاملات مباشرة للدفع الفوري
   const handleConfirmOrder = async () => {
@@ -323,44 +386,30 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
       };
 
       // فتح بوابة معاملات مباشرة لجميع طرق الدفع الفورية - إصلاح شامل
-      if (paymentMethod === 'immediate') {
+      if (paymentMethod === 'immediate' && paymentType === 'moamalat') {
         setOrderReadyForPayment(orderData);
-        setShowMoamalatGateway(true);
-        setIsProcessingOrder(false);
+        await initializeMoamalatPayment(orderData);
         return; // فتح معاملات مباشرة
       }
-      
+
+      // فتح بوابة معاملات للدفع الفوري - استخدام نفس التكامل المباشر
+      if (paymentMethod === 'immediate') {
+        setOrderReadyForPayment(orderData);
+        // استخدام نفس التكامل المباشر من SubscriptionCheckoutModal
+        await initializeMoamalatPayment(orderData);
+        return; // فتح معاملات مباشرة
+      }
+
       // لجميع طرق الدفع الأخرى، معالجة مباشرة
       await new Promise(resolve => setTimeout(resolve, 1500));
       orderData.status = 'confirmed' as const;
       onOrderComplete(orderData);
       setIsProcessingOrder(false);
-      
+
     } catch (error) {
       alert('حدث خطأ أثناء معالجة الطلب. يرجى المحاولة مرة أخرى.');
       setIsProcessingOrder(false);
     }
-  };
-
-  // معالج نجاح الدفع عبر معاملات
-  const handleMoamalatSuccess = (transactionData: { id: string; status: string; amount: number; [key: string]: unknown }) => {
-    if (orderReadyForPayment) {
-      const completedOrder = {
-        ...orderReadyForPayment,
-        status: 'confirmed' as const,
-        paymentDetails: transactionData
-      };
-      setShowMoamalatGateway(false);
-      setOrderReadyForPayment(null);
-      onOrderComplete(completedOrder);
-    }
-  };
-
-  // معالج فشل الدفع عبر معاملات
-  const handleMoamalatError = (error: string) => {
-    setShowMoamalatGateway(false);
-    setOrderReadyForPayment(null);
-    alert(`فشل في الدفع: ${error}`);
   };
 
   // طرق الدفع المتاحة
@@ -530,11 +579,55 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
               <CardHeader>
                 <CardTitle>ملخص الطلب</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between">
-                  <span>إجمالي المنتجات:</span>
-                  <span>{subtotal.toFixed(2)} د.ل</span>
+              <CardContent className="space-y-4">
+                {/* قائمة المنتجات */}
+                <div className="space-y-3 pb-3 border-b">
+                  <h3 className="font-semibold text-sm text-gray-700">المنتجات ({cartItems.length})</h3>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {cartItems.map((item) => {
+                      const media = buildProductMediaConfig(item.product, PRODUCT_IMAGE_FALLBACK_SRC);
+
+                      return (
+                        <div key={item.id} className="flex gap-3 p-2 bg-gray-50 rounded-lg">
+                          <picture>
+                            {media.pictureSources.map((src) => {
+                              const type = getImageMimeType(src);
+                              return <source key={src} srcSet={src} {...(type ? { type } : {})} />;
+                            })}
+                            <img
+                              src={media.primary}
+                              alt={item.product.name}
+                              className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+                              data-image-sources={JSON.stringify(media.datasetSources)}
+                              data-image-index="0"
+                              data-fallback-src={PRODUCT_IMAGE_FALLBACK_SRC}
+                              onError={advanceImageOnError}
+                            />
+                          </picture>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-medium text-gray-900 truncate">{item.product.name}</h4>
+                            <p className="text-xs text-gray-500">
+                              {item.size && `المقاس: ${item.size}`}
+                              {item.size && item.color && ' • '}
+                              {item.color && `اللون: ${item.color}`}
+                            </p>
+                            <div className="flex items-center justify-between mt-1">
+                              <span className="text-xs text-gray-600">الكمية: {item.quantity}</span>
+                              <span className="text-sm font-semibold text-primary">{(item.product.price * item.quantity).toFixed(2)} د.ل</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
+
+                {/* الملخص المالي */}
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>إجمالي المنتجات:</span>
+                    <span>{subtotal.toFixed(2)} د.ل</span>
+                  </div>
                 <div className="flex justify-between">
                   <span>قيمة الشحن والتوصيل:</span>
                   <span>{shippingCost.toFixed(2)} د.ل</span>
@@ -548,6 +641,7 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
                   <span>المجموع النهائي:</span>
                   <span className="text-primary">{total.toFixed(2)} د.ل</span>
                 </div>
+              </div>
 
                 {/* كوبون التخفيض */}
                 <div className="space-y-2">
@@ -877,7 +971,7 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
               ) : (
                 <>
                   <CreditCard className="h-5 w-5 mr-2" />
-                  {paymentMethod === 'immediate' ? 'ادفع الآن عبر معاملات' : 'تأكيد الطلب'}
+                  {paymentMethod === 'immediate' ? 'ادفع عبر معاملات' : 'اتمام الطلب'}
                 </>
               )}
             </Button>
@@ -907,7 +1001,7 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
               
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-4">
                 <p className="text-green-800 font-semibold mb-2">
-                  تخفيض بقيمة 1.5% من إجمالي فاتورة الطلب
+                  تخفيض بقيمة 50% من إجمالي فاتورة الطلب
                 </p>
                 <p className="text-sm text-green-700">
                   تسوق واربح معنا دائماً مكافآت وهدايا مع متجر إشرو
@@ -943,19 +1037,6 @@ const EnhancedCheckoutPage: React.FC<EnhancedCheckoutPageProps> = ({
       <CouponSuccessModal
         isOpen={showCouponSuccessModal}
         onClose={() => setShowCouponSuccessModal(false)}
-      />
-
-      {/* بوابة الدفع المتعددة - الواجهة الرسمية المحدثة */}
-      <MultiPaymentGateway
-        isOpen={showMoamalatGateway}
-        onClose={() => {
-          setShowMoamalatGateway(false);
-          setOrderReadyForPayment(null);
-        }}
-        amount={total}
-        orderData={orderReadyForPayment}
-        onPaymentSuccess={handleMoamalatSuccess}
-        onPaymentError={handleMoamalatError}
       />
 
       {/* نافذة طلب التسجيل للضيوف */}

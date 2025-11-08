@@ -20,9 +20,18 @@ import {
   Check,
   X
 } from "lucide-react";
-import MoamalatOfficialLightbox from "@/components/MoamalatOfficialLightbox";
+import { openMoamalatLightbox, ensureMoamalatScript } from "@/lib/moamalat";
+import {
+  PRODUCT_IMAGE_FALLBACK_SRC,
+  advanceImageOnError,
+  buildProductMediaConfig,
+  getImageMimeType
+} from "@/lib/utils";
 import { citiesData, shippingData, paymentMethods, availableCoupons, generateOrderId } from "@/data/ecommerceData";
 import CouponMessageModal from "@/components/CouponMessageModal";
+
+const PAYMENT_ICON_FALLBACK_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="12" fill="#f9fafb"/><path d="M24 32h32" stroke="#d1d5db" stroke-width="4" stroke-linecap="round"/><path d="M28 42h24" stroke="#d1d5db" stroke-width="4" stroke-linecap="round"/><rect x="20" y="28" width="40" height="24" rx="6" fill="none" stroke="#9ca3af" stroke-width="4"/></svg>';
+const PAYMENT_ICON_FALLBACK_SRC = `data:image/svg+xml;utf8,${encodeURIComponent(PAYMENT_ICON_FALLBACK_SVG)}`;
 
 interface CartItem {
   id: number;
@@ -108,15 +117,20 @@ const CartPage: React.FC<CartPageProps> = ({
     }
 
     // البحث عن الكوبون المحفوظ من واجهة الترحيب
-    const welcomeCouponData = localStorage.getItem('eshro_user_coupon');
-    let welcomeCoupon: any = null;
-    if (welcomeCouponData) {
+    const storedRewardCoupon = localStorage.getItem('eshro_reward_coupon_data') || sessionStorage.getItem('eshro_reward_coupon_data');
+    const storedUserCoupon = localStorage.getItem('eshro_user_coupon') || sessionStorage.getItem('eshro_user_coupon');
+    const parseSafely = (raw: string | null) => {
+      if (!raw) {
+        return null;
+      }
       try {
-        welcomeCoupon = JSON.parse(welcomeCouponData);
+        return JSON.parse(raw);
       } catch (e) {
         console.error('خطأ في قراءة كوبون الترحيب:', e);
+        return null;
       }
-    }
+    };
+    const welcomeCoupon: any = parseSafely(storedRewardCoupon) || parseSafely(storedUserCoupon);
     
     // البحث في الكوبونات المتاحة
     const availableCoupon = availableCoupons.find(c => c.code === couponCode);
@@ -146,7 +160,7 @@ const CartPage: React.FC<CartPageProps> = ({
     if (coupon) {
       setAppliedCoupon(coupon);
       setCouponModalType('success');
-      setCouponModalMessage('مبروك لقد فزت معنا بكوبون خصم!\nفزت معنا كوبون خصم بقيمة 1.5% من إجمالي مشترياتك\nنتمنى لك التوفيق، مع إشرو تخليكم تشروا');
+      setCouponModalMessage(`مبروك لقد فزت معنا بكوبون خصم!\nخصم خرافي بقيمة ${coupon.discount || 50}% من إجمالي مشترياتك\nنتمنى لك التوفيق، مع إشرو تخليكم تشروا`);
       setShowCouponModal(true);
     } else {
       setCouponModalType('error');
@@ -298,29 +312,41 @@ const CartView: React.FC<any> = ({
     <div className="lg:col-span-2 space-y-4">
       <h2 className="text-xl font-bold text-gray-900 mb-4">المنتجات في السلة</h2>
       
-      {cartItems.map((item: CartItem) => (
-        <Card key={`${item.product.id}-${item.size}-${item.color}`} className="overflow-hidden">
-          <CardContent className="p-4">
-            <div className="flex gap-4">
-              <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                <img
-                  src={item.product.images?.[0] || '/assets/products/placeholder.png'}
-                  alt={item.product.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/assets/products/placeholder.png';
-                  }}
-                />
-              </div>
-              
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900">{item.product.name}</h3>
-                <p className="text-sm text-gray-600 mb-2">
-                  المقاس: {item.size} • اللون: {item.color}
-                </p>
+      {cartItems.map((item: CartItem) => {
+        const media = buildProductMediaConfig(item.product, PRODUCT_IMAGE_FALLBACK_SRC);
+
+        return (
+          <Card key={`${item.product.id}-${item.size}-${item.color}`} className="overflow-hidden">
+            <CardContent className="p-4">
+              <div className="flex gap-4">
+                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                  <picture>
+                    {media.pictureSources.map((src) => {
+                      const type = getImageMimeType(src);
+                      return <source key={src} srcSet={src} {...(type ? { type } : {})} />;
+                    })}
+                    <img
+                      src={media.primary}
+                      alt={item.product.name}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                      data-image-sources={JSON.stringify(media.datasetSources)}
+                      data-image-index="0"
+                      data-fallback-src={PRODUCT_IMAGE_FALLBACK_SRC}
+                      onError={advanceImageOnError}
+                    />
+                  </picture>
+                </div>
                 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">{item.product.name}</h3>
+                  <p className="text-sm text-gray-600 mb-2">
+                    المقاس: {item.size} • اللون: {item.color}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -355,7 +381,8 @@ const CartView: React.FC<any> = ({
             </div>
           </CardContent>
         </Card>
-      ))}
+      );
+      })}
     </div>
     
     {/* ملخص الطلب */}
@@ -609,11 +636,14 @@ const CheckoutView: React.FC<any> = ({
                       />
                       <label htmlFor={`onDelivery-${method.name}`} className="flex items-center justify-center cursor-pointer hover:bg-gray-50 p-2 rounded-lg">
                         <img 
-                          src={method.icon} 
+                          src={method.icon || PAYMENT_ICON_FALLBACK_SRC} 
                           alt={method.name}
                           className="w-12 h-12 object-contain bg-transparent"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iNiIgZmlsbD0iI2Y5ZmFmYiIvPgo8cGF0aCBkPSJNMTggMThoMTJ2NkgxOHYtNlptMCA2aDEydjZIMTh2LTZaIiBmaWxsPSIjNmI3MjgwIi8+CjwvcIZnPgo=';
+                            const target = e.target as HTMLImageElement;
+                            if (target.src === PAYMENT_ICON_FALLBACK_SRC) return;
+                            target.onerror = null;
+                            target.src = PAYMENT_ICON_FALLBACK_SRC;
                           }}
                         />
                       </label>
@@ -646,11 +676,14 @@ const CheckoutView: React.FC<any> = ({
                       />
                       <label htmlFor={`immediate-${method.name}`} className="flex items-center justify-center cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition-colors">
                         <img 
-                          src={method.icon} 
+                          src={method.icon || PAYMENT_ICON_FALLBACK_SRC} 
                           alt={method.name}
                           className="w-20 h-20 object-contain bg-transparent"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiByeD0iMTIiIGZpbGw9IiNmOWZhZmIiLz4KPHA9GggZD0iTTQwIDYwYzEzLjI1NSAwIDI0LTEwLjc0NSAyNC0yNHMtMTAuNzQ1LTI0LTI0LTI0LTI0IDEwLjc0NS0yNCAyNHMxMC43NDUgMjQgMjQgMjR6IiBmaWxsPSIjZTVlN2ViIi8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4xZW0iPfCfkqQ8L3RleHQ+Cjwvc3ZnPg==';
+                            const target = e.target as HTMLImageElement;
+                            if (target.src === PAYMENT_ICON_FALLBACK_SRC) return;
+                            target.onerror = null;
+                            target.src = PAYMENT_ICON_FALLBACK_SRC;
                           }}
                         />
                       </label>
@@ -861,21 +894,41 @@ const CheckoutView: React.FC<any> = ({
             <CardTitle>المنتجات</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {cartItems.map((item: CartItem) => (
-              <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-lg">👗</span>
+            {cartItems.map((item: CartItem) => {
+              const media = buildProductMediaConfig(item.product, PRODUCT_IMAGE_FALLBACK_SRC);
+
+              return (
+                <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-white border flex-shrink-0 flex items-center justify-center">
+                    <picture>
+                      {media.pictureSources.map((src) => {
+                        const type = getImageMimeType(src);
+                        return <source key={src} srcSet={src} {...(type ? { type } : {})} />;
+                      })}
+                      <img
+                        src={media.primary}
+                        alt={item.product.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                        data-image-sources={JSON.stringify(media.datasetSources)}
+                        data-image-index="0"
+                        data-fallback-src={PRODUCT_IMAGE_FALLBACK_SRC}
+                        onError={advanceImageOnError}
+                      />
+                    </picture>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-sm">{item.product.name}</h4>
+                    <p className="text-xs text-gray-600">{item.size} • {item.color}</p>
+                    <p className="text-xs text-gray-600">الكمية: {item.quantity}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-primary">{item.product.price * item.quantity} د.ل</div>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-medium text-sm">{item.product.name}</h4>
-                  <p className="text-xs text-gray-600">{item.size} • {item.color}</p>
-                  <p className="text-xs text-gray-600">الكمية: {item.quantity}</p>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-primary">{item.product.price * item.quantity} د.ل</div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
       </div>
@@ -891,28 +944,62 @@ const PaymentView: React.FC<any> = ({
   onBack,
   onPaymentComplete
 }) => {
-  const [showMoamalatGateway, setShowMoamalatGateway] = useState(false);
+  const [isLaunchingMoamalat, setIsLaunchingMoamalat] = useState(false);
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
-  const handlePaymentStart = () => {
+  useEffect(() => {
     if (orderData.payment.method === 'immediate') {
-      // فتح بوابة معاملات للدفع الفوري
-      setShowMoamalatGateway(true);
-      return;
-    } else {
-      // للدفع عند الاستلام - تأكيد مباشر
-      setIsProcessingOrder(true);
-      setTimeout(() => {
-        const finalOrderData = {
-          ...orderData,
-          id: generateOrderId(),
-          date: new Date().toISOString(),
-          status: 'confirmed'
-        };
-        setIsProcessingOrder(false);
-        onPaymentComplete(finalOrderData);
-      }, 1500);
+      ensureMoamalatScript().catch((error) => {
+        console.error('Moamalat script preload failed:', error);
+      });
     }
+  }, [orderData.payment.method]);
+
+  const handlePaymentStart = async () => {
+    if (orderData.payment.method === 'immediate') {
+      setIsProcessingOrder(true);
+      setIsLaunchingMoamalat(true);
+      try {
+        await openMoamalatLightbox({
+          amountLYD: Number(orderData.total),
+          referencePrefix: 'ORD',
+          orderId: orderData.id,
+          customerMobile: orderData.customer?.phone,
+          onComplete: (transactionData) => {
+            handleMoamalatSuccess(transactionData);
+            setIsProcessingOrder(false);
+            setIsLaunchingMoamalat(false);
+          },
+          onError: (error) => {
+            handleMoamalatError(error);
+            setIsProcessingOrder(false);
+            setIsLaunchingMoamalat(false);
+          },
+          onCancel: () => {
+            setIsProcessingOrder(false);
+            setIsLaunchingMoamalat(false);
+          },
+        });
+      } catch (error: any) {
+        console.error('Moamalat launch failed:', error);
+        setIsProcessingOrder(false);
+        setIsLaunchingMoamalat(false);
+        alert('تعذر فتح بوابة معاملات. يرجى المحاولة مرة أخرى.');
+      }
+      return;
+    }
+
+    setIsProcessingOrder(true);
+    setTimeout(() => {
+      const finalOrderData = {
+        ...orderData,
+        id: generateOrderId(),
+        date: new Date().toISOString(),
+        status: 'confirmed'
+      };
+      setIsProcessingOrder(false);
+      onPaymentComplete(finalOrderData);
+    }, 1500);
   };
 
   // معالج نجاح الدفع عبر معاملات
@@ -924,14 +1011,13 @@ const PaymentView: React.FC<any> = ({
       status: 'confirmed',
       paymentDetails: transactionData
     };
-    setShowMoamalatGateway(false);
     onPaymentComplete(completedOrder);
   };
 
   // معالج فشل الدفع عبر معاملات
-  const handleMoamalatError = (error: string) => {
-    setShowMoamalatGateway(false);
-    alert(`فشل في الدفع: ${error}`);
+  const handleMoamalatError = (error: any) => {
+    const message = error?.error || error?.message || error || 'خطأ غير معروف';
+    alert(`فشل في الدفع: ${message}`);
   };
 
   return (
@@ -988,15 +1074,14 @@ const PaymentView: React.FC<any> = ({
         </CardContent>
       </Card>
 
-      {/* بوابة الدفع معاملات - الواجهة الرسمية */}
-      <MoamalatOfficialLightbox
-        isOpen={showMoamalatGateway}
-        onClose={() => setShowMoamalatGateway(false)}
-        amount={orderData.total}
-        orderData={orderData}
-        onPaymentSuccess={handleMoamalatSuccess}
-        onPaymentError={handleMoamalatError}
-      />
+      {isLaunchingMoamalat && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white px-6 py-4 rounded-lg shadow-lg text-center">
+            <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-sm text-gray-600">جاري فتح بوابة معاملات...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -68,26 +68,13 @@ const supportedBanks = [
 ];
 ```
 
-#### إعداد التكامل
-```typescript
-// إعدادات بوابة مواملات
-const moamalatConfig = {
-  environment: process.env.NODE_ENV === 'production' ? 'production' : 'test',
-  credentials: {
-    merchantId: process.env.MOAMALAT_MERCHANT_ID,
-    apiKey: process.env.MOAMALAT_API_KEY,
-    secretKey: process.env.MOAMALAT_SECRET_KEY
-  },
-  endpoints: {
-    test: 'https://test.moamalat.ly/api',
-    production: 'https://api.moamalat.ly/api'
-  },
-  webhooks: {
-    paymentStatus: process.env.MOAMALAT_WEBHOOK_URL,
-    refundStatus: process.env.MOAMALAT_REFUND_WEBHOOK_URL
-  }
-};
-```
+#### إعداد التكامل (2025)
+- **الوحدة المركزية**: `openMoamalatLightbox` تبني حمولة الدفع وتطلق Lightbox بعد توليد التوقيع `src/lib/moamalat.ts:186`.
+- **تحميل السكربت**: `ensureMoamalatScript` تتعامل مع تحميل `https://tnpg.moamalat.net:6006/js/lightbox.js` لمرة واحدة وتتأكد من جاهزية `Lightbox.Checkout` قبل الاستدعاء `src/lib/moamalat.ts:41`.
+- **مصادر الاعتماد**: يتم الحصول على `MID` و`TID` من المتغيرات البيئية أو عبر `fetch('/api/moamalat/config')` عند الحاجة `src/lib/moamalat.ts:84`.
+- **توقيع المعاملة**: يتم إرسال البيانات إلى `POST /api/moamalat/hash` مع توليد HMAC محلي في حال توفّر مفتاح اختبار `src/lib/moamalat.ts:118`.
+- **نقاط التكامل**: يتم استدعاء الوحدة من السلة والدفع المحسّن واشتراكات العملاء مع التحميل المسبق ومعالجة الحالات الموحدة `src/pages/CartPage.tsx:905`, `src/pages/EnhancedCheckoutPage.tsx:280`, `src/components/SubscriptionCheckoutModal.tsx:160`.
+- **مرجع تفصيلي**: انظر ملف `docs/moamalat-integration-updates-2025.md` لمزيد من الشرح واختبارات التحقق.
 
 #### طرق الدفع المدعومة
 ```typescript

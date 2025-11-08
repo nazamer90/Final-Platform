@@ -3,16 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-  CreditCard, 
-  Lock, 
-  Shield, 
+import {
   AlertCircle,
-  CheckCircle,
-  Loader2,
-  X,
+  ArrowLeft,
   Building2,
-  ArrowLeft
+  CheckCircle,
+  CreditCard,
+  Loader2,
+  Lock,
+  Shield,
+  X
 } from 'lucide-react';
 
 interface MoamalatPaymentGatewayProps {
@@ -91,14 +91,14 @@ const MoamalatPaymentGateway: React.FC<MoamalatPaymentGatewayProps> = ({
         // محاكاة استجابة API معاملات
         const transactionData = {
           transactionId: 'MOAMALAT_' + Date.now(),
-          amount: amount,
+          amount,
           status: 'completed',
           timestamp: new Date().toISOString(),
           gateway: 'moamalat',
           bank: selectedBank,
           cardNumber: cardNumber.replace(/(.{4})/g, '$1 ').trim(),
           maskedCardNumber: cardNumber.substring(0, 4) + 'XXXX XXXX ' + cardNumber.substring(12),
-          expiryDate: expiryDate,
+          expiryDate,
           merchantId: 'ESHRO_001',
           terminalId: 'TERM_001',
           actionCode: '00', // نجاح العملية
@@ -189,9 +189,11 @@ const MoamalatPaymentGateway: React.FC<MoamalatPaymentGatewayProps> = ({
               اختر مصرفك:
             </Label>
             <select 
+              id="bank-select"
               value={selectedBank} 
               onChange={(e) => setSelectedBank(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              aria-label="اختر مصرفك"
             >
               <option value="">اختر مصرفك...</option>
               {libyanBanks.map((bank) => (

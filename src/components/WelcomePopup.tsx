@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
-import { 
-  X, 
-  Gift, 
+import {
+  X,
+  Gift,
   Copy,
   Check,
-  ShoppingBag,
   Bell,
   Trophy,
   Star,
@@ -23,6 +20,10 @@ interface WelcomePopupProps {
   onRegistrationComplete: (couponData: any) => void;
 }
 
+const SESSION_COUPON_KEY = 'eshro_reward_session_code';
+const COUPON_DATA_KEY = 'eshro_reward_coupon_data';
+const USER_COUPON_STORAGE_KEY = 'eshro_user_coupon';
+
 const WelcomePopup: React.FC<WelcomePopupProps> = ({
   isOpen,
   onClose,
@@ -35,7 +36,6 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({
     email: ''
   });
   const [couponCode, setCouponCode] = useState('');
-  const [couponGenerated, setCouponGenerated] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const generateCouponCode = () => {
@@ -54,40 +54,46 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({
   };
 
   const handleRegistration = () => {
-    if (!formData.name.trim() || !formData.phone.trim() || !formData.email.trim()) {
+    const trimmedName = formData.name.trim();
+    const trimmedEmail = formData.email.trim();
+    const normalizedPhone = formData.phone.trim();
+
+    if (!trimmedName || !trimmedEmail || !normalizedPhone) {
       alert('يرجى ملء جميع الحقول');
       return;
     }
 
-    // التحقق من صيغة رقم الهاتف - يقبل مع أو بدون مسافة
-    const phoneRegex = /^9[0-9]\s?[0-9]{7}$/;
-    if (!phoneRegex.test(formData.phone)) {
-      alert('يرجى إدخال رقم الهاتف بالصيغة الصحيحة: 944062927 أو 94 4062927');
+    const phoneRegex = /^09\d{8}$/;
+    if (!phoneRegex.test(normalizedPhone)) {
+      alert('يرجى إدخال رقم الهاتف بالصيغة الصحيحة: 09XXXXXXXX');
       return;
     }
 
-    // توليد الكوبون وحفظه
-    const newCoupon = generateCouponCode();
-    setCouponCode(newCoupon);
-    setCouponGenerated(true);
-    
-    // حفظ الكوبون في localStorage
-    const couponData = {
-      code: newCoupon,
-      discount: 1.5,
+    const activeCode = couponCode || generateCouponCode();
+    const couponPayload = {
+      code: activeCode,
+      discount: 50,
       minAmount: 0,
-      user: formData,
+      user: {
+        name: trimmedName,
+        phone: normalizedPhone,
+        email: trimmedEmail
+      },
       createdAt: new Date().toISOString(),
       expiryHours: 24
     };
-    
-    localStorage.setItem('eshro_user_coupon', JSON.stringify(couponData));
-    onRegistrationComplete(couponData);
-    
-    // محاكاة إرسال البريد الإلكتروني
-    sendWelcomeEmail(formData, newCoupon);
-    
-    // الانتقال للواجهة الثانية
+
+    setCouponCode(activeCode);
+
+    const serialized = JSON.stringify(couponPayload);
+    localStorage.setItem(USER_COUPON_STORAGE_KEY, serialized);
+    localStorage.setItem(COUPON_DATA_KEY, serialized);
+    sessionStorage.setItem(USER_COUPON_STORAGE_KEY, serialized);
+    sessionStorage.setItem(COUPON_DATA_KEY, serialized);
+    sessionStorage.setItem(SESSION_COUPON_KEY, activeCode);
+
+    onRegistrationComplete(couponPayload);
+    sendWelcomeEmail(couponPayload.user, activeCode);
     setCurrentStep(2);
   };
 
@@ -103,6 +109,10 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({
 
   const handleStartShopping = () => {
     console.log('handleStartShopping called - closing welcome popup');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('eshro_logged_in_as_visitor', 'false');
+      sessionStorage.setItem('eshro_logged_in_as_visitor', 'false');
+    }
     onClose();
   };
 
@@ -124,13 +134,58 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({
     }
   };
 
-  // تأثير تطبيق useEffect لتوليد الكوبون في الواجهة الأولى
   React.useEffect(() => {
-    if (currentStep === 1 && !couponGenerated) {
-      const newCoupon = generateCouponCode();
-      setCouponCode(newCoupon);
+    if (!isOpen || typeof window === 'undefined') {
+      return;
     }
-  }, [currentStep, couponGenerated]);
+
+    const ensureCouponData = () => {
+      try {
+        const sessionCoupon = sessionStorage.getItem(COUPON_DATA_KEY);
+        if (sessionCoupon) {
+          const parsed = JSON.parse(sessionCoupon);
+          setCouponCode(parsed.code);
+          localStorage.setItem(COUPON_DATA_KEY, sessionCoupon);
+          sessionStorage.setItem(SESSION_COUPON_KEY, parsed.code);
+          return;
+        }
+
+        const sessionCode = sessionStorage.getItem(SESSION_COUPON_KEY);
+        if (sessionCode) {
+          const fallbackPayload = {
+            code: sessionCode,
+            discount: 50,
+            minAmount: 0,
+            createdAt: new Date().toISOString(),
+            expiryHours: 24
+          };
+          const serializedFallback = JSON.stringify(fallbackPayload);
+          sessionStorage.setItem(COUPON_DATA_KEY, serializedFallback);
+          localStorage.setItem(COUPON_DATA_KEY, serializedFallback);
+          setCouponCode(sessionCode);
+          return;
+        }
+
+        const newCode = generateCouponCode();
+        const couponPayload = {
+          code: newCode,
+          discount: 50,
+          minAmount: 0,
+          createdAt: new Date().toISOString(),
+          expiryHours: 24
+        };
+        const serialized = JSON.stringify(couponPayload);
+        sessionStorage.setItem(SESSION_COUPON_KEY, newCode);
+        sessionStorage.setItem(COUPON_DATA_KEY, serialized);
+        localStorage.setItem(COUPON_DATA_KEY, serialized);
+        setCouponCode(newCode);
+      } catch (error) {
+        console.error('فشل في إعداد بيانات الكوبون:', error);
+      }
+    };
+
+    ensureCouponData();
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -141,6 +196,7 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({
         {/* زر الإغلاق */}
         <button
           onClick={onClose}
+          title="إغلاق"
           className="absolute top-4 left-4 w-8 h-8 bg-gray-200/80 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors z-10"
         >
           <X className="h-4 w-4 text-gray-700" />
@@ -148,19 +204,19 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({
 
         {currentStep === 1 ? (
           /* الواجهة الأولى - الترحيب والتسجيل */
-          <div className="relative p-6">
+          <div className="relative p-6 flex flex-col items-center justify-center text-center gap-6">
             {/* العنوان والرموز */}
-            <div className="text-center mb-6">
-              <div className="mb-4">
-                <span className="text-2xl">🏆</span>
-                <span className="text-sm font-bold text-primary mx-2">مبروك! لقد فزت بعضوية إشرو التحفيزية</span>
-                <span className="text-2xl">🏆</span>
-              </div>
-              <p className="text-orange-500 font-bold text-lg mb-4">🏅 المكافآت الحصرية والمذهلة</p>
+            <div className="w-full flex flex-col items-center justify-center gap-3">
+              <h2 className="text-3xl font-black text-primary leading-relaxed text-center">
+                أهلاً وسهلاً في عالم إشرو السحري! 🎉
+              </h2>
+              <p className="text-lg text-purple-600 font-semibold leading-relaxed text-center">
+                ✨ استعد لتجربة تسوق لا تُنسى مع عروض خرافية ومكافآت مذهلة! ✨
+              </p>
             </div>
 
             {/* نموذج التسجيل */}
-            <div className="space-y-4">
+            <div className="w-full space-y-4">
               <div className="relative">
                 <User className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
@@ -187,9 +243,13 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({
                 <Phone className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   type="tel"
-                  placeholder="رقم الموبايل (944062927)"
+                  placeholder="رقم الموبايل (09XXXXXXXX)"
                   value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  maxLength={10}
+                  onChange={(e) => {
+                    const digitsOnly = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                    setFormData(prev => ({ ...prev, phone: digitsOnly }));
+                  }}
                   className="text-right pr-10 bg-white border-2 border-primary/20 focus:border-primary rounded-xl py-3"
                 />
               </div>
@@ -205,87 +265,84 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({
           </div>
         ) : (
           /* الواجهة الثانية - المبروك والكوبون */
-          <div className="relative p-6">
-            {/* أيقونة التحدي الأخضر في الأعلى */}
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="h-8 w-8 text-white" />
+          <div className="relative p-6 space-y-6 bg-gradient-to-br from-purple-100 via-amber-50 to-pink-100 flex flex-col items-center justify-center text-center max-h-[78vh] overflow-y-auto scrollbar-thin scrollbar-thumb-primary/40 scrollbar-track-white/40">
+            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-r from-pink-400/30 via-amber-300/30 to-purple-400/30 blur-3xl" />
+
+            <div className="relative text-center space-y-4">
+              <div className="mx-auto w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-xl gift-swing">
+                <Gift className="h-10 w-10 text-white" />
               </div>
-              
-              <h2 className="text-primary font-bold text-lg mb-2">
-                🏆 مبروك! لقد فزت بعضوية إشرو التحفيزية 🏆
+              <h2 className="text-2xl font-extrabold text-purple-700">
+                مبروك! لقد فزت بعضوية إشرو الذهبية!
               </h2>
-              
-              <h3 className="text-primary/80 font-bold text-base mb-4">
-                المكافآت الحصرية والمذهلة
+              <p className="text-lg font-semibold text-pink-600">
+                ألوان احتفالية مبهرة • مفرقعات وأجواء عيد ميلاد • تأثيرات بصرية وصوتية احتفالية
+              </p>
+              <h3 className="text-xl font-bold text-orange-500">
+                🎁 مكافآتك الحصرية والمذهلة: 💸
               </h3>
             </div>
 
-            {/* كوبون الخصم */}
-            <div className="bg-primary/10 border-2 border-primary/30 rounded-xl p-4 mb-6">
-              <div className="text-center">
-                <h4 className="text-primary font-bold mb-2">🔥 كوبون خصم زي في 🔥</h4>
-                <p className="text-sm text-gray-700 mb-3">صالح لمدة 24 ساعة على جميع المنتجات + الشحن والتوصيل مجاني</p>
-                
-                <div className="bg-white border-2 border-dashed border-primary rounded-lg p-4 mb-4 relative">
-                  <div className="text-center">
-                    <p className="text-sm font-bold text-gray-700 mb-2">الكود:</p>
-                    <div className="bg-primary/10 rounded-lg p-3 mb-3">
-                      <code className="text-xl font-bold text-primary tracking-wider">{couponCode}</code>
-                    </div>
-                    <Button
-                      onClick={handleCopyCoupon}
-                      className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="h-4 w-4 mr-1" />
-                          تم النسخ!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-4 w-4 mr-1" />
-                          نسخ
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                  <div className="absolute top-2 right-2">
-                    <Gift className="h-6 w-6 text-primary" />
-                  </div>
+            <div className="relative bg-white/90 border-2 border-dashed border-primary rounded-2xl p-6 text-center shadow-lg flex flex-col items-center gap-4">
+              <h4 className="text-xl font-extrabold text-primary">
+                🔥 كوبون خصم خرافي 50% 🔥
+              </h4>
+              <p className="text-sm text-gray-700">
+                صالح لمدة 24 ساعة على جميع المنتجات + الشحن والتوصيل مجاني!
+              </p>
+              <div className="bg-gradient-to-r from-primary/10 to-green-100 rounded-xl p-4 w-full">
+                <p className="text-sm font-bold text-gray-700 mb-2">الكود:</p>
+                <div className="bg-white rounded-lg p-3 mb-3 border border-primary/40">
+                  <code className="text-xl font-bold text-primary tracking-wider block break-words">
+                    {couponCode}
+                  </code>
                 </div>
+                <Button
+                  onClick={handleCopyCoupon}
+                  className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1" />
+                      تم النسخ!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-1" />
+                      نسخ
+                    </>
+                  )}
+                </Button>
+              </div>
+              <div className="flex items-center justify-center gap-4 text-2xl">
+                <span role="img" aria-label="fireworks">🎇</span>
+                <span role="img" aria-label="party">🎉</span>
+                <span role="img" aria-label="clapping">👏</span>
               </div>
             </div>
 
-            {/* ما ينتظرك الآن */}
-            <div className="mb-6">
-              <h4 className="text-center font-bold text-gray-700 mb-4">📍 ما ينتظرك الآن</h4>
-              <div className="space-y-3 text-right text-sm">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-blue-500" />
-                  <span className="text-gray-700">تم إرسال رقمك المميز وكوبونك إلى البريد</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Bell className="h-4 w-4 text-yellow-500" />
-                  <span className="text-gray-700">ستصلك إشعارات فورية بأحدث العروض والمنتجات</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Trophy className="h-4 w-4 text-yellow-600" />
-                  <span className="text-gray-700">تم تأهيلك للسحب الشهري على جوائز بقيمة 10000 د.ل</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Star className="h-4 w-4 text-purple-500" />
-                  <span className="text-gray-700">استمتع بنقاط الولاء ومضاعفتها مع كل عملية شراء</span>
-                </div>
+            <div className="space-y-3 text-center text-sm bg-white/80 rounded-2xl p-4 shadow">
+              <h4 className="text-center font-bold text-gray-700 mb-2">📍 ما ينتظرك الآن</h4>
+              <div className="flex items-center gap-3 justify-center">
+                <Mail className="h-4 w-4 text-blue-500" />
+                <span className="text-gray-700">تم إرسال كود الخصم الذهبي إلى بريدك الإلكتروني</span>
+              </div>
+              <div className="flex items-center gap-3 justify-center">
+                <Bell className="h-4 w-4 text-yellow-500" />
+                <span className="text-gray-700">إشعارات فورية بالعروض الخرافية والمكافآت المذهلة</span>
+              </div>
+              <div className="flex items-center gap-3 justify-center">
+                <Trophy className="h-4 w-4 text-yellow-600" />
+                <span className="text-gray-700">دخول تلقائي للسحب الشهري على جوائز بقيمة 10000 د.ل</span>
+              </div>
+              <div className="flex items-center gap-3 justify-center">
+                <Star className="h-4 w-4 text-purple-500" />
+                <span className="text-gray-700">نقاط ولاء ذهبية تتضاعف مع كل عملية شراء</span>
               </div>
             </div>
 
-            {/* زر البدء بالتسوق */}
             <Button
-              onClick={() => {
-                console.log('Start shopping button clicked in welcome popup');
-                handleStartShopping();
-              }}
+              onClick={handleStartShopping}
               className="w-full bg-gradient-to-r from-green-500 to-primary hover:from-green-600 hover:to-primary/90 text-white font-bold py-4 rounded-xl shadow-lg text-base"
             >
               🛍️ ابدأ رحلة التسوق معنا 🛍️

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,6 +7,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Bell, Phone, Mail, MessageCircle, X, CheckCircle, Clock } from 'lucide-react';
 import type { Product } from '@/data/storeProducts';
+import {
+  PRODUCT_IMAGE_FALLBACK_SRC,
+  advanceImageOnError,
+  buildProductMediaConfig,
+  getImageMimeType
+} from '@/lib/utils';
 
 interface NotifyWhenAvailableProps {
   product: Product;
@@ -41,6 +47,11 @@ const NotifyWhenAvailable: React.FC<NotifyWhenAvailableProps> = ({
     notificationTypes: [] as string[]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const mediaConfig = useMemo(
+    () => buildProductMediaConfig(product, PRODUCT_IMAGE_FALLBACK_SRC),
+    [product]
+  );
 
   const notificationOptions = [
     { id: 'email', label: 'بريد إلكتروني', icon: Mail },
@@ -131,11 +142,21 @@ const NotifyWhenAvailable: React.FC<NotifyWhenAvailableProps> = ({
               {/* Product Info */}
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
                 <div className="flex items-center gap-3">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-12 h-12 object-cover rounded-lg"
-                  />
+                  <picture>
+                    {mediaConfig.pictureSources.map((src) => {
+                      const type = getImageMimeType(src);
+                      return <source key={src} srcSet={src} {...(type ? { type } : {})} />;
+                    })}
+                    <img
+                      src={mediaConfig.primary}
+                      alt={product.name}
+                      className="w-12 h-12 object-cover rounded-lg"
+                      data-image-sources={JSON.stringify(mediaConfig.datasetSources)}
+                      data-image-index="0"
+                      data-fallback-src={PRODUCT_IMAGE_FALLBACK_SRC}
+                      onError={advanceImageOnError}
+                    />
+                  </picture>
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">{product.name}</h3>
                     <p className="text-sm text-gray-600">{product.price} د.ل</p>
@@ -270,11 +291,21 @@ const NotifyWhenAvailable: React.FC<NotifyWhenAvailableProps> = ({
               {/* Product Info */}
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <div className="flex items-center gap-3">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-12 h-12 object-cover rounded-lg"
-                  />
+                  <picture>
+                    {mediaConfig.pictureSources.map((src) => {
+                      const type = getImageMimeType(src);
+                      return <source key={src} srcSet={src} {...(type ? { type } : {})} />;
+                    })}
+                    <img
+                      src={mediaConfig.primary}
+                      alt={product.name}
+                      className="w-12 h-12 object-cover rounded-lg"
+                      data-image-sources={JSON.stringify(mediaConfig.datasetSources)}
+                      data-image-index="0"
+                      data-fallback-src={PRODUCT_IMAGE_FALLBACK_SRC}
+                      onError={advanceImageOnError}
+                    />
+                  </picture>
                   <div className="flex-1 text-right">
                     <h3 className="font-semibold text-gray-900">{product.name}</h3>
                     <p className="text-sm text-gray-600">{product.price} د.ل</p>

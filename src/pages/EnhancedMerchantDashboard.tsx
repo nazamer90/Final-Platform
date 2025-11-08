@@ -35,6 +35,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { libyanCities } from '@/data/libya/cities/cities';
@@ -154,6 +155,26 @@ type DashboardSection =
   | 'settings-interface'
   | 'pos-overview';
 
+type TicketPriority = 'عالية' | 'متوسطة' | 'منخفضة';
+type TicketStatus = 'مفتوحة' | 'قيد المعالجة' | 'تم الحل';
+
+interface Ticket {
+  id: string;
+  title: string;
+  description: string;
+  customer: string;
+  priority: TicketPriority;
+  status: TicketStatus;
+  createdAt: string;
+}
+
+interface ChatMessage {
+  id: number;
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}
+
 const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
@@ -205,6 +226,42 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
   const [biddingModalOpen, setBiddingModalOpen] = useState(false);
   const [showBiddingMapModal, setShowBiddingMapModal] = useState(false);
   const [biddingSelectedCoordinates, setBiddingSelectedCoordinates] = useState<{lat: number, lng: number} | null>(null);
+
+  // Ticket system states
+  const [tickets, setTickets] = useState<Ticket[]>([
+    {
+      id: 'TS-2024-001',
+      title: 'مشكلة في تسجيل الدخول',
+      description: 'العميل لا يستطيع الدخول إلى حسابه رغم إدخال البيانات الصحيحة',
+      customer: 'أحمد محمد',
+      priority: 'عالية',
+      status: 'مفتوحة',
+      createdAt: 'منذ 2 ساعة'
+    },
+    {
+      id: 'TS-2024-002',
+      title: 'تأخير في التوصيل',
+      description: 'الطلب رقم 12345 تأخر عن الموعد المحدد',
+      customer: 'فاطمة علي',
+      priority: 'متوسطة',
+      status: 'قيد المعالجة',
+      createdAt: 'منذ 4 ساعات'
+    }
+  ]);
+  const [ticketModalOpen, setTicketModalOpen] = useState(false);
+  const [newTicket, setNewTicket] = useState<{ title: string; description: string; customer: string; priority: TicketPriority }>({
+    title: '',
+    description: '',
+    customer: '',
+    priority: 'متوسطة'
+  });
+
+  // Chat bot states
+  const [chatModalOpen, setChatModalOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    { id: 1, text: 'مرحباً! كيف يمكنني مساعدتك اليوم؟', sender: 'bot', timestamp: new Date() }
+  ]);
+  const [currentMessage, setCurrentMessage] = useState('');
   const [biddingForm, setBiddingForm] = useState({
     name: '',
     phone: '',
@@ -780,6 +837,69 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
     setCatalogExpanded(!catalogExpanded);
   };
 
+  // Ticket functions
+  const handleCreateTicket = () => {
+    if (newTicket.title && newTicket.description && newTicket.customer) {
+      const ticketId = `TS-2024-${String(tickets.length + 1).padStart(3, '0')}`;
+      const newTicketData: Ticket = {
+        id: ticketId,
+        title: newTicket.title,
+        description: newTicket.description,
+        customer: newTicket.customer,
+        priority: newTicket.priority,
+        status: 'مفتوحة',
+        createdAt: 'الآن'
+      };
+
+      setTickets((prev) => [newTicketData, ...prev]);
+      setNewTicket({
+        title: '',
+        description: '',
+        customer: '',
+        priority: 'متوسطة'
+      });
+      setTicketModalOpen(false);
+    }
+  };
+
+  // Chat functions
+  const handleSendMessage = () => {
+    if (currentMessage.trim()) {
+      const userMessage: ChatMessage = {
+        id: chatMessages.length + 1,
+        text: currentMessage,
+        sender: 'user',
+        timestamp: new Date()
+      };
+
+      setChatMessages((prev) => [...prev, userMessage]);
+      setCurrentMessage('');
+
+      // Simulate bot response after 1 second
+      setTimeout(() => {
+        const botResponses = [
+          'شكراً لتواصلك معنا. سأساعدك في حل هذه المشكلة.',
+          'أفهم مشكلتك. دعني أتحقق من التفاصيل.',
+          'سأقوم بإحالة استفسارك إلى الفريق المختص.',
+          'هل يمكنك تقديم المزيد من التفاصيل حول المشكلة؟',
+          'شكراً لصبرك. نحن نعمل على حل هذه المشكلة.'
+        ];
+
+        const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)] || botResponses[0];
+
+        setChatMessages((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            text: randomResponse,
+            sender: 'bot',
+            timestamp: new Date()
+          }
+        ]);
+      }, 1000);
+    }
+  };
+
   const handleCustomersToggle = () => {
     setCustomersExpanded(!customersExpanded);
   };
@@ -967,7 +1087,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
       if (!googleLoaded && !document.getElementById('google-maps-sdk')) {
         const script = document.createElement('script');
         script.id = 'google-maps-sdk';
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY&callback=initGoogleMaps`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY&callback=initGoogleMaps&loading=async`;
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
@@ -1083,7 +1203,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
       // Load Google Maps script if not already loaded
       if (!(window as any).google?.maps) {
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY&callback=initGoogleMaps`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY&callback=initGoogleMaps&loading=async`;
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
@@ -1176,7 +1296,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
         if (!existingScript) {
           console.log('Loading Google Maps script for logistics');
           const script = document.createElement('script');
-          script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY&callback=initLogisticsGoogleMaps`;
+          script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places&language=ar&region=LY&callback=initLogisticsGoogleMaps&loading=async`;
           script.async = true;
           script.defer = true;
           document.head.appendChild(script);
@@ -1668,6 +1788,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
                 size="sm"
                 onClick={() => setShowMapModal(false)}
                 className="hover:bg-gray-100"
+                aria-label="إغلاق اختيار الموقع"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -1690,7 +1811,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
               </div>
 
               {/* Map Container */}
-              <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ height: '450px' }}>
+              <div className="relative bg-gray-100 rounded-lg overflow-hidden h-[450px]">
                 {!mapLoaded ? (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
                     <div className="text-center">
@@ -1699,16 +1820,15 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
                       <p className="text-gray-600 mb-2">يرجى الانتظار قليلاً...</p>
                       <div className="flex justify-center items-center gap-1 text-sm text-gray-500">
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse [animation-delay:0.2s]"></div>
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse [animation-delay:0.4s]"></div>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div
                     id="google-map"
-                    className="w-full h-full"
-                    style={{ minHeight: '450px' }}
+                    className="w-full h-full min-h-[450px]"
                   ></div>
                 )}
               </div>
@@ -1933,6 +2053,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
               {/* Mobile Menu Button */}
               <button
                 onClick={toggleSidebar}
+                aria-label="فتح القائمة الجانبية"
                 className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 md:hidden"
               >
                 <svg
@@ -1953,11 +2074,11 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white/80 backdrop-blur-lg shadow-lg transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:inset-0 ${
+        <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white/80 backdrop-blur-lg shadow-lg transform transition-transform duration-300 ease-in-out top-16 h-[calc(100vh-64px)] md:translate-x-0 md:static md:inset-0 md:top-auto md:h-auto overflow-y-auto ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`} style={{ top: '64px', height: 'calc(100vh - 64px)' }}>
-          <div className="flex flex-col h-full pt-5 pb-4 overflow-y-auto">
-            <nav className="flex-1 px-4 space-y-1">
+        }`}>
+          <div className="flex flex-col h-full pt-5 pb-4">
+            <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
               {/* Overview Section */}
               <div>
                 <button
@@ -2592,7 +2713,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
         )}
 
         {/* Main Content */}
-        <main className="flex-1">
+        <main className="flex-1 overflow-y-auto">
           <div className="py-6">
             <div className="w-full px-4 sm:px-6 lg:px-8">
               {/* Content based on active section */}
@@ -4475,6 +4596,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
                                   id="category-image"
                                   accept="image/*"
                                   className="hidden"
+                                  aria-label="تحميل صورة التصنيف"
                                   onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
@@ -4505,6 +4627,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
                                   id="category-bg-image"
                                   accept="image/*"
                                   className="hidden"
+                                  aria-label="تحميل صورة الخلفية"
                                   onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
@@ -9320,6 +9443,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
                                 id="slider-image"
                                 accept="image/*,.pdf"
                                 className="hidden"
+                                aria-label="تحميل صورة السلايدر"
                                 onChange={(e) => {
                                   const file = e.target.files?.[0];
                                   if (file) {
@@ -9621,6 +9745,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
                               <button
                                 key={dot}
                                 className={`w-3 h-3 rounded-full transition-colors ${dot === 0 ? 'bg-pink-500' : 'bg-gray-300 hover:bg-gray-400'}`}
+                                aria-label={`الانتقال إلى الشريحة ${dot + 1}`}
                                 onClick={() => {
                                   const container = document.getElementById('slider-container');
                                   if (container) {
@@ -9634,6 +9759,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
                           {/* Navigation Arrows */}
                           <button
                             className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-all shadow-lg hover:shadow-xl"
+                            aria-label="السابق"
                             onClick={() => {
                               const container = document.getElementById('slider-container');
                               if (container) {
@@ -9649,6 +9775,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
                             </svg>
                           </button>
                           <button
+                            aria-label="التالي"
                             className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-all shadow-lg hover:shadow-xl"
                             onClick={() => {
                               const container = document.getElementById('slider-container');
@@ -9917,6 +10044,7 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
                                 id="ad-image"
                                 accept="image/*,.pdf"
                                 className="hidden"
+                                aria-label="تحميل صورة الإعلان"
                                 onChange={(e) => {
                                   const file = e.target.files?.[0];
                                   if (file) {
@@ -13079,12 +13207,303 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
               {activeSection === 'customer-service' && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-gray-900">خدمة العملاء</h2>
+
+                  {/* الدردشة المباشرة (Live Chat) */}
                   <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <MessageSquare className="h-5 w-5 text-blue-600" />
+                        الدردشة المباشرة (Live Chat)
+                      </CardTitle>
+                    </CardHeader>
                     <CardContent className="p-6">
-                      <p className="text-sm text-gray-600 mb-4">مركز خدمة العملاء</p>
-                      <div className="text-center p-8 bg-gray-50 rounded-lg">
-                        <Phone className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                        <p className="text-gray-600">محتوى خدمة العملاء سيتم إضافته قريباً</p>
+                      <p className="text-sm text-gray-600 mb-4">
+                        تكامل حقيقي مع شات بوت يعمل ومتكامل مع واجهة التاجر بحيث يتم طرح الاستفسارات ويتم الرد على أي استفسار بشكل حقيقي
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
+                            <Bot className="h-5 w-5 text-blue-600" />
+                            <span className="text-sm font-medium">حالة الشات بوت: نشط</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
+                            <Activity className="h-5 w-5 text-green-600" />
+                            <span className="text-sm font-medium">محادثات نشطة: 12</span>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                            <Settings className="h-4 w-4 mr-2" />
+                            إعدادات الشات بوت
+                          </Button>
+                          <Button variant="outline" className="w-full">
+                            <Eye className="h-4 w-4 mr-2" />
+                            عرض المحادثات
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium mb-2">إحصائيات اليوم</h4>
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div>
+                            <div className="text-2xl font-bold text-blue-600">45</div>
+                            <div className="text-sm text-gray-600">استفسار</div>
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-green-600">38</div>
+                            <div className="text-sm text-gray-600">تم الرد</div>
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-yellow-600">7</div>
+                            <div className="text-sm text-gray-600">معلق</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* الدعم الهاتفي */}
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Phone className="h-5 w-5 text-green-600" />
+                        الدعم الهاتفي
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-sm text-gray-600 mb-4">
+                        يوفر خدمة شخصية ومباشرة، ويفضله بعض العملاء للتعامل مع المشاكل المعقدة أو الاستفسارات الملحّة
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div className="p-3 bg-green-50 rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">خط الدعم الرئيسي</span>
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">متاح</Badge>
+                            </div>
+                            <div className="text-lg font-bold text-green-600 mt-1">+218 91-234-5678</div>
+                          </div>
+                          <div className="p-3 bg-blue-50 rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">خط الطوارئ</span>
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-800">24/7</Badge>
+                            </div>
+                            <div className="text-lg font-bold text-blue-600 mt-1">+218 92-345-6789</div>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <Button className="w-full bg-green-600 hover:bg-green-700">
+                            <Phone className="h-4 w-4 mr-2" />
+                            إجراء مكالمة
+                          </Button>
+                          <Button variant="outline" className="w-full">
+                            <FileText className="h-4 w-4 mr-2" />
+                            سجل المكالمات
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium mb-2">إحصائيات المكالمات</h4>
+                        <div className="grid grid-cols-4 gap-4 text-center">
+                          <div>
+                            <div className="text-xl font-bold text-green-600">156</div>
+                            <div className="text-sm text-gray-600">مكالمة اليوم</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-blue-600">89%</div>
+                            <div className="text-sm text-gray-600">معدل الإجابة</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-yellow-600">4.2</div>
+                            <div className="text-sm text-gray-600">متوسط الانتظار (دقيقة)</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-purple-600">4.8</div>
+                            <div className="text-sm text-gray-600">تقييم العملاء</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* البريد الإلكتروني */}
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Mail className="h-5 w-5 text-purple-600" />
+                        البريد الإلكتروني
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-sm text-gray-600 mb-4">
+                        مناسب للاستفسارات التي لا تتطلب استجابة فورية، ويسمح بالاحتفاظ بسجل مكتوب للمحادثات
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div className="p-3 bg-purple-50 rounded-lg">
+                            <div className="text-sm font-medium">البريد الإلكتروني الرئيسي</div>
+                            <div className="text-lg font-bold text-purple-600 mt-1">support@merchant.com</div>
+                          </div>
+                          <div className="p-3 bg-indigo-50 rounded-lg">
+                            <div className="text-sm font-medium">البريد التجاري</div>
+                            <div className="text-lg font-bold text-indigo-600 mt-1">sales@merchant.com</div>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                            <Mail className="h-4 w-4 mr-2" />
+                            إرسال بريد إلكتروني
+                          </Button>
+                          <Button variant="outline" className="w-full">
+                            <Archive className="h-4 w-4 mr-2" />
+                            البريد الوارد
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium mb-2">إحصائيات البريد الإلكتروني</h4>
+                        <div className="grid grid-cols-4 gap-4 text-center">
+                          <div>
+                            <div className="text-xl font-bold text-purple-600">234</div>
+                            <div className="text-sm text-gray-600">رسالة اليوم</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-green-600">98%</div>
+                            <div className="text-sm text-gray-600">معدل الرد</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-blue-600">2.3</div>
+                            <div className="text-sm text-gray-600">متوسط الرد (ساعة)</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-yellow-600">4.6</div>
+                            <div className="text-sm text-gray-600">رضا العملاء</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* منصات التواصل الاجتماعي */}
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Globe className="h-5 w-5 text-pink-600" />
+                        منصات التواصل الاجتماعي
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-sm text-gray-600 mb-4">
+                        يتيح الرد على استفسارات وشكاوى العملاء بشكل علني أو خاص، مما يعكس الشفافية ويسهم في بناء ثقة العملاء
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="p-4 bg-blue-50 rounded-lg text-center">
+                          <div className="text-2xl mb-2">📘</div>
+                          <div className="font-medium">فيسبوك</div>
+                          <div className="text-sm text-gray-600 mt-1">12 رسالة جديدة</div>
+                          <Button size="sm" className="mt-2 bg-blue-600 hover:bg-blue-700">
+                            إدارة
+                          </Button>
+                        </div>
+                        <div className="p-4 bg-pink-50 rounded-lg text-center">
+                          <div className="text-2xl mb-2">📷</div>
+                          <div className="font-medium">إنستغرام</div>
+                          <div className="text-sm text-gray-600 mt-1">8 تعليقات</div>
+                          <Button size="sm" className="mt-2 bg-pink-600 hover:bg-pink-700">
+                            إدارة
+                          </Button>
+                        </div>
+                        <div className="p-4 bg-blue-50 rounded-lg text-center">
+                          <div className="text-2xl mb-2">🐦</div>
+                          <div className="font-medium">تويتر</div>
+                          <div className="text-sm text-gray-600 mt-1">5 منشنات</div>
+                          <Button size="sm" className="mt-2 bg-blue-400 hover:bg-blue-500">
+                            إدارة
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium mb-2">إحصائيات التواصل الاجتماعي</h4>
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div>
+                            <div className="text-xl font-bold text-blue-600">156</div>
+                            <div className="text-sm text-gray-600">تفاعل اليوم</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-green-600">94%</div>
+                            <div className="text-sm text-gray-600">معدل الاستجابة</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-purple-600">4.7</div>
+                            <div className="text-sm text-gray-600">متوسط التقييم</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* الأسئلة الشائعة (FAQ) */}
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <HelpCircle className="h-5 w-5 text-orange-600" />
+                        الأسئلة الشائعة (FAQ)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-sm text-gray-600 mb-4">
+                        توفير إجابات واضحة للأسئلة المتكررة يقلل من عدد الاستفسارات المباشرة، ويمكّن العملاء من إيجاد حلول لمشاكلهم بأنفسهم
+                      </p>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="p-4 border rounded-lg">
+                            <h5 className="font-medium mb-2">كيف أتابع طلبي؟</h5>
+                            <p className="text-sm text-gray-600">يمكنك تتبع طلبك من خلال رقم الطلب في صفحة "طلباتي"</p>
+                            <div className="text-xs text-gray-500 mt-1">المشاهدات: 1,245</div>
+                          </div>
+                          <div className="p-4 border rounded-lg">
+                            <h5 className="font-medium mb-2">ما هي سياسة الإرجاع؟</h5>
+                            <p className="text-sm text-gray-600">يمكن إرجاع المنتجات خلال 14 يوماً من تاريخ الاستلام</p>
+                            <div className="text-xs text-gray-500 mt-1">المشاهدات: 892</div>
+                          </div>
+                          <div className="p-4 border rounded-lg">
+                            <h5 className="font-medium mb-2">كيف أغير عنوان التوصيل؟</h5>
+                            <p className="text-sm text-gray-600">يمكن تعديل العنوان قبل شحن الطلب من إعدادات الحساب</p>
+                            <div className="text-xs text-gray-500 mt-1">المشاهدات: 567</div>
+                          </div>
+                          <div className="p-4 border rounded-lg">
+                            <h5 className="font-medium mb-2">ما هي طرق الدفع المتاحة؟</h5>
+                            <p className="text-sm text-gray-600">نقبل الدفع عند التوصيل والتحويل البنكي وبطاقات الائتمان</p>
+                            <div className="text-xs text-gray-500 mt-1">المشاهدات: 734</div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button className="bg-orange-600 hover:bg-orange-700">
+                            <Plus className="h-4 w-4 mr-2" />
+                            إضافة سؤال جديد
+                          </Button>
+                          <Button variant="outline">
+                            <Edit className="h-4 w-4 mr-2" />
+                            تعديل الأسئلة
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium mb-2">إحصائيات الأسئلة الشائعة</h4>
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div>
+                            <div className="text-xl font-bold text-orange-600">45</div>
+                            <div className="text-sm text-gray-600">سؤال متاح</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-green-600">12,456</div>
+                            <div className="text-sm text-gray-600">إجمالي المشاهدات</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-blue-600">73%</div>
+                            <div className="text-sm text-gray-600">معدل حل المشاكل</div>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -13094,12 +13513,319 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
               {activeSection === 'technical-support' && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-gray-900">الدعم الفني</h2>
+
+                  {/* الواتساب شات بوت */}
                   <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <MessageSquare className="h-5 w-5 text-green-600" />
+                        الواتساب شات بوت
+                      </CardTitle>
+                    </CardHeader>
                     <CardContent className="p-6">
-                      <p className="text-sm text-gray-600 mb-4">مركز الدعم الفني</p>
-                      <div className="text-center p-8 bg-gray-50 rounded-lg">
-                        <HelpCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                        <p className="text-gray-600">محتوى الدعم الفني سيتم إضافته قريباً</p>
+                      <p className="text-sm text-gray-600 mb-4">
+                        واجهة للتواصل المباشر والرد على أي استفسار لأي زبون، كما يمكن عمل إعلان عبر Premium Sender لإرسال رسائل تسويقية لمجموعة كبيرة من الزبائن في وقت واحد
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
+                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span className="text-sm font-medium">حالة الواتساب: متصل</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
+                            <Activity className="h-5 w-5 text-blue-600" />
+                            <span className="text-sm font-medium">محادثات نشطة: 8</span>
+                          </div>
+                          <div className="p-3 bg-purple-50 rounded-lg">
+                            <div className="text-sm font-medium mb-1">Premium Sender Integration</div>
+                            <div className="text-xs text-gray-600">https://premiumsender.in</div>
+                            <Badge variant="secondary" className="mt-1 bg-purple-100 text-purple-800">مفعل</Badge>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <Button className="w-full bg-green-600 hover:bg-green-700">
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            فتح واجهة الواتساب
+                          </Button>
+                          <Button variant="outline" className="w-full">
+                            <Send className="h-4 w-4 mr-2" />
+                            إرسال رسالة جماعية
+                          </Button>
+                          <Button variant="outline" className="w-full">
+                            <Settings className="h-4 w-4 mr-2" />
+                            إعدادات Premium Sender
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium mb-2">إحصائيات الواتساب</h4>
+                        <div className="grid grid-cols-4 gap-4 text-center">
+                          <div>
+                            <div className="text-xl font-bold text-green-600">156</div>
+                            <div className="text-sm text-gray-600">رسالة اليوم</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-blue-600">89%</div>
+                            <div className="text-sm text-gray-600">معدل الرد</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-purple-600">2.1</div>
+                            <div className="text-sm text-gray-600">متوسط الرد (دقيقة)</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-yellow-600">4.9</div>
+                            <div className="text-sm text-gray-600">تقييم العملاء</div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* الشات بوت الرد الآلي */}
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Bot className="h-5 w-5 text-indigo-600" />
+                        الشات بوت الرد الآلي
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-sm text-gray-600 mb-4">
+                        يجب أن يتم تحويلك مباشرة أو تكون متكاملة مع المنصة التالية: ChatGPT, DeepSeek, Gemini, Claude, Grok all in one AI sidebar, for AI search, read, and write مع واجهة التاجر
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div className="p-3 bg-indigo-50 rounded-lg">
+                            <div className="text-sm font-medium mb-1">الذكاء الاصطناعي النشط</div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              <span className="text-sm text-indigo-600 font-medium">ChatGPT-4</span>
+                            </div>
+                          </div>
+                          <div className="p-3 bg-blue-50 rounded-lg">
+                            <div className="text-sm font-medium mb-1">نماذج AI المتاحة</div>
+                            <div className="flex flex-wrap gap-1">
+                              <Badge variant="secondary" className="text-xs">ChatGPT</Badge>
+                              <Badge variant="secondary" className="text-xs">DeepSeek</Badge>
+                              <Badge variant="secondary" className="text-xs">Gemini</Badge>
+                              <Badge variant="secondary" className="text-xs">Claude</Badge>
+                              <Badge variant="secondary" className="text-xs">Grok</Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <Button className="w-full bg-indigo-600 hover:bg-indigo-700" onClick={() => setChatModalOpen(true)}>
+                            <Bot className="h-4 w-4 mr-2" />
+                            فتح واجهة الشات بوت
+                          </Button>
+                          <Button variant="outline" className="w-full">
+                            <Settings className="h-4 w-4 mr-2" />
+                            تبديل نموذج AI
+                          </Button>
+                          <Button variant="outline" className="w-full">
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            تحليلات الذكاء الاصطناعي
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium mb-2">إحصائيات الذكاء الاصطناعي</h4>
+                        <div className="grid grid-cols-4 gap-4 text-center">
+                          <div>
+                            <div className="text-xl font-bold text-indigo-600">1,234</div>
+                            <div className="text-sm text-gray-600">استعلام اليوم</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-green-600">95%</div>
+                            <div className="text-sm text-gray-600">دقة الردود</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-blue-600">0.8</div>
+                            <div className="text-sm text-gray-600">متوسط الرد (ثانية)</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-purple-600">4.7</div>
+                            <div className="text-sm text-gray-600">رضا المستخدمين</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-medium mb-2 text-blue-800">مميزات التكامل مع AI Sidebar</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span>البحث الذكي في المحتوى</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span>قراءة وتحليل النصوص</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span>كتابة المحتوى التلقائي</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span>دعم متعدد اللغات</span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* نظام التذاكر */}
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-orange-600" />
+                        نظام التذاكر
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-sm text-gray-600 mb-4">
+                        واجهة لنظام التذاكر، والمعروف بنظام التذاكر كيفية عمله بما يتماى مع بيانات الواجهة وما يعرض فيها من بيانات
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="p-4 bg-red-50 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-red-600">{tickets.filter(t => t.status === 'مفتوحة').length}</div>
+                          <div className="text-sm text-gray-600">تذكرة مفتوحة</div>
+                        </div>
+                        <div className="p-4 bg-yellow-50 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-yellow-600">{tickets.filter(t => t.status === 'قيد المعالجة').length}</div>
+                          <div className="text-sm text-gray-600">قيد المعالجة</div>
+                        </div>
+                        <div className="p-4 bg-green-50 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-green-600">{tickets.filter(t => t.status === 'تم الحل').length}</div>
+                          <div className="text-sm text-gray-600">تم الحل</div>
+                        </div>
+                      </div>
+                      <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {tickets.slice(0, 5).map((ticket) => (
+                          <div key={ticket.id} className="border rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <Badge
+                                  variant={ticket.priority === 'عالية' ? 'destructive' : ticket.priority === 'متوسطة' ? 'secondary' : 'outline'}
+                                  className={ticket.priority === 'متوسطة' ? 'bg-yellow-100 text-yellow-800' : ''}
+                                >
+                                  {ticket.priority}
+                                </Badge>
+                                <span className="font-medium">#{ticket.id}</span>
+                              </div>
+                              <span className="text-sm text-gray-500">{ticket.createdAt}</span>
+                            </div>
+                            <h5 className="font-medium mb-1">{ticket.title}</h5>
+                            <p className="text-sm text-gray-600 mb-2">{ticket.description}</p>
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm text-gray-600">{ticket.customer}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex gap-2 mt-4">
+                        <Button className="bg-orange-600 hover:bg-orange-700" onClick={() => setTicketModalOpen(true)}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          إنشاء تذكرة جديدة
+                        </Button>
+                        <Button variant="outline">
+                          <Eye className="h-4 w-4 mr-2" />
+                          عرض جميع التذاكر
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* مكتب المساعدة */}
+                  <Card className="shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Users className="h-5 w-5 text-teal-600" />
+                        مكتب المساعدة
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-sm text-gray-600 mb-4">
+                        واجهة لمكتب الاتصال، كول سنتر، للرد على الزبائن وتسجيل المكالمات
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div className="p-3 bg-teal-50 rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">وكلاء متاحون</span>
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">8/10</Badge>
+                            </div>
+                          </div>
+                          <div className="p-3 bg-blue-50 rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium">مكالمات نشطة</span>
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-800">6</Badge>
+                            </div>
+                          </div>
+                          <div className="p-3 bg-purple-50 rounded-lg">
+                            <div className="text-sm font-medium mb-1">تسجيل المكالمات</div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              <span className="text-xs text-purple-600">مفعل - جميع المكالمات مسجلة</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <Button className="w-full bg-teal-600 hover:bg-teal-700">
+                            <Phone className="h-4 w-4 mr-2" />
+                            لوحة الاتصال
+                          </Button>
+                          <Button variant="outline" className="w-full">
+                            <FileText className="h-4 w-4 mr-2" />
+                            سجل المكالمات
+                          </Button>
+                          <Button variant="outline" className="w-full">
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            تقارير الأداء
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-medium mb-2">إحصائيات مركز الاتصال</h4>
+                        <div className="grid grid-cols-4 gap-4 text-center">
+                          <div>
+                            <div className="text-xl font-bold text-teal-600">234</div>
+                            <div className="text-sm text-gray-600">مكالمة اليوم</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-green-600">91%</div>
+                            <div className="text-sm text-gray-600">معدل الإجابة</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-blue-600">3.2</div>
+                            <div className="text-sm text-gray-600">متوسط المكالمة (دقيقة)</div>
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-purple-600">4.6</div>
+                            <div className="text-sm text-gray-600">رضا العملاء</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-4 bg-teal-50 rounded-lg">
+                        <h4 className="font-medium mb-2 text-teal-800">مميزات مركز الاتصال</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span>تسجيل تلقائي للمكالمات</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span>تتبع أداء الوكلاء</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span>إحصائيات مفصلة</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span>دعم متعدد القنوات</span>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -13123,6 +13849,119 @@ const EnhancedMerchantDashboard: React.FC<{ onLogout?: () => void }> = ({ onLogo
           </div>
         </main>
       </div>
+
+      {/* Chat Bot Modal */}
+      <Dialog open={chatModalOpen} onOpenChange={setChatModalOpen}>
+        <DialogContent className="sm:max-w-[600px] h-[500px] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bot className="h-5 w-5 text-indigo-600" />
+              شات بوت ذكي - دعم فني
+            </DialogTitle>
+            <DialogDescription>
+              تحدث مع الشات بوت الذكي للحصول على المساعدة الفورية
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 rounded-lg">
+            {chatMessages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[70%] p-3 rounded-lg ${
+                    message.sender === 'user'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white border shadow-sm'
+                  }`}
+                >
+                  <p className="text-sm">{message.text}</p>
+                  <p className={`text-xs mt-1 ${
+                    message.sender === 'user' ? 'text-indigo-100' : 'text-gray-500'
+                  }`}>
+                    {message.timestamp.toLocaleTimeString('ar-LY')}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2 pt-4">
+            <Input
+              value={currentMessage}
+              onChange={(e) => setCurrentMessage(e.target.value)}
+              placeholder="اكتب رسالتك هنا..."
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              className="flex-1"
+            />
+            <Button onClick={handleSendMessage} className="bg-indigo-600 hover:bg-indigo-700">
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ticket Creation Modal */}
+      <Dialog open={ticketModalOpen} onOpenChange={setTicketModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>إنشاء تذكرة جديدة</DialogTitle>
+            <DialogDescription>
+              أدخل تفاصيل التذكرة الجديدة. سيتم إضافتها إلى قائمة التذاكر المفتوحة فوراً.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="ticket-title">عنوان التذكرة</Label>
+              <Input
+                id="ticket-title"
+                value={newTicket.title}
+                onChange={(e) => setNewTicket({...newTicket, title: e.target.value})}
+                placeholder="أدخل عنوان التذكرة"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="ticket-customer">اسم العميل</Label>
+              <Input
+                id="ticket-customer"
+                value={newTicket.customer}
+                onChange={(e) => setNewTicket({...newTicket, customer: e.target.value})}
+                placeholder="أدخل اسم العميل"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="ticket-priority">الأولوية</Label>
+              <Select value={newTicket.priority} onValueChange={(value) => setNewTicket({...newTicket, priority: value as 'عالية' | 'متوسطة' | 'منخفضة'})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر الأولوية" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="عالية">عالية</SelectItem>
+                  <SelectItem value="متوسطة">متوسطة</SelectItem>
+                  <SelectItem value="منخفضة">منخفضة</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="ticket-description">وصف المشكلة</Label>
+              <Textarea
+                id="ticket-description"
+                value={newTicket.description}
+                onChange={(e) => setNewTicket({...newTicket, description: e.target.value})}
+                placeholder="وصف تفصيلي للمشكلة"
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTicketModalOpen(false)}>
+              إلغاء
+            </Button>
+            <Button onClick={handleCreateTicket} className="bg-orange-600 hover:bg-orange-700">
+              إنشاء التذكرة
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

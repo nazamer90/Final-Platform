@@ -123,12 +123,15 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="linkLocation">مكان العرض</Label>
+              <Label id="linkLocationLabel" htmlFor="linkLocation">مكان العرض</Label>
               <select
                 id="linkLocation"
                 value={newLink.location}
                 onChange={(e) => setNewLink({...newLink, location: e.target.value})}
                 className="w-full p-2 border rounded-md text-right"
+                aria-labelledby="linkLocationLabel"
+                aria-label="مكان العرض"
+                title="مكان العرض"
               >
                 <option value="header">الهيدر (القائمة الرئيسية)</option>
                 <option value="footer">الفوتر</option>
@@ -136,8 +139,8 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
             </div>
 
             <div className="flex items-center gap-2">
-              <input type="checkbox" id="samePage" />
-              <Label htmlFor="samePage">فتح الرابط في نفس الصفحة</Label>
+              <input type="checkbox" id="samePage" aria-labelledby="samePageLabel" aria-label="فتح الرابط في نفس الصفحة" title="فتح الرابط في نفس الصفحة" />
+              <Label id="samePageLabel" htmlFor="samePage">فتح الرابط في نفس الصفحة</Label>
             </div>
 
             <Button onClick={handleAddLink} className="w-full">
@@ -181,12 +184,12 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
                     <Badge variant="outline">{item.type === 'custom' ? 'رابط مخصص' : 'صفحة'}</Badge>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline">
+                    <Button type="button" size="sm" variant="outline" aria-label="تحرير العنصر">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </Button>
-                    <Button size="sm" variant="outline">
+                    <Button type="button" size="sm" variant="outline" aria-label="حذف العنصر">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -202,12 +205,12 @@ export const MenuManagementView: React.FC<MenuManagementViewProps> = ({
                           <span className="text-sm text-gray-700">{child.name}</span>
                           <div className="flex gap-1">
                             <Badge className="bg-blue-100 text-blue-800 text-xs">{child.type}</Badge>
-                            <Button size="sm" variant="outline">
+                            <Button type="button" size="sm" variant="outline" aria-label="تحرير العنصر الفرعي">
                               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                             </Button>
-                            <Button size="sm" variant="outline">
+                            <Button type="button" size="sm" variant="outline" aria-label="حذف العنصر الفرعي">
                               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                               </svg>

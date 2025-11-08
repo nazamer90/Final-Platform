@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
@@ -7,27 +7,49 @@ interface MoamalatRealLightboxProps {
   onClose: () => void;
   amount: number;
   orderData: any;
+  paymentMethod?: string;
   onPaymentSuccess: (transactionData: any) => void;
   onPaymentError: (error: string) => void;
 }
 
+// Helper functions for environment variables
+function getPublicEnv(key: string): string | undefined {
+  const w = (typeof window !== 'undefined' ? (window as any) : {}) || {};
+  const pe: any = (typeof process !== 'undefined' ? (process as any).env : {}) || {};
+  return (
+    pe[`NEXT_PUBLIC_${key}`] ||
+    pe[`VITE_${key}`] ||
+    pe[key] ||
+    w[key]
+  );
+}
+
+function getFirstEnv(...keys: string[]) {
+  for (const k of keys) {
+    const v = getPublicEnv(k);
+    if (v !== undefined && v !== null && v !== '') return v;
+  }
+  return undefined;
+}
+
 // Moamalat Real Lightbox Configuration
-const MOAMALAT_CONFIG = {
-  // Test credentials - Replace with production values
-  merchantId: '10081014649',
-  terminalId: '99179395',
-  merchantSecretKey: '3a488a89b3f7993476c252f017c488bb',
-  
-  // Environment URLs
-  testURL: 'https://test.moamalat.net/api/v2/LightBox',
-  productionURL: 'https://npg.moamalat.net/api/v2/LightBox',
-  
-  // SDK URLs
-  testSDK: 'https://test.moamalat.net/lightbox/moamalat.lightbox.js',
-  productionSDK: 'https://npg.moamalat.net/lightbox/moamalat.lightbox.js',
-  
-  // Environment flag
-  isProduction: false // Set to true for production
+const getMoamalatConfig = () => {
+  // Load from environment variables with fallbacks
+  const merchantId = getFirstEnv('MOAMALAT_MID', 'MOAMALATPAY_MID') || '10081014649';
+  const terminalId = getFirstEnv('MOAMALAT_TID', 'MOAMALATPAY_TID') || '99179395';
+  const merchantSecretKey = getFirstEnv('MOAMALAT_SECRET', 'MOAMALATPAY_KEY') || '3a488a89b3f7993476c252f017c488bb';
+  const isProduction = getFirstEnv('MOAMALAT_ENV', 'MOAMALATPAY_PRODUCTION') === 'production';
+
+  return {
+    merchantId,
+    terminalId,
+    merchantSecretKey,
+    // SDK URLs from documentation
+    testSDK: 'https://tnpg.moamalat.net:6006/js/lightbox.js',
+    productionSDK: 'https://npg.moamalat.net:6006/js/lightbox.js',
+    // Environment flag
+    isProduction
+  };
 };
 
 const MoamalatRealLightbox: React.FC<MoamalatRealLightboxProps> = ({
@@ -35,220 +57,169 @@ const MoamalatRealLightbox: React.FC<MoamalatRealLightboxProps> = ({
   onClose,
   amount,
   orderData,
+  paymentMethod,
   onPaymentSuccess,
   onPaymentError
 }) => {
   const lightboxRef = useRef<HTMLDivElement>(null);
   const sdkLoadedRef = useRef<boolean>(false);
+  const configRef = useRef<any>(null);
 
-  // Load Moamalat Lightbox SDK
-  useEffect(() => {
-    if (isOpen && !sdkLoadedRef.current) {
-      loadMoamalatSDK();
-    }
-  }, [isOpen, loadMoamalatSDK]);
-
-  function loadMoamalatSDK() {
-    // Check if script already exists
-    if (document.querySelector('#moamalat-sdk')) {
-      initializeLightbox();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.id = 'moamalat-sdk';
-    script.src = MOAMALAT_CONFIG.isProduction
-      ? MOAMALAT_CONFIG.productionSDK
-      : MOAMALAT_CONFIG.testSDK;
-
-    script.onload = () => {
-      console.log('Moamalat SDK loaded successfully');
-      sdkLoadedRef.current = true;
-      initializeLightbox();
-    };
-
-    script.onerror = () => {
-      console.error('Failed to load Moamalat SDK');
-      onPaymentError('فشل في تحميل نظام الدفع. يرجى المحاولة لاحقاً.');
-    };
-
-    document.head.appendChild(script);
+  // Get config on mount
+  if (!configRef.current) {
+    configRef.current = getMoamalatConfig();
   }
 
-  const initializeLightbox = () => {
-    if (!lightboxRef.current) return;
-
-    try {
-      // Generate unique merchant reference
-      const merchantReference = `ESHRO_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-      
-      // Convert amount to dirhams (Moamalat expects smallest unit)
-      const amountInDirhams = Math.round(amount * 1000);
-
-      // Generate secure hash (simplified - in production use proper HMAC-SHA256)
-      const secureHash = generateSecureHash({
-        merchantId: MOAMALAT_CONFIG.merchantId,
-        terminalId: MOAMALAT_CONFIG.terminalId,
-        amount: amountInDirhams,
-        merchantReference: merchantReference,
-        secretKey: MOAMALAT_CONFIG.merchantSecretKey
-      });
-
-      // Create lightbox parameters
-      const lightboxParams = {
-        merchantId: MOAMALAT_CONFIG.merchantId,
-        terminalId: MOAMALAT_CONFIG.terminalId,
-        amount: amountInDirhams,
-        merchantReference: merchantReference,
-        currency: '434', // LYD
-        secureHash: secureHash,
-        redirectUrl: window.location.href,
-        
-        // Callback functions
-        onSuccess: handlePaymentSuccess,
-        onError: handlePaymentError,
-        onCancel: handlePaymentCancel,
-        
-        // UI Configuration
-        language: 'ar',
-        theme: 'default'
-      };
-
-      // Initialize Moamalat Lightbox
-      if ((window as any).MoamalatLightbox) {
-        (window as any).MoamalatLightbox.init(lightboxParams);
-      } else {
-        // Fallback: Use iframe integration
-        createLightboxIframe(lightboxParams);
-      }
-
-    } catch (error) {
-      console.error('Error initializing Moamalat Lightbox:', error);
-      onPaymentError('خطأ في تهيئة نظام الدفع');
-    }
-  };
-
-  const generateSecureHash = (params: any) => {
-    // This is a simplified hash generation
-    // In production, use proper HMAC-SHA256 with crypto library
-    const hashString = `${params.merchantId}|${params.terminalId}|${params.amount}|${params.merchantReference}|${params.secretKey}`;
-    
-    // For now, return a simple hash (replace with proper HMAC-SHA256)
-    return btoa(hashString).replace(/[^a-zA-Z0-9]/g, '').substring(0, 32);
-  };
-
-  const createLightboxIframe = (params: any) => {
-    if (!lightboxRef.current) return;
-
-    const iframe = document.createElement('iframe');
-    iframe.src = buildLightboxURL(params);
-    iframe.style.cssText = `
-      width: 100%;
-      height: 600px;
-      border: none;
-      border-radius: 8px;
-    `;
-
-    // Add event listener for iframe messages
-    window.addEventListener('message', handleIframeMessage, false);
-
-    lightboxRef.current.appendChild(iframe);
-  };
-
-  const buildLightboxURL = (params: any) => {
-    const baseURL = MOAMALAT_CONFIG.isProduction 
-      ? MOAMALAT_CONFIG.productionURL 
-      : MOAMALAT_CONFIG.testURL;
-
-    const queryParams = new URLSearchParams({
-      merchantId: params.merchantId,
-      terminalId: params.terminalId,
-      amount: params.amount.toString(),
-      merchantReference: params.merchantReference,
-      currency: params.currency,
-      secureHash: params.secureHash,
-      language: params.language || 'ar'
-    });
-
-    return `${baseURL}?${queryParams.toString()}`;
-  };
-
-  const handleIframeMessage = (event: MessageEvent) => {
-    try {
-      const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-      
-      if (data.type === 'moamalat-payment') {
-        switch (data.status) {
-          case 'success':
-            handlePaymentSuccess(data.transaction);
-            break;
-          case 'error':
-            handlePaymentError(data.error);
-            break;
-          case 'cancel':
-            handlePaymentCancel();
-            break;
-        }
-      }
-    } catch (error) {
-      console.error('Error handling iframe message:', error);
-    }
-  };
-
-  const handlePaymentSuccess = (transactionData: any) => {
+  const handlePaymentSuccess = useCallback((transactionData: any) => {
     console.log('Payment successful:', transactionData);
-    
-    // Clean up
-    cleanup();
-    
-    // Format transaction data
     const formattedData = {
-      TxnDate: transactionData.txnDate || new Date().toISOString().replace(/[-:]/g, '').slice(0, 14),
-      SystemReference: transactionData.systemReference || Math.floor(Math.random() * 9999999) + 1000000,
-      NetworkReference: transactionData.networkReference || '506' + Math.floor(Math.random() * 999999999),
-      MerchantReference: transactionData.merchantReference,
-      Amount: transactionData.amount || (amount * 1000).toString(),
-      Currency: transactionData.currency || '434',
-      PaidThrough: transactionData.paidThrough || 'Card',
-      PayerAccount: transactionData.payerAccount,
-      PayerName: transactionData.payerName,
+      TxnDate: transactionData.TxnDate,
+      SystemReference: transactionData.SystemReference,
+      NetworkReference: transactionData.NetworkReference,
+      MerchantReference: transactionData.MerchantReference,
+      Amount: transactionData.Amount,
+      Currency: transactionData.Currency,
+      PaidThrough: transactionData.PaidThrough,
+      PayerAccount: transactionData.PayerAccount,
+      PayerName: transactionData.PayerName,
+      ProviderSchemeName: transactionData.ProviderSchemeName,
       status: 'completed',
       gateway: 'moamalat_lightbox',
       timestamp: new Date().toISOString(),
-      secureHash: transactionData.secureHash
+      secureHash: transactionData.SecureHash
     };
-    
     onPaymentSuccess(formattedData);
     onClose();
-  };
+  }, [onClose, onPaymentSuccess]);
 
-  const handlePaymentError = (error: string) => {
+  const handlePaymentError = useCallback((error: any) => {
     console.error('Payment error:', error);
-    cleanup();
-    onPaymentError(error || 'حدث خطأ في عملية الدفع');
-  };
+    onPaymentError(error.error || 'حدث خطأ في عملية الدفع');
+  }, [onPaymentError]);
 
-  const handlePaymentCancel = () => {
+  const handlePaymentCancel = useCallback(() => {
     console.log('Payment cancelled');
-    cleanup();
     onClose();
+  }, [onClose]);
+
+  // Load Moamalat Lightbox SDK when opened
+  useEffect(() => {
+    if (!(isOpen && !sdkLoadedRef.current)) return;
+
+    const initializeLightbox = async () => {
+      try {
+        const merchantReference = `ESHRO_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+        const amountInDirhams = Math.round(amount * 1000);
+        const trxDateTime = new Date().toISOString().replace(/[-:]/g, '').slice(0, 12);
+
+        // Generate secure hash according to documentation
+        const secureHash = await generateSecureHash({
+          Amount: amountInDirhams.toString(),
+          DateTimeLocalTrxn: trxDateTime,
+          MerchantId: configRef.current.merchantId,
+          MerchantReference: merchantReference,
+          TerminalId: configRef.current.terminalId
+        });
+
+        // Configure Lightbox according to documentation
+        if ((window as any).Lightbox && (window as any).Lightbox.Checkout) {
+          (window as any).Lightbox.Checkout.configure = {
+            MID: configRef.current.merchantId,
+            TID: configRef.current.terminalId,
+            AmountTrxn: amountInDirhams,
+            MerchantReference: merchantReference,
+            TrxDateTime: trxDateTime,
+            SecureHash: secureHash,
+            completeCallback: handlePaymentSuccess,
+            errorCallback: handlePaymentError,
+            cancelCallback: handlePaymentCancel
+          };
+
+          // Show the lightbox
+          (window as any).Lightbox.Checkout.showLightbox();
+        } else {
+          console.error('Lightbox SDK not loaded properly');
+          onPaymentError('فشل في تحميل نظام الدفع');
+        }
+      } catch (error) {
+        console.error('Error initializing Moamalat Lightbox:', error);
+        onPaymentError('خطأ في تهيئة نظام الدفع');
+      }
+    };
+
+    const loadMoamalatSDK = () => {
+      // SDK is now loaded statically in index.html
+      if ((window as any).Lightbox && (window as any).Lightbox.Checkout) {
+        sdkLoadedRef.current = true;
+        initializeLightbox();
+      } else {
+        // Wait a bit for the script to load
+        setTimeout(() => {
+          if ((window as any).Lightbox && (window as any).Lightbox.Checkout) {
+            sdkLoadedRef.current = true;
+            initializeLightbox();
+          } else {
+            console.error('Lightbox SDK not loaded');
+            onPaymentError('فشل في تحميل نظام الدفع. يرجى المحاولة لاحقاً.');
+          }
+        }, 1000);
+      }
+    };
+
+    loadMoamalatSDK();
+  }, [amount, handlePaymentCancel, handlePaymentError, handlePaymentSuccess, isOpen, onPaymentError]);
+
+  const generateSecureHash = async (params: any) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/moamalat/hash', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          Amount: params.Amount,
+          DateTimeLocalTrxn: params.DateTimeLocalTrxn,
+          MerchantId: params.MerchantId,
+          MerchantReference: params.MerchantReference,
+          TerminalId: params.TerminalId
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate secure hash');
+      }
+
+      const data = await response.json();
+      return data.secureHash;
+    } catch (error) {
+      console.error('Error generating secure hash:', error);
+      // Fallback to client-side generation (not secure, for testing only)
+      const sortedParams = {
+        Amount: params.Amount,
+        DateTimeLocalTrxn: params.DateTimeLocalTrxn,
+        MerchantId: params.MerchantId,
+        MerchantReference: params.MerchantReference,
+        TerminalId: params.TerminalId
+      };
+
+      const queryString = Object.keys(sortedParams)
+        .sort()
+        .map(key => `${key}=${sortedParams[key]}`)
+        .join('&');
+
+      const hashString = queryString + configRef.current.merchantSecretKey;
+      return btoa(hashString).replace(/[^a-zA-Z0-9]/g, '').substring(0, 64).toUpperCase();
+    }
   };
 
-  function cleanup() {
-    // Remove iframe message listener
-    window.removeEventListener('message', handleIframeMessage);
-    
-    // Clear lightbox container
-    if (lightboxRef.current) {
-      lightboxRef.current.innerHTML = '';
-    }
-  }
+
 
   // Cleanup on unmount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     return () => {
-      cleanup();
+      if (lightboxRef.current) {
+        lightboxRef.current.innerHTML = '';
+      }
     };
   }, []);
 
@@ -276,6 +247,8 @@ const MoamalatRealLightbox: React.FC<MoamalatRealLightboxProps> = ({
             size="sm"
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
+            title="إغلاق"
+            aria-label="إغلاق"
           >
             <X className="h-5 w-5" />
           </Button>
