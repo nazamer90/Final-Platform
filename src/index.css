@@ -1335,3 +1335,27 @@ var,
     background-position: 20px 0, 20px 10px, 30px -10px, 10px 0px;
   }
 }
+
+/* إصلاح نهائي لضمان عدم انضغاط المحتوى على Vercel */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#root {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+main, section, div[class*="container"], div[class*="wrapper"] {
+  width: 100% !important;
+  max-width: 100% !important;
+}
