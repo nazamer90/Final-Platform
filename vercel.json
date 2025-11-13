@@ -18,5 +18,7 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "framework": "vite"
+  "framework": "vite",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build"
 }
