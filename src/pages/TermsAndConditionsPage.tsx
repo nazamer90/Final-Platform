@@ -104,7 +104,7 @@ const TermsAndConditionsPage: React.FC<TermsAndConditionsPageProps> = ({ onBack 
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
       {/* الهيدر */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+        <div className="w-full px-4 mx-auto max-w-7xl py-4">
           <div className="flex items-center justify-between">
             <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
@@ -130,7 +130,7 @@ const TermsAndConditionsPage: React.FC<TermsAndConditionsPageProps> = ({ onBack 
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="w-full px-4 mx-auto max-w-7xl py-8">
         {error ? (
           <Card className="shadow-lg border-red-200">
             <CardContent className="p-8 text-center">

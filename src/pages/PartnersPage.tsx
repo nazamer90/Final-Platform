@@ -37,7 +37,7 @@ const Header = ({ onBack }: { onBack: () => void }) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <FloatingCubes />
-      <div className="container flex h-16 items-center justify-between">
+      <div className="w-full px-4 mx-auto max-w-7xl flex h-16 items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={onBack} className="flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -138,7 +138,7 @@ export default function PartnersPage({ onBack }: { onBack: () => void }) {
       <section className="relative py-20 overflow-hidden">
         <FloatingCubes />
         
-        <div className="container px-4 relative z-10">
+        <div className="w-full px-4 mx-auto max-w-7xl relative z-10">
           <div className="flex items-center justify-center text-center mb-16 fade-in-up">
             <h1 className="flex items-center justify-center text-4xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">

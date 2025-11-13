@@ -118,7 +118,7 @@ const Header = ({
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <FloatingCubes />
-      <div className="container flex h-16 items-center justify-between">
+      <div className="w-full px-4 mx-auto max-w-7xl flex h-16 items-center justify-between">
         <div className="flex items-center gap-3">
           <img
             src="/eshro-new-logo.png"
@@ -499,7 +499,7 @@ const ServicesSection = ({ onNavigate }: { onNavigate: (page: string) => void })
     <section className="services-section py-20 bg-slate-900 text-white relative overflow-hidden">
       <FloatingCubes />
       
-      <div className="container px-4 relative z-10">
+      <div className="w-full px-4 mx-auto max-w-7xl relative z-10">
         <div className="text-center mb-16 fade-in-up">
           <h2 className="flex items-center justify-center text-4xl md:text-5xl font-bold mb-6">
             <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
@@ -561,7 +561,7 @@ const StoresCarousel = ({ onStoreClick }: { onStoreClick: (storeSlug: string) =>
     <section className="stores-carousel py-16 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
       <FloatingCubes />
       
-      <div className="container px-4 relative z-10">
+      <div className="w-full px-4 mx-auto max-w-7xl relative z-10">
         <h2 className="flex items-center justify-center text-2xl md:text-4xl font-bold mb-12 fade-in-up">
           <span className="text-primary">متاجر على منصة إشرو</span>
         </h2>
@@ -670,7 +670,7 @@ const PartnersSection = ({ onNavigate }: { onNavigate: (page: string) => void })
       `}</style>
       <FloatingCubes />
       
-      <div className="container px-4 relative z-10">
+      <div className="w-full px-4 mx-auto max-w-7xl relative z-10">
         <div className="flex items-center justify-center mb-12 fade-in-up">
           <h2 className="text-2xl md:text-4xl font-bold mb-2 text-primary">شركاء النجاح</h2>
         </div>
@@ -801,7 +801,7 @@ const Footer = () => {
     <footer className="bg-slate-900 text-white py-16 relative overflow-hidden">
       <FloatingCubes />
 
-      <div className="container px-4 relative z-10">
+      <div className="w-full px-4 mx-auto max-w-7xl relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="text-center">
             <div className="flex justify-center mb-4">
@@ -2125,7 +2125,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="bg-white shadow-sm border-b">
-          <div className="container mx-auto px-4 py-4">
+          <div className="w-full px-4 mx-auto max-w-7xl py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Button variant="ghost" size="sm" onClick={handleBackToHome}>
@@ -2138,7 +2138,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-8">
+        <div className="w-full px-4 mx-auto max-w-7xl py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
               <Bell className="h-16 w-16 text-primary mx-auto mb-4" />
@@ -2175,7 +2175,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="bg-white shadow-sm border-b">
-          <div className="container mx-auto px-4 py-4">
+          <div className="w-full px-4 mx-auto max-w-7xl py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Button variant="ghost" size="sm" onClick={handleBackToHome}>
@@ -2188,7 +2188,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-8">
+        <div className="w-full px-4 mx-auto max-w-7xl py-8">
           <div className="max-w-md mx-auto">
             <Card className="p-6">
               <div className="text-center mb-6">
