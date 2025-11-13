@@ -114,6 +114,155 @@ import {
     Zap
   } from 'lucide-react';
 
+const LOGISTICS_FALLBACK_ICON = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMTI4IDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMiAyMGMwLTQuNDI5IDIuNjUxLTguNDQzIDYuNzEzLTEwLjMzTDU5LjA4NCAyLjYzOUM2MS43OTYgMS4zNzIgNjQuNzQ4IDAgNjcuOTk5IDBoNTguMDAyQzEyNy4zOTcgMCAxMzIgNC42MDMgMTMyIDEwLjI1NHY1OS40OTJDMTEzLjMzMiA3NS4zMzUgOTQuMzg3IDgwIDc1LjUwMiA4MEg1Mi41Yy02LjAyOCAwLTEyLjA0LTIuMTc3LTE2LjczNC02LjA4OEwxNC4wNTIgNjMuNzA0QzExLjQxMiA2MS42NzQgMTAuMDAyIDU4LjY1OCAxMCA1NS40NTJWMjB6IiBmaWxsPSIjZjNmNGY5Ii8+PHRleHQgeD0iNjQiIHk9IjUwIiBmb250LXNpemU9IjI0IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiM1NjU2NTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5PIElDT048L3RleHQ+PC9zdmc+';
+
+interface LogisticsCompany {
+  name: string;
+  phone: string;
+  mobilePhone: string;
+  email: string;
+  location: string;
+  city?: string;
+  src: string;
+  lat?: number;
+  lng?: number;
+}
+
+const INITIAL_LOGISTICS_COMPANIES: LogisticsCompany[] = [
+  {
+    name: 'هدهد',
+    phone: '+218 91 000 0001',
+    mobilePhone: '+218 91 000 1001',
+    email: 'info@hudhud.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/hudhud.jpeg',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'دي اتش ال',
+    phone: '+218 91 000 0002',
+    mobilePhone: '+218 91 000 1002',
+    email: 'info@dhl.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/dhl.png',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'ارامكس',
+    phone: '+218 91 000 0003',
+    mobilePhone: '+218 91 000 1003',
+    email: 'info@aramex.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/aramex.webp',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'برستو',
+    phone: '+218 91 000 0004',
+    mobilePhone: '+218 91 000 1004',
+    email: 'info@presto.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/presto.jpg',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'فانيكس',
+    phone: '+218 91 000 0005',
+    mobilePhone: '+218 91 000 1005',
+    email: 'info@vanex.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/vanex.png',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'زام',
+    phone: '+218 91 000 0006',
+    mobilePhone: '+218 91 000 1006',
+    email: 'info@zam.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/ZAM.png',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'ديبو فاست',
+    phone: '+218 91 000 0007',
+    mobilePhone: '+218 91 000 1007',
+    email: 'info@bebo_fast.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/bebo_fast.webp',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'درب السيل',
+    phone: '+218 91 000 0008',
+    mobilePhone: '+218 91 000 1008',
+    email: 'info@darbsail.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/darbsail.png',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'سونيك اكسبريس',
+    phone: '+218 91 000 0009',
+    mobilePhone: '+218 91 000 1009',
+    email: 'info@sonicexpress.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/sonicexpress.webp',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'جو دليفيري',
+    phone: '+218 91 000 0010',
+    mobilePhone: '+218 91 000 1010',
+    email: 'info@go-delivery.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/go-delivery.webp',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'وينغيس',
+    phone: '+218 91 000 0011',
+    mobilePhone: '+218 91 000 1011',
+    email: 'info@wings.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/wingsly.webp',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+  {
+    name: 'دراجات نارية',
+    phone: '+218 91 000 0012',
+    mobilePhone: '+218 91 000 1012',
+    email: 'info@motorcycles.ly',
+    location: 'طرابلس، ليبيا',
+    city: 'طرابلس',
+    src: '/assets/partners/transport/other_delivery.png',
+    lat: 32.8872,
+    lng: 13.1913,
+  },
+];
+
 type DashboardSection =
   | 'overview'
   | 'orders-manual'
@@ -541,12 +690,18 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
   const [logisticsForm, setLogisticsForm] = useState({
     name: '',
     phone: '',
+    mobilePhone: '',
     email: '',
     city: '',
     address: '',
     lat: '',
-    lng: ''
+    lng: '',
+    logo: ''
   });
+  const [isEditingLogistics, setIsEditingLogistics] = useState(false);
+  const [editingLogisticsIndex, setEditingLogisticsIndex] = useState<number | null>(null);
+  const [logisticsLogoPreview, setLogisticsLogoPreview] = useState('');
+  const [logisticsPendingCoordinates, setLogisticsPendingCoordinates] = useState<{lat: number; lng: number} | null>(null);
 
   const [biddingModalOpen, setBiddingModalOpen] = useState(false);
   const [showBiddingMapModal, setShowBiddingMapModal] = useState(false);
@@ -615,20 +770,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
     });
   }, []);
 
-  const [shippingCompanies, setShippingCompanies] = useState([
-    { name: 'هدهد', phone: '+218 91 000 0001', email: 'info@hudhud.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/hudhud.jpeg' },
-    { name: 'دي اتش ال', phone: '+218 91 000 0002', email: 'info@dhl.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/dhl.png' },
-    { name: 'ارامكس', phone: '+218 91 000 0003', email: 'info@aramex.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/aramex.webp' },
-    { name: 'برستو', phone: '+218 91 000 0004', email: 'info@presto.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/presto.jpg' },
-    { name: 'فانيكس', phone: '+218 91 000 0005', email: 'info@vanex.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/vanex.png' },
-    { name: 'زام', phone: '+218 91 000 0006', email: 'info@zam.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/ZAM.png', large: true },
-    { name: 'ديبو فاست', phone: '+218 91 000 0007', email: 'info@bebo_fast.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/bebo_fast.webp', large: true },
-    { name: 'درب السيل', phone: '+218 91 000 0008', email: 'info@darbsail.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/darbsail.png', large: true },
-    { name: 'سونيك اكسبريس', phone: '+218 91 000 0009', email: 'info@sonicexpress.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/sonicexpress.webp' },
-    { name: 'جو دليفيري', phone: '+218 91 000 0010', email: 'info@go-delivery.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/go-delivery.webp' },
-    { name: 'وينغيس', phone: '+218 91 000 0011', email: 'info@wings.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/wingsly.webp' },
-    { name: 'دراجات نارية', phone: '+218 91 000 0012', email: 'info@motorcycles.ly', location: 'طرابلس، ليبيا', src: '/assets/partners/transport/other_delivery.png' }
-  ]);
+  const [shippingCompanies, setShippingCompanies] = useState<LogisticsCompany[]>(INITIAL_LOGISTICS_COMPANIES);
 
   const merchantId = useMemo(() => {
     const resolved = resolveMerchantId(currentMerchant);
@@ -2085,31 +2227,159 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
   // Bidding map initialization
 
   // Services handlers
-  const handleSaveLogistics = () => {
-    if (!logisticsForm.name.trim()) {
-      alert('يرجى إدخال اسم الخدمة');
-      return;
-    }
-
-    const newCompany = {
-      name: logisticsForm.name,
-      phone: logisticsForm.phone,
-      email: logisticsForm.email,
-      location: logisticsForm.address,
-      src: '/assets/partners/transport/other_delivery.png'
-    };
-
-    setShippingCompanies(prev => [...prev, newCompany]);
-    setLogisticsModalOpen(false);
+  const resetLogisticsFormState = () => {
     setLogisticsForm({
       name: '',
       phone: '',
+      mobilePhone: '',
       email: '',
       city: '',
       address: '',
       lat: '',
-      lng: ''
+      lng: '',
+      logo: ''
     });
+    setLogisticsLogoPreview('');
+    setLogisticsPendingCoordinates(null);
+    setLogisticsSelectedCoordinates(null);
+  };
+
+  const openLogisticsAddModal = () => {
+    setIsEditingLogistics(false);
+    setEditingLogisticsIndex(null);
+    resetLogisticsFormState();
+    setLogisticsModalOpen(true);
+  };
+
+  const openLogisticsEditModal = (index: number) => {
+    const company = shippingCompanies[index];
+    if (!company) {
+      return;
+    }
+    setIsEditingLogistics(true);
+    setEditingLogisticsIndex(index);
+    setLogisticsForm({
+      name: company.name,
+      phone: company.phone,
+      mobilePhone: company.mobilePhone ?? company.phone,
+      email: company.email,
+      city: company.city ?? '',
+      address: company.location,
+      lat: company.lat !== undefined ? company.lat.toFixed(6) : '',
+      lng: company.lng !== undefined ? company.lng.toFixed(6) : '',
+      logo: company.src
+    });
+    setLogisticsLogoPreview(company.src);
+    if (company.lat !== undefined && company.lng !== undefined) {
+      setLogisticsSelectedCoordinates({ lat: company.lat, lng: company.lng });
+    } else {
+      setLogisticsSelectedCoordinates(null);
+    }
+    setLogisticsPendingCoordinates(null);
+    setLogisticsModalOpen(true);
+  };
+
+  const closeLogisticsModal = () => {
+    setLogisticsModalOpen(false);
+    setIsEditingLogistics(false);
+    setEditingLogisticsIndex(null);
+    resetLogisticsFormState();
+  };
+
+  const handleLogisticsLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    const allowedTypes = ['image/webp', 'image/png', 'image/jpeg', 'image/jpg', 'image/bmp', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('الرجاء اختيار ملف بصيغة WEBP, PNG, JPG, JPEG, BMP أو PDF');
+      e.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      if (file.type === 'application/pdf') {
+        setLogisticsForm(prev => ({
+          ...prev,
+          logo: LOGISTICS_FALLBACK_ICON
+        }));
+        setLogisticsLogoPreview(LOGISTICS_FALLBACK_ICON);
+      } else {
+        setLogisticsForm(prev => ({
+          ...prev,
+          logo: result
+        }));
+        setLogisticsLogoPreview(result);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const clearLogisticsLogo = () => {
+    setLogisticsLogoPreview('');
+    setLogisticsForm(prev => ({ ...prev, logo: '' }));
+  };
+
+  const confirmLogisticsCoordinates = () => {
+    if (!logisticsPendingCoordinates) return;
+    const { lat, lng } = logisticsPendingCoordinates;
+    setLogisticsForm(prev => ({
+      ...prev,
+      lat: lat.toFixed(6),
+      lng: lng.toFixed(6)
+    }));
+    setLogisticsSelectedCoordinates({ lat, lng });
+    setLogisticsPendingCoordinates(null);
+  };
+
+  const handleSaveLogistics = () => {
+    if (!logisticsForm.name.trim()) {
+      alert('يرجى إدخال اسم الشركة');
+      return;
+    }
+    if (!logisticsForm.phone.trim()) {
+      alert('يرجى إدخال رقم الهاتف');
+      return;
+    }
+    if (!logisticsForm.email.trim()) {
+      alert('يرجى إدخال البريد الإلكتروني');
+      return;
+    }
+
+    const latValue = logisticsForm.lat ? parseFloat(logisticsForm.lat) : undefined;
+    const lngValue = logisticsForm.lng ? parseFloat(logisticsForm.lng) : undefined;
+    const trimmedCity = logisticsForm.city.trim();
+
+    const nextCompany: LogisticsCompany = {
+      name: logisticsForm.name.trim(),
+      phone: logisticsForm.phone.trim(),
+      mobilePhone: logisticsForm.mobilePhone.trim() || logisticsForm.phone.trim(),
+      email: logisticsForm.email.trim(),
+      location: logisticsForm.address.trim(),
+      src: logisticsForm.logo || logisticsLogoPreview || LOGISTICS_FALLBACK_ICON,
+      ...(trimmedCity ? { city: trimmedCity } : {}),
+      ...(latValue !== undefined ? { lat: latValue } : {}),
+      ...(lngValue !== undefined ? { lng: lngValue } : {})
+    };
+
+    if (latValue === undefined || lngValue === undefined) {
+      setLogisticsSelectedCoordinates(null);
+    } else {
+      setLogisticsSelectedCoordinates({ lat: latValue, lng: lngValue });
+    }
+
+    if (isEditingLogistics && editingLogisticsIndex !== null) {
+      setShippingCompanies(prev =>
+        prev.map((company, index) => (index === editingLogisticsIndex ? nextCompany : company))
+      );
+    } else {
+      setShippingCompanies(prev => [...prev, nextCompany]);
+    }
+
+    closeLogisticsModal();
   };
 
   const handleLogisticsMapSearch = () => {
@@ -11219,7 +11489,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                     <div></div>
                     <Button
                       className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                      onClick={() => setLogisticsModalOpen(true)}
+                      onClick={openLogisticsAddModal}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       إضافة خدمة شحن جديدة
@@ -11231,11 +11501,13 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                     <div className="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-[9999]">
                       <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-4xl mx-4 shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">إضافة خدمة شحن جديدة 🚚✨</h3>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                            {isEditingLogistics ? 'تعديل بيانات شركة الشحن' : 'إضافة خدمة شحن جديدة 🚚✨'}
+                          </h3>
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setLogisticsModalOpen(false)}
+                            onClick={closeLogisticsModal}
                             className="hover:bg-gray-100"
                           >
                             <X className="h-4 w-4" />
@@ -11247,12 +11519,12 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                             <h4 className="font-bold text-blue-900 mb-2">معلومات الشركة الأساسية</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div>
-                                <Label htmlFor="service-name">اسم الخدمة</Label>
+                                <Label htmlFor="service-name">اسم الشركة</Label>
                                 <Input
                                   id="service-name"
                                   placeholder="مثال: شركة الشحن السريع"
                                   value={logisticsForm.name}
-                                  onChange={(e) => setLogisticsForm({...logisticsForm, name: e.target.value})}
+                                  onChange={(e) => setLogisticsForm({ ...logisticsForm, name: e.target.value })}
                                   className="mt-1"
                                 />
                               </div>
@@ -11262,7 +11534,17 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                                   id="service-phone"
                                   placeholder="+218 91 000 0000"
                                   value={logisticsForm.phone}
-                                  onChange={(e) => setLogisticsForm({...logisticsForm, phone: e.target.value})}
+                                  onChange={(e) => setLogisticsForm({ ...logisticsForm, phone: e.target.value })}
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="service-mobile">رقم الموبايل</Label>
+                                <Input
+                                  id="service-mobile"
+                                  placeholder="+218 91 000 1000"
+                                  value={logisticsForm.mobilePhone}
+                                  onChange={(e) => setLogisticsForm({ ...logisticsForm, mobilePhone: e.target.value })}
                                   className="mt-1"
                                 />
                               </div>
@@ -11272,13 +11554,65 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                                   id="service-email"
                                   placeholder="info@company.com"
                                   value={logisticsForm.email}
-                                  onChange={(e) => setLogisticsForm({...logisticsForm, email: e.target.value})}
+                                  onChange={(e) => setLogisticsForm({ ...logisticsForm, email: e.target.value })}
                                   className="mt-1"
                                 />
                               </div>
+                              <div className="md:col-span-2">
+                                <Label htmlFor="logistics-logo-input" className="text-gray-700 font-bold">شعار الشركة</Label>
+                                <div className="mt-2 flex flex-col md:flex-row items-center md:items-start gap-4">
+                                  <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-blue-200 bg-white flex items-center justify-center overflow-hidden">
+                                    {(logisticsLogoPreview || logisticsForm.logo) ? (
+                                      <img
+                                        src={logisticsLogoPreview || logisticsForm.logo}
+                                        alt={logisticsForm.name ? `شعار ${logisticsForm.name}` : 'شعار شركة الشحن'}
+                                        className="w-full h-full object-contain p-2"
+                                        onError={(e) => {
+                                          (e.currentTarget as HTMLImageElement).src = LOGISTICS_FALLBACK_ICON;
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="flex flex-col items-center text-blue-500">
+                                        <Upload className="h-8 w-8 mb-2" />
+                                        <span className="text-xs font-semibold text-center text-blue-600">لم يتم تحميل شعار بعد</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-col items-center md:items-start gap-2">
+                                    <input
+                                      id="logistics-logo-input"
+                                      type="file"
+                                      accept=".webp,.png,.jpg,.jpeg,.bmp,.pdf"
+                                      className="hidden"
+                                      onChange={handleLogisticsLogoUpload}
+                                      aria-label="تحميل شعار شركة الشحن"
+                                    />
+                                    <Button
+                                      type="button"
+                                      onClick={() => document.getElementById('logistics-logo-input')?.click()}
+                                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                                    >
+                                      تحميل الشعار
+                                    </Button>
+                                    {(logisticsLogoPreview || logisticsForm.logo) && (
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        onClick={clearLogisticsLogo}
+                                        className="text-red-600 hover:text-red-700"
+                                      >
+                                        إزالة الشعار
+                                      </Button>
+                                    )}
+                                    <p className="text-xs text-gray-500 text-center md:text-right">
+                                      الصيغ المدعومة: WEBP, PNG, JPG, JPEG, BMP, PDF
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
                               <div>
                                 <Label htmlFor="service-city">المدينة</Label>
-                                <Select value={logisticsForm.city} onValueChange={(value) => setLogisticsForm({...logisticsForm, city: value})}>
+                                <Select value={logisticsForm.city} onValueChange={(value) => setLogisticsForm({ ...logisticsForm, city: value })}>
                                   <SelectTrigger className="mt-1">
                                     <SelectValue placeholder="اختر المدينة" />
                                   </SelectTrigger>
@@ -11297,7 +11631,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                                   id="service-address"
                                   placeholder="طرابلس، ليبيا - الدائرة السابعة"
                                   value={logisticsForm.address}
-                                  onChange={(e) => setLogisticsForm({...logisticsForm, address: e.target.value})}
+                                  onChange={(e) => setLogisticsForm({ ...logisticsForm, address: e.target.value })}
                                   className="mt-1"
                                 />
                               </div>
@@ -11314,7 +11648,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                                   step="any"
                                   placeholder="32.8872"
                                   value={logisticsForm.lat}
-                                  onChange={(e) => setLogisticsForm({...logisticsForm, lat: e.target.value})}
+                                  onChange={(e) => setLogisticsForm({ ...logisticsForm, lat: e.target.value })}
                                   className="mt-1"
                                 />
                               </div>
@@ -11325,7 +11659,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                                   step="any"
                                   placeholder="13.1913"
                                   value={logisticsForm.lng}
-                                  onChange={(e) => setLogisticsForm({...logisticsForm, lng: e.target.value})}
+                                  onChange={(e) => setLogisticsForm({ ...logisticsForm, lng: e.target.value })}
                                   className="mt-1"
                                 />
                               </div>
@@ -11336,14 +11670,19 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                                     zoom={7}
                                     style={{ height: '100%', width: '100%' }}
                                   >
-                                    <MapClickHandler setLogisticsForm={setLogisticsForm} logisticsForm={logisticsForm} />
+                                    <LogisticsMapClickHandler onMapClick={({ lat, lng }) => setLogisticsPendingCoordinates({ lat, lng })} />
                                     <TileLayer
                                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     />
-                                    {(logisticsForm.lat && logisticsForm.lng) && (
-                                      <Marker position={[parseFloat(logisticsForm.lat), parseFloat(logisticsForm.lng)]}>
-                                        <Popup>الموقع المحدد</Popup>
+                                    {(logisticsPendingCoordinates || (logisticsForm.lat && logisticsForm.lng)) && (
+                                      <Marker
+                                        position={[
+                                          logisticsPendingCoordinates?.lat ?? parseFloat(logisticsForm.lat),
+                                          logisticsPendingCoordinates?.lng ?? parseFloat(logisticsForm.lng)
+                                        ]}
+                                      >
+                                        <Popup>الموقع المختار</Popup>
                                       </Marker>
                                     )}
                                     <Marker position={[32.8872, 13.1913]}>
@@ -11353,6 +11692,37 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                                   <div className="absolute top-2 left-2 bg-white p-2 rounded shadow text-sm">
                                     انقر على الخريطة لتحديد الموقع
                                   </div>
+                                  {logisticsPendingCoordinates && (
+                                    <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-sm border border-green-200 rounded-xl p-4 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                      <div>
+                                        <p className="text-sm font-semibold text-gray-800">إحداثيات غير مؤكدة</p>
+                                        <p className="text-xs text-gray-600">
+                                          {logisticsPendingCoordinates.lat.toFixed(6)}, {logisticsPendingCoordinates.lng.toFixed(6)}
+                                        </p>
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <Button
+                                          size="sm"
+                                          className="bg-green-600 hover:bg-green-700 text-white"
+                                          onClick={confirmLogisticsCoordinates}
+                                        >
+                                          تأكيد الموقع
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => setLogisticsPendingCoordinates(null)}
+                                        >
+                                          إلغاء
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {!logisticsPendingCoordinates && logisticsForm.lat && logisticsForm.lng && (
+                                    <div className="absolute bottom-3 left-3 right-3 bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl text-center text-sm font-bold">
+                                      ✅ الموقع المؤكد: {logisticsForm.lat}, {logisticsForm.lng}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -11364,11 +11734,11 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                               className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
                             >
                               <Save className="h-4 w-4 mr-2" />
-                              🚚 إضافة خدمة الشحن ✨
+                              {isEditingLogistics ? '💾 حفظ التعديلات' : '🚚 إضافة خدمة الشحن ✨'}
                             </Button>
                             <Button
                               variant="outline"
-                              onClick={() => setLogisticsModalOpen(false)}
+                              onClick={closeLogisticsModal}
                               className="transition-all duration-200 hover:bg-gray-50"
                             >
                               إلغاء
@@ -11475,36 +11845,57 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                   {/* Shipping Companies List */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {shippingCompanies.map((company, index) => (
-                      <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow bg-transparent">
-                        <CardContent className="p-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="w-32 h-32 bg-transparent flex items-center justify-center mx-auto mb-4">
-                              <img
-                                src={company.src}
-                                alt={company.name}
-                                className={`${company.large ? 'w-40 h-40' : 'w-32 h-32'} object-contain`}
-                              />
-                            </div>
-
+                      <Card key={`${company.name}-${index}`} className="shadow-lg hover:shadow-2xl transition-shadow bg-white/90 backdrop-blur-sm border border-slate-100">
+                        <CardContent className="p-6 flex flex-col items-center text-center gap-4">
+                          <div className="w-32 h-32 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-center">
+                            <img
+                              src={company.src || LOGISTICS_FALLBACK_ICON}
+                              alt={company.name}
+                              className="w-full h-full object-contain p-2"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = LOGISTICS_FALLBACK_ICON;
+                              }}
+                            />
                           </div>
-                          
-                          <div className="space-y-2 text-sm">
-                            <div className="flex items-center gap-2">
-                              <Phone className="h-4 w-4 text-gray-400" />
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900">{company.name}</h3>
+                            {company.city && <p className="text-sm text-gray-500 mt-1">{company.city}</p>}
+                          </div>
+                          <div className="space-y-2 text-sm text-gray-600 w-full max-w-xs">
+                            <div className="flex items-center justify-center gap-2">
+                              <Phone className="h-4 w-4 text-blue-500" />
                               <span>{company.phone}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Mail className="h-4 w-4 text-gray-400" />
-                              <span>{company.email}</span>
+                            {company.mobilePhone && (
+                              <div className="flex items-center justify-center gap-2">
+                                <Smartphone className="h-4 w-4 text-blue-500" />
+                                <span>{company.mobilePhone}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-center gap-2">
+                              <Mail className="h-4 w-4 text-blue-500" />
+                              <span className="break-all">{company.email}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-4 w-4 text-gray-400" />
+                            <div className="flex items-center justify-center gap-2">
+                              <MapPin className="h-4 w-4 text-blue-500" />
                               <span>{company.location}</span>
                             </div>
+                            {(company.lat !== undefined && company.lng !== undefined) && (
+                              <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+                                <Globe className="h-4 w-4 text-blue-400" />
+                                <span>{company.lat.toFixed(4)}, {company.lng.toFixed(4)}</span>
+                              </div>
+                            )}
                           </div>
-                          <div className="flex gap-2 mt-4">
-                            <Button size="sm" variant="outline">عرض الموقع</Button>
-                            <Button size="sm" variant="outline" onClick={() => setBankModalOpen(true)}>تعديل</Button>
+                          <div className="flex gap-3 mt-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openLogisticsEditModal(index)}
+                              className="px-5"
+                            >
+                              تعديل البيانات
+                            </Button>
                           </div>
                         </CardContent>
                       </Card>
@@ -14424,22 +14815,5 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
     </div>
   );
 };
-
-const MapClickHandler: React.FC<{ setLogisticsForm: React.Dispatch<React.SetStateAction<any>>, logisticsForm: any }> = ({ setLogisticsForm, logisticsForm }) => {
-  useMapEvents({
-    click: (e) => {
-      const { lat, lng } = e.latlng;
-      if (setLogisticsForm) {
-        setLogisticsForm({
-          ...logisticsForm,
-          lat: lat.toString(),
-          lng: lng.toString()
-        });
-      }
-    },
-  });
-  return null;
-};
-
 
 export default EnhancedMerchantDashboard;
