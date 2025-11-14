@@ -33,7 +33,7 @@ graph TB
 
     %% Data Layer
     subgraph "Data Layer"
-        J[Neon PostgreSQL] --> K[(Relational Database)]
+        J[MySQL Database] --> K[(Relational Database)]
         L[Cloudflare KV] --> M[(Key-Value Store)]
         N[Cloudflare R2] --> O[(Object Storage)]
     end
