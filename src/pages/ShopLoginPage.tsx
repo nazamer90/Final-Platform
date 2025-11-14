@@ -507,7 +507,7 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
                   type={userType === 'admin' ? 'email' : 'text'}
                   placeholder={
                     userType === 'admin'
-                      ? 'admin@eshro.ly'
+                      ? 'أدخل البريد الإلكتروني لمسؤول النظام'
                       : userType === 'merchant'
                       ? 'أدخل اسم المتجر أو البريد الإلكتروني'
                       : 'أدخل اسم المستخدم أو البريد الإلكتروني'
@@ -526,11 +526,7 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder={
-                      userType === 'admin'
-                        ? 'admin123'
-                        : 'أدخل كلمة المرور'
-                    }
+                    placeholder="أدخل كلمة المرور"
                     value={credentials.password}
                     onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
                     className="text-right pl-10"
@@ -609,7 +605,7 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
               </p>
               <button
                 onClick={onNavigateToAccountTypeSelection || onNavigateToRegister}
-                className="text-sm font-medium text-green-400 hover:text-green-400 hover:underline"
+                className="text-sm font-medium text-green-400 hover:text-green-400 hover:underline text-center mx-auto block"
               >
                 قم بإنشاء حساب جديد معنا
               </button>
@@ -621,12 +617,12 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
         <div className="grid grid-cols-3 gap-4 mt-12 w-full max-w-md">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
-              <Card className="p-4 hover:shadow-lg transition-shadow">
+              <Card className="p-4 hover:shadow-lg transition-shadow text-center">
                 <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center mx-auto mb-2 text-white`}>
                   {stat.icon}
                 </div>
                 <div className="text-2xl font-bold text-slate-800 mb-1">{stat.number}</div>
-                <div className="text-xs text-slate-600 leading-tight">{stat.description}</div>
+                <div className="text-xs text-slate-600 leading-tight text-center">{stat.description}</div>
               </Card>
             </div>
           ))}
