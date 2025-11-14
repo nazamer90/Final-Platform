@@ -65,8 +65,8 @@ const AccountTypeSelectionPage: React.FC<AccountTypeSelectionPageProps> = ({
             <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
               <User className="h-10 w-10 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">اختر نوع الحساب المناسب لك</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <h1 className="flex items-center justify-center text-3xl font-bold text-gray-900 mb-4">اختر نوع الحساب المناسب لك</h1>
+            <p className="center justify-center text-lg text-gray-600 max-w-2xl mx-auto">
               انضم إلى مجتمع إشرو بالطريقة التي تناسب احتياجاتك، سواء كنت تاجراً تبحث عن منصة لبيع منتجاتك أو زائراً تبحث عن أفضل العروض
             </p>
           </div>
@@ -83,8 +83,8 @@ const AccountTypeSelectionPage: React.FC<AccountTypeSelectionPageProps> = ({
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Store className="h-8 w-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl text-blue-700">حساب تاجر</CardTitle>
-                <p className="text-gray-600">لأصحاب الأعمال والمتاجر الإلكترونية</p>
+                <CardTitle className="flex items-center justify-center text-2xl text-blue-700 text-center">حساب تاجر</CardTitle>
+                <p className="flex items-center justify-center text-gray-600 text-center">لأصحاب الأعمال والمتاجر الإلكترونية</p>
               </CardHeader>
 
               <CardContent>
@@ -101,8 +101,8 @@ const AccountTypeSelectionPage: React.FC<AccountTypeSelectionPageProps> = ({
                 </div>
 
                 <div className="mt-6 p-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl text-white text-center">
-                  <p className="font-semibold">ابدأ رحلتك كتاجر ناجح مع إشرو</p>
-                  <p className="text-sm opacity-90">انضم إلى آلاف التجار الناجحين</p>
+                  <p className="flex items-center justify-center font-semibold text-center">ابدأ رحلتك كتاجر ناجح مع إشرو</p>
+                  <p className="flex items-center justify-center text-sm opacity-90 text-center">انضم إلى آلاف التجار الناجحين</p>
                 </div>
               </CardContent>
 
@@ -123,8 +123,8 @@ const AccountTypeSelectionPage: React.FC<AccountTypeSelectionPageProps> = ({
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <User className="h-8 w-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl text-green-700">حساب زائر</CardTitle>
-                <p className="text-gray-600">للمتسوقين والعملاء الأفراد</p>
+                <CardTitle className="flex items-center justify-center text-2xl text-green-700 text-center">حساب زائر</CardTitle>
+                <p className="flex items-center justify-center text-gray-600 text-center">للمتسوقين والعملاء الأفراد</p>
               </CardHeader>
 
               <CardContent>
@@ -141,8 +141,8 @@ const AccountTypeSelectionPage: React.FC<AccountTypeSelectionPageProps> = ({
                 </div>
 
                 <div className="mt-6 p-4 bg-gradient-to-r from-green-500 to-green-600 rounded-xl text-white text-center">
-                  <p className="font-semibold">استمتع بتجربة تسوق استثنائية</p>
-                  <p className="text-sm opacity-90">اكتشف آلاف المنتجات والعروض</p>
+                  <p className="flex items-center justify-center font-semibold text-center">استمتع بتجربة تسوق استثنائية</p>
+                  <p className="flex items-center justify-center text-sm opacity-90 text-center">اكتشف آلاف المنتجات والعروض</p>
                 </div>
               </CardContent>
 
@@ -155,11 +155,11 @@ const AccountTypeSelectionPage: React.FC<AccountTypeSelectionPageProps> = ({
           </div>
 
           {/* زر التأكيد */}
-          <div className="text-center">
+          <div className="text-center flex justify-center">
             {selectedType === 'merchant' && (
               <Button
                 onClick={onSelectMerchant}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-12 py-4 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-12 py-4 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center"
               >
                 <Store className="h-5 w-5 mr-2" />
                 متابعة كتاجر
@@ -169,7 +169,7 @@ const AccountTypeSelectionPage: React.FC<AccountTypeSelectionPageProps> = ({
             {selectedType === 'visitor' && (
               <Button
                 onClick={onSelectVisitor}
-                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-12 py-4 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-12 py-4 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center"
               >
                 <User className="h-5 w-5 mr-2" />
                 متابعة كزائر
