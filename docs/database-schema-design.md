@@ -2,6 +2,31 @@
 
 ---
 
+## 🛡️ Security & Architecture Overview
+
+### Security Features
+- **Data Encryption**: Sensitive payment data encrypted using AES-256-GCM
+- **Password Hashing**: bcrypt with 12 salt rounds
+- **Audit Logging**: All database operations logged for compliance
+- **Input Validation**: Joi schemas on all endpoints
+- **SQL Injection Protection**: Parameterized queries
+- **Access Control**: RBAC with merchant/customer/admin roles
+
+### Performance Optimizations
+- **InnoDB Engine**: ACID compliance and row-level locking
+- **UTF8MB4 Charset**: Full Unicode support for Arabic text
+- **Strategic Indexing**: Optimized for common query patterns
+- **Connection Pooling**: Efficient database connection management
+- **Query Optimization**: EXPLAIN and slow query analysis
+
+### Backup & Recovery
+- **Automated Backups**: Daily backup scripts
+- **Point-in-Time Recovery**: Transaction log backups
+- **Encryption at Rest**: Database files encrypted
+- **Multi-Region Replication**: Disaster recovery setup
+
+---
+
 ## Database: eishro_db
 
 ---
@@ -355,6 +380,30 @@ CREATE TABLE product_images (
   -- Indexes
   KEY idx_product_id (product_id)
 );
+```
+
+---
+
+## 📌 Table: audit_logs
+
+```sql
+CREATE TABLE audit_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(36),
+  action VARCHAR(100) NOT NULL,
+  table_name VARCHAR(100),
+  record_id VARCHAR(36),
+  old_values JSON,
+  new_values JSON,
+  ip_address VARCHAR(45),
+  user_agent TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  -- Indexes
+  KEY idx_user_id (user_id),
+  KEY idx_action (action),
+  KEY idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ---

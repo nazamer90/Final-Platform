@@ -24,6 +24,31 @@ import {
 } from 'lucide-react';
 import { storesData } from '@/data/ecommerceData';
 import { allStoreProducts } from '@/data/allStoreProducts';
+
+// Get dynamic stores from localStorage
+const getDynamicStores = () => {
+  try {
+    const stored = localStorage.getItem('eshro_stores');
+    if (!stored) return [];
+
+    const stores = JSON.parse(stored);
+    return stores.map((store: any) => ({
+      id: store.id,
+      name: store.nameAr,
+      slug: store.subdomain,
+      description: store.description,
+      logo: '/assets/default-store.png',
+      categories: store.categories,
+      url: `/${store.subdomain}`,
+      endpoints: {},
+      social: {},
+      isActive: true
+    }));
+  } catch (error) {
+    console.error('Error loading dynamic stores:', error);
+    return [];
+  }
+};
 import { nawaemProducts } from '@/data/stores/nawaem/products';
 import { sheirineProducts } from '@/data/stores/sheirine/products';
 import { prettyProducts } from '@/data/stores/pretty/products';
@@ -64,30 +89,70 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
   const [showNotifyModal, setShowNotifyModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // العثور على المتجر
-  const store = storesData.find(s => s.slug === storeSlug);
+  const getDynamicStores = () => {
+    try {
+      const stored = localStorage.getItem('eshro_stores');
+      if (!stored) return [];
+      
+      const newStores = JSON.parse(stored);
+      return newStores.map((store: any) => ({
+        id: store.id || Date.now(),
+        name: store.nameAr,
+        slug: store.subdomain,
+        description: store.description,
+        logo: store.logo || '/assets/default-store.png',
+        categories: store.categories || [],
+        url: `/${store.subdomain}`,
+        endpoints: {},
+        social: {},
+        isActive: true
+      }));
+    } catch (error) {
+      console.error('Error loading dynamic stores:', error);
+      return [];
+    }
+  };
 
-  // تصفية المنتجات
+  const allStores = [...storesData, ...getDynamicStores()];
+  const store = allStores.find(s => s.slug === storeSlug);
+
+  const getStoreProducts = (storeSlug: string, storeId?: number) => {
+    try {
+      const stored = localStorage.getItem(`store_products_${storeSlug}`);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.error(`Error loading products for store ${storeSlug}:`, error);
+    }
+    return [];
+  };
+
   let storeProducts: any[] = [];
   if (store) {
-    switch (store.slug) {
-      case 'nawaem':
-        storeProducts = nawaemProducts;
-        break;
-      case 'sheirine':
-        storeProducts = sheirineProducts;
-        break;
-      case 'pretty':
-        storeProducts = allStoreProducts.filter(p => p.storeId === store.id);
-        break;
-      case 'delta-store':
-        storeProducts = deltaProducts;
-        break;
-      case 'magna-beauty':
-        storeProducts = magnaBeautyProducts;
-        break;
-      default:
-        storeProducts = allStoreProducts.filter(p => p.storeId === store.id);
+    const dynamicProducts = getStoreProducts(store.slug, store.id);
+    if (dynamicProducts.length > 0) {
+      storeProducts = dynamicProducts;
+    } else {
+      switch (store.slug) {
+        case 'nawaem':
+          storeProducts = nawaemProducts;
+          break;
+        case 'sheirine':
+          storeProducts = sheirineProducts;
+          break;
+        case 'pretty':
+          storeProducts = allStoreProducts.filter(p => p.storeId === store.id);
+          break;
+        case 'delta-store':
+          storeProducts = deltaProducts;
+          break;
+        case 'magna-beauty':
+          storeProducts = magnaBeautyProducts;
+          break;
+        default:
+          storeProducts = allStoreProducts.filter(p => p.storeId === store.id);
+      }
     }
   }
 
@@ -263,7 +328,9 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
         sliderImages.length > 0 && (
           <div className="relative h-80 bg-gradient-to-r from-primary/10 to-primary/5 overflow-hidden">
             <div className="absolute inset-0 flex transition-transform duration-500 ease-in-out"
-                 style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
+                 style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                 role="region"
+                 aria-label="محتوى السلايدر">
               {sliderImages.map((product, index) => (
                 <div key={product.id} className="w-full flex-shrink-0 relative">
                   <div className="container mx-auto px-4 h-full flex items-center">
@@ -316,12 +383,16 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                 <button
                   onClick={prevSlide}
                   className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-colors"
+                  aria-label="الصورة السابقة"
+                  title="الصورة السابقة"
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </button>
                 <button
                   onClick={nextSlide}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-colors"
+                  aria-label="الصورة التالية"
+                  title="الصورة التالية"
                 >
                   <ArrowRight className="h-5 w-5" />
                 </button>
@@ -338,6 +409,8 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                     className={`w-3 h-3 rounded-full transition-colors ${
                       index === activeSlide ? 'bg-white' : 'bg-white/50'
                     }`}
+                    aria-label={`انتقل إلى الشريحة ${index + 1}`}
+                    title={`الشريحة ${index + 1}`}
                   />
                 ))}
               </div>
@@ -401,13 +474,13 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                 منصة إشرو الإلكترونية - مستقبل التجارة الإلكترونية في ليبيا
               </p>
               <div className="flex gap-3">
-                <button className="w-8 h-8 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors">
+                <button className="w-8 h-8 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors" aria-label="تابعنا على إنستجرام" title="إنستجرام">
                   <Instagram className="h-4 w-4" />
                 </button>
-                <button className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
+                <button className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors" aria-label="تابعنا على فيسبوك" title="فيسبوك">
                   <Facebook className="h-4 w-4" />
                 </button>
-                <button className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center hover:bg-green-500 transition-colors">
+                <button className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center hover:bg-green-500 transition-colors" aria-label="زيارة الموقع الإلكتروني" title="الموقع الإلكتروني">
                   <Globe className="h-4 w-4" />
                 </button>
               </div>
@@ -571,6 +644,8 @@ const ProductCard: React.FC<{
                   ? 'bg-red-500 text-white' 
                   : 'bg-white/80 text-gray-600 hover:bg-red-500 hover:text-white'
               }`}
+              aria-label={isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+              title={isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
             >
               <Heart className="h-4 w-4" fill={isFavorite ? 'currentColor' : 'none'} />
             </button>

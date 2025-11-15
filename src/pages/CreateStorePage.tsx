@@ -189,7 +189,6 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
         return;
       }
 
-      // محاكاة إنشاء المتجر
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       const storeData = {
@@ -197,14 +196,48 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
         commercialRegister: formData.commercialRegister?.name || '',
         practiceLicense: formData.practiceLicense?.name || '',
         id: Date.now().toString(),
+        nameAr: formData.nameAr,
+        nameEn: formData.nameEn,
         createdAt: new Date().toISOString(),
         status: 'active',
-        trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 أيام
+        trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
       };
 
-      // حفظ المتجر الجديد في localStorage
       existingStores.push(storeData);
       localStorage.setItem('eshro_stores', JSON.stringify(existingStores));
+
+      const defaultProducts = [
+        {
+          id: 1,
+          name: 'منتج جديد - 1',
+          description: 'وصف المنتج الجديد',
+          price: 50,
+          originalPrice: 75,
+          category: formData.categories[0] || 'عام',
+          images: ['/assets/default-product.png'],
+          colors: [{ name: 'أسود' }, { name: 'أبيض' }],
+          sizes: ['S', 'M', 'L', 'XL'],
+          availableSizes: ['S', 'M', 'L', 'XL'],
+          rating: 4.5,
+          reviews: 0,
+          tags: ['جديد'],
+          storeId: storeData.id,
+          inStock: true,
+          quantity: 100
+        }
+      ];
+
+      localStorage.setItem(`store_products_${formData.subdomain}`, JSON.stringify(defaultProducts));
+
+      const merchantCredentials = {
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        storeName: formData.nameAr,
+        subdomain: formData.subdomain,
+        storeId: storeData.id
+      };
+      localStorage.setItem(`merchant_${formData.subdomain}`, JSON.stringify(merchantCredentials));
 
       onStoreCreated(storeData);
 

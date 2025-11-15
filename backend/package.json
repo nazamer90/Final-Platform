@@ -11,7 +11,11 @@
     "lint": "eslint src --ext .ts",
     "test": "jest",
     "db:migrate": "ts-node src/database/migrate.ts",
-    "db:seed": "ts-node src/database/seed.ts"
+    "db:seed": "ts-node src/database/seed.ts",
+    "db:backup": "ts-node src/database/backup.ts backup",
+    "db:restore": "ts-node src/database/backup.ts restore",
+    "db:list": "ts-node src/database/backup.ts list",
+    "db:clean": "ts-node src/database/backup.ts clean"
   },
   "keywords": [
     "eishro",

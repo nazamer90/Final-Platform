@@ -15,6 +15,12 @@ import ShopLoginPage from "@/pages/ShopLoginPage";
 import CreateStorePage from "@/pages/CreateStorePage";
 import AccountTypeSelectionPage from "@/pages/AccountTypeSelectionPage";
 import VisitorRegistrationPage from "@/pages/VisitorRegistrationPage";
+import MerchantTermsAcceptance from "@/pages/MerchantTermsAcceptance";
+import MerchantPersonalInfo, { PersonalInfoData } from "@/pages/MerchantPersonalInfo";
+import MerchantStoreInfo, { StoreInfoData } from "@/pages/MerchantStoreInfo";
+import MerchantStoreSuccess from "@/pages/MerchantStoreSuccess";
+import CreateStoreWizard from "@/pages/CreateStoreWizard";
+import StoreCreationSuccessPage from "@/pages/StoreCreationSuccessPage";
 import TermsAndConditionsPage from "@/pages/TermsAndConditionsPage";
 import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
 import EnhancedMerchantDashboard from "@/pages/EnhancedMerchantDashboard";
@@ -555,7 +561,35 @@ const StoresCarousel = ({ onStoreClick }: { onStoreClick: (storeSlug: string) =>
     'delta-store': '/assets/stores/delta-store.webp',
     'magna-beauty': '/assets/stores/magna-beauty.webp',
   };
-  const featured = storesData.filter(s => featuredSlugs.includes(s.slug));
+
+  const getDynamicStores = () => {
+    try {
+      const stored = localStorage.getItem('eshro_stores');
+      if (!stored) return [];
+
+      const newStores = JSON.parse(stored);
+      return newStores.map((store: any) => ({
+        id: store.id || Date.now(),
+        name: store.nameAr,
+        slug: store.subdomain,
+        description: store.description,
+        logo: store.logo || '/assets/default-store.png',
+        categories: store.categories || [],
+        url: `/${store.subdomain}`,
+        endpoints: {},
+        social: {},
+        isActive: true
+      }));
+    } catch (error) {
+      console.error('Error loading dynamic stores:', error);
+      return [];
+    }
+  };
+
+  const allStores = [...storesData, ...getDynamicStores()];
+  // Show all stores: first the featured ones, then all dynamic stores
+  const featured = allStores.filter(s => featuredSlugs.includes(s.slug))
+    .concat(allStores.filter(s => !featuredSlugs.includes(s.slug)));
 
   return (
     <section className="stores-carousel py-16 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
@@ -566,7 +600,7 @@ const StoresCarousel = ({ onStoreClick }: { onStoreClick: (storeSlug: string) =>
           <span className="text-primary">متاجر على منصة إشرو</span>
         </h2>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 justify-items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 justify-items-center">
           {featured.map((store, index) => (
             <div
               key={index}
@@ -889,6 +923,12 @@ export default function Home() {
   const [isLoggedInAsVisitor, setIsLoggedInAsVisitor] = useState(false);
   const [allStores, setAllStores] = useState<any[]>([]);
   const [merchantSubPage, setMerchantSubPage] = useState('analytics');
+  const [merchantFlowStep, setMerchantFlowStep] = useState<'terms' | 'personal' | 'store' | null>(null);
+  const [merchantFlowData, setMerchantFlowData] = useState<{
+    personalInfo?: PersonalInfoData;
+    storeInfo?: StoreInfoData;
+  }>({});
+  const [storeCreationData, setStoreCreationData] = useState<any>(null);
   const validOrders = useMemo(() => orders.filter(order => order && order.id), [orders]);
 
   // عرض النافذة الترحيبية في كل مرة يتم فتح المنصة (لأغراض التسويق وتشجيع الاشتراك)
@@ -1885,6 +1925,156 @@ export default function Home() {
         onBack={handleBackToHome}
         onSelectMerchant={() => setCurrentPage('register')}
         onSelectVisitor={() => setCurrentPage('visitor-register')}
+        onSelectMerchantFlow={() => {
+          setMerchantFlowStep('terms');
+          setCurrentPage('merchant-flow');
+        }}
+      />
+    );
+  }
+
+  // عرض صفحة اتفاقية شروط التاجر
+  if (currentPage === 'merchant-flow' && merchantFlowStep === 'terms') {
+    return (
+      <MerchantTermsAcceptance
+        onBack={() => {
+          setMerchantFlowStep(null);
+          setMerchantFlowData({});
+          setCurrentPage('account-type-selection');
+        }}
+        onAccept={() => setMerchantFlowStep('personal')}
+      />
+    );
+  }
+
+  // عرض صفحة معلومات التاجر الشخصية
+  if (currentPage === 'merchant-flow' && merchantFlowStep === 'personal') {
+    return (
+      <MerchantPersonalInfo
+        onBack={() => setMerchantFlowStep('terms')}
+        onNext={(personalInfo) => {
+          setMerchantFlowData(prev => ({ ...prev, personalInfo }));
+          setCurrentPage('create-store-wizard');
+        }}
+        initialData={merchantFlowData.personalInfo}
+      />
+    );
+  }
+
+  // عرض صفحة معلومات المتجر
+  if (currentPage === 'merchant-flow' && merchantFlowStep === 'store') {
+    return (
+      <MerchantStoreInfo
+        onBack={() => setMerchantFlowStep('personal')}
+        onNext={(storeInfo) => {
+          setMerchantFlowData(prev => ({ ...prev, storeInfo }));
+          const { personalInfo } = merchantFlowData;
+          if (personalInfo && storeInfo) {
+            const newStore = {
+              id: Date.now().toString(),
+              nameAr: storeInfo.storeNameAr,
+              nameEn: storeInfo.storeNameEn,
+              email: personalInfo.email,
+              phone: personalInfo.phone,
+              password: personalInfo.password,
+              subdomain: storeInfo.subdomain,
+              description: storeInfo.description,
+              logo: storeInfo.logoPreview,
+              category: storeInfo.category,
+              createdAt: new Date().toISOString(),
+              status: 'active',
+              termsAccepted: true,
+              trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+            };
+            const existingStores = JSON.parse(localStorage.getItem('eshro_stores') || '[]');
+            existingStores.push(newStore);
+            localStorage.setItem('eshro_stores', JSON.stringify(existingStores));
+            const merchantCredentials = {
+              email: personalInfo.email,
+              password: personalInfo.password,
+              phone: personalInfo.phone,
+              storeName: storeInfo.storeNameAr,
+              subdomain: storeInfo.subdomain,
+              storeId: newStore.id
+            };
+            localStorage.setItem(`merchant_${storeInfo.subdomain}`, JSON.stringify(merchantCredentials));
+            const defaultProducts = [
+              {
+                id: 1,
+                name: 'منتج جديد - 1',
+                description: 'وصف المنتج الجديد',
+                price: 50,
+                originalPrice: 75,
+                category: storeInfo.category,
+                images: ['/assets/default-product.png'],
+                colors: [{ name: 'أسود' }, { name: 'أبيض' }],
+                sizes: ['S', 'M', 'L', 'XL'],
+                availableSizes: ['S', 'M', 'L', 'XL'],
+                rating: 4.5,
+                reviews: 0,
+                tags: ['جديد'],
+                storeId: newStore.id,
+                inStock: true,
+                quantity: 100
+              }
+            ];
+            localStorage.setItem(`store_products_${storeInfo.subdomain}`, JSON.stringify(defaultProducts));
+
+            // إنشاء صلاحيات افتراضية للمتجر الجديد
+            const MERCHANT_PERMISSIONS_KEY = "eishro:merchant-permissions";
+            const existingPermissions = JSON.parse(localStorage.getItem(MERCHANT_PERMISSIONS_KEY) || '{}');
+
+            // قائمة الأقسام الافتراضية (جميع الأقسام مفعلة للمتاجر الجديدة)
+            const defaultSections = [
+              "overview-root",
+              "orders-group", "orders-all", "orders-manual", "orders-abandoned", "orders-unavailable",
+              "catalog-group", "catalog-hub", "catalog-products", "catalog-categories", "catalog-stock",
+              "catalog-stock-adjustments", "catalog-stock-notifications",
+              "customers-group", "customers-all", "customers-groups", "customers-reviews", "customers-questions",
+              "marketing-group", "marketing-hub", "marketing-campaigns", "marketing-coupons", "marketing-loyalty",
+              "analytics-group", "analytics-dashboard", "analytics-live", "analytics-sales", "analytics-stock", "analytics-customers",
+              "finance-group", "finance-overview", "finance-subscriptions",
+              "settings-group", "settings-general", "settings-store", "settings-pages", "settings-menu",
+              "settings-sliders", "settings-ads", "settings-services",
+              "logistics-group", "logistics-overview", "logistics-shipments",
+              "payments-group", "payments-main", "payments-operations", "payments-deposits", "payments-banks",
+              "support-group", "support-customer", "support-technical",
+              "logout-root"
+            ];
+
+            // إنشاء صلاحيات افتراضية (جميع الأقسام مفعلة)
+            const defaultPermissions: Record<string, boolean> = {};
+            defaultSections.forEach(sectionId => {
+              defaultPermissions[sectionId] = true;
+            });
+
+            existingPermissions[newStore.id] = defaultPermissions;
+            localStorage.setItem(MERCHANT_PERMISSIONS_KEY, JSON.stringify(existingPermissions));
+
+            setCurrentMerchant(newStore);
+            setMerchantFlowStep(null);
+            setMerchantFlowData({});
+            setCurrentPage('merchant-store-success');
+          }
+        }}
+        initialData={merchantFlowData.storeInfo}
+      />
+    );
+  }
+
+  // عرض صفحة نجاح إنشاء المتجر
+  if (currentPage === 'merchant-store-success' && currentMerchant) {
+    return (
+      <MerchantStoreSuccess
+        storeData={currentMerchant}
+        onDashboard={() => {
+          setIsLoggedInAsMerchant(true);
+          setCurrentPage('merchant-dashboard');
+        }}
+        onHome={() => {
+          setCurrentPage('home');
+          setCurrentMerchant(null);
+        }}
       />
     );
   }
@@ -1926,6 +2116,107 @@ export default function Home() {
         onBack={handleBackToHome}
         onNavigateToLogin={() => setCurrentPage('login')}
         onStoreCreated={handleStoreCreated}
+      />
+    );
+  }
+
+  // عرض صفحة معالج إنشاء المتجر الجديد
+  if (currentPage === 'create-store-wizard') {
+    const merchantData = merchantFlowData.personalInfo;
+    if (!merchantData) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">البيانات غير صحيحة</h2>
+            <Button onClick={handleBackToHome}>العودة للرئيسية</Button>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <CreateStoreWizard
+        onBack={() => setMerchantFlowStep('personal')}
+        merchantEmail={merchantData.email}
+        merchantPhone={merchantData.phone}
+        onComplete={(storeData) => {
+          // حفظ بيانات المتجر الكاملة
+          const newStore = {
+            id: Date.now().toString(),
+            nameAr: storeData.nameAr,
+            nameEn: storeData.nameEn,
+            description: storeData.description,
+            email: storeData.merchantEmail,
+            phone: storeData.merchantPhone,
+            password: merchantData.password,
+            subdomain: storeData.nameEn.toLowerCase().replace(/\s+/g, '-'),
+            logo: storeData.logo,
+            category: storeData.category,
+            latitude: storeData.latitude,
+            longitude: storeData.longitude,
+            warehouseChoice: storeData.warehouseChoice,
+            createdAt: new Date().toISOString(),
+            status: 'active',
+            trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+          };
+
+          const existingStores = JSON.parse(localStorage.getItem('eshro_stores') || '[]');
+          existingStores.push(newStore);
+          localStorage.setItem('eshro_stores', JSON.stringify(existingStores));
+
+          const merchantCredentials = {
+            email: storeData.merchantEmail,
+            password: merchantData.password,
+            phone: storeData.merchantPhone,
+            storeName: storeData.nameAr,
+            subdomain: newStore.subdomain,
+            storeId: newStore.id,
+            category: storeData.category,
+            warehouseChoice: storeData.warehouseChoice
+          };
+          localStorage.setItem(`merchant_${newStore.subdomain}`, JSON.stringify(merchantCredentials));
+
+          const defaultProducts = [
+            {
+              id: 1,
+              name: 'منتج جديد - 1',
+              description: 'وصف المنتج الجديد',
+              price: 50,
+              originalPrice: 75,
+              category: storeData.category,
+              images: ['/assets/default-product.png'],
+              colors: [{ name: 'أسود' }, { name: 'أبيض' }],
+              sizes: ['S', 'M', 'L', 'XL'],
+              availableSizes: ['S', 'M', 'L', 'XL'],
+              rating: 0,
+              reviews: 0,
+              tags: [],
+              storeId: newStore.id,
+              inStock: true,
+              quantity: 0,
+              likes: 0,
+              views: 0,
+              orders: 0
+            }
+          ];
+          localStorage.setItem(`store_products_${newStore.subdomain}`, JSON.stringify(defaultProducts));
+
+          setCurrentPage('store-creation-success');
+          setStoreCreationData(storeData);
+        }}
+      />
+    );
+  }
+
+  // عرض صفحة نجاح إنشاء المتجر
+  if (currentPage === 'store-creation-success' && storeCreationData) {
+    return (
+      <StoreCreationSuccessPage
+        storeData={storeCreationData}
+        onNavigateToHome={handleBackToHome}
+        onNavigateToLogin={() => {
+          setCurrentPage('login');
+          setMerchantFlowStep('terms');
+        }}
       />
     );
   }

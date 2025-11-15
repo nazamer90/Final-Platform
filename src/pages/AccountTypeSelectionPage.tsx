@@ -7,12 +7,14 @@ interface AccountTypeSelectionPageProps {
   onBack: () => void;
   onSelectMerchant: () => void;
   onSelectVisitor: () => void;
+  onSelectMerchantFlow?: () => void;
 }
 
 const AccountTypeSelectionPage: React.FC<AccountTypeSelectionPageProps> = ({
   onBack,
   onSelectMerchant,
-  onSelectVisitor
+  onSelectVisitor,
+  onSelectMerchantFlow
 }) => {
   const [selectedType, setSelectedType] = useState<'merchant' | 'visitor' | null>(null);
 
@@ -158,7 +160,7 @@ const AccountTypeSelectionPage: React.FC<AccountTypeSelectionPageProps> = ({
           <div className="text-center flex justify-center">
             {selectedType === 'merchant' && (
               <Button
-                onClick={onSelectMerchant}
+                onClick={onSelectMerchantFlow || onSelectMerchant}
                 className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-12 py-4 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-center flex items-center justify-center"
               >
                 <Store className="h-5 w-5 mr-2" />

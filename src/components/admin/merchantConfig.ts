@@ -30,6 +30,41 @@ interface MerchantProfile {
 const MERCHANT_PERMISSIONS_KEY = "eishro:merchant-permissions";
 const MERCHANT_PERMISSIONS_EVENT = "eishro-merchant-permissions-updated";
 
+// دالة لجلب المتاجر الديناميكية من localStorage
+const getDynamicMerchants = (): MerchantProfile[] => {
+  try {
+    const stored = localStorage.getItem('eshro_stores');
+    if (!stored) return [];
+
+    const stores = JSON.parse(stored);
+    return stores.map((store: any) => ({
+      id: store.id,
+      name: store.nameAr,
+      tagline: store.description || 'متجر جديد',
+      owner: store.email?.split('@')[0] || 'جديد',
+      plan: 'Basic',
+      tier: 'جديد',
+      color: 'from-blue-500 to-cyan-500',
+      icon: Shirt, // استخدام أيقونة افتراضية
+      emblem: '🛍️',
+      stats: {
+        orders: 0,
+        satisfaction: 100,
+        growth: '+0%'
+      },
+      disabled: [] // المتاجر الجديدة تبدأ بجميع الأقسام مفعلة
+    }));
+  } catch (error) {
+    console.error('Error loading dynamic merchants:', error);
+    return [];
+  }
+};
+
+// دمج المتاجر الثابتة مع الديناميكية
+const getAllMerchants = (): MerchantProfile[] => {
+  return [...merchants, ...getDynamicMerchants()];
+};
+
 const merchantSections: SectionNode[] = [
   {
     id: "overview-root",
@@ -228,4 +263,11 @@ const merchants: MerchantProfile[] = [
 ];
 
 export type { MerchantProfile, SectionNode };
-export { MERCHANT_PERMISSIONS_EVENT, MERCHANT_PERMISSIONS_KEY, merchantSections, merchants };
+export {
+  MERCHANT_PERMISSIONS_EVENT,
+  MERCHANT_PERMISSIONS_KEY,
+  merchantSections,
+  merchants,
+  getDynamicMerchants,
+  getAllMerchants
+};

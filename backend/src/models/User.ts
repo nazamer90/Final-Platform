@@ -1,6 +1,8 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '@config/database';
 import { UserRole } from '@shared-types/index';
+import securityManager from '@config/security';
+import logger from '@utils/logger';
 
 interface UserAttributes {
   id: string;
@@ -118,6 +120,38 @@ User.init(
     underscored: false,
     charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci',
+    hooks: {
+      beforeCreate: async (user: User) => {
+        // Hash password before saving
+        if (user.password) {
+          user.password = await securityManager.hashPassword(user.password);
+        }
+      },
+      beforeUpdate: async (user: User) => {
+        // Hash password if it's being updated
+        if (user.changed('password') && user.password) {
+          user.password = await securityManager.hashPassword(user.password);
+        }
+      },
+      afterCreate: async (user: User) => {
+        // Log user creation
+        logger.info(`👤 New user created: ${user.email} (${user.role})`);
+      },
+      afterUpdate: async (user: User) => {
+        // Log user updates (excluding password changes)
+        const changes = user.changed();
+        if (changes && changes.length > 0) {
+          const sanitizedChanges = changes.filter(field => field !== 'password');
+          if (sanitizedChanges.length > 0) {
+            logger.info(`📝 User updated: ${user.email}, changed: ${sanitizedChanges.join(', ')}`);
+          }
+        }
+      },
+      afterDestroy: async (user: User) => {
+        // Log user deletion
+        logger.info(`🗑️  User deleted: ${user.email}`);
+      }
+    }
   }
 );
 

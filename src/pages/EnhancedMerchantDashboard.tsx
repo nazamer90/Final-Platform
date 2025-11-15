@@ -1705,10 +1705,190 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
   };
 
   // Header state
-  const [systemStatus, setSystemStatus] = useState('online');
-  const [unavailableOrdersCount, setUnavailableOrdersCount] = useState(5);
+  const [systemStatus, setSystemStatus] = useState<'online' | 'offline' | 'maintenance'>('online');
+  const [unavailableOrdersCount, setUnavailableOrdersCount] = useState(0);
   const [chatbotOpen, setChatbotOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [chatInput, setChatInput] = useState('');
+
+  // Chatbot functionality
+  const handleChatSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+
+    const userMessage = {
+      id: chatMessages.length + 1,
+      text: chatInput,
+      sender: 'user' as const,
+      timestamp: new Date()
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+    setChatInput('');
+
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse = getBotResponse(chatInput);
+      const botMessage = {
+        id: chatMessages.length + 2,
+        text: botResponse,
+        sender: 'bot' as const,
+        timestamp: new Date()
+      };
+      setChatMessages(prev => [...prev, botMessage]);
+    }, 1000);
+  };
+
+  const getBotResponse = (message: string): string => {
+    const lowerMessage = message.toLowerCase();
+
+    if (lowerMessage.includes('طلب') || lowerMessage.includes('order')) {
+      return 'يمكنك عرض الطلبات من قسم "الطلبات" في الشريط الجانبي. هل تحتاج مساعدة في إدارة طلب معين؟';
+    }
+    if (lowerMessage.includes('منتج') || lowerMessage.includes('product')) {
+      return 'لإدارة المنتجات، انتقل إلى قسم "إدارة المنتجات" في الشريط الجانبي. يمكنك إضافة، تعديل، أو حذف المنتجات من هناك.';
+    }
+    if (lowerMessage.includes('شحن') || lowerMessage.includes('shipping')) {
+      return 'معلومات الشحن متاحة في قسم "الشحن والتوصيل". يمكنك تتبع حالة الشحنات والتحكم في عمليات التوصيل.';
+    }
+    if (lowerMessage.includes('تقرير') || lowerMessage.includes('report')) {
+      return 'يمكنك عرض التقارير المفصلة من قسم "التقارير والإحصائيات" لمتابعة أداء متجرك.';
+    }
+    if (lowerMessage.includes('إعدادات') || lowerMessage.includes('settings')) {
+      return 'لضبط إعدادات المتجر، انتقل إلى قسم "إعدادات المتجر" في الشريط الجانبي.';
+    }
+    if (lowerMessage.includes('مساعدة') || lowerMessage.includes('help')) {
+      return 'أنا هنا لمساعدتك! يمكنني إرشادك حول إدارة المتجر، الطلبات، المنتجات، والشحن. ما الذي تحتاج مساعدة فيه بالضبط؟';
+    }
+
+    return 'شكراً لرسالتك! إذا كان لديك أي أسئلة حول إدارة المتجر أو تحتاج مساعدة، فلا تتردد في السؤال.';
+  };
+
+  // Dynamic system status check
+  useEffect(() => {
+    const checkSystemStatus = async () => {
+      try {
+        // Check if we can access localStorage (basic connectivity check)
+        const test = localStorage.getItem('eshro_test');
+        localStorage.setItem('eshro_test', 'test');
+        localStorage.removeItem('eshro_test');
+
+        // Simulate occasional maintenance or connectivity issues (5% chance)
+        const randomStatus = Math.random();
+        if (randomStatus < 0.05) {
+          setSystemStatus('maintenance');
+        } else if (randomStatus < 0.10) {
+          setSystemStatus('offline');
+        } else {
+          setSystemStatus('online');
+        }
+      } catch (error) {
+        setSystemStatus('offline');
+      }
+    };
+
+    // Check status immediately and then every 30 seconds
+    checkSystemStatus();
+    const interval = setInterval(checkSystemStatus, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Dynamic unavailable orders count
+  useEffect(() => {
+    const calculateUnavailableOrders = () => {
+      try {
+        // For new stores (no products yet), show 0
+        if (!storeProducts || storeProducts.length === 0) {
+          setUnavailableOrdersCount(0);
+          return;
+        }
+
+        // Check if this is a new store by checking if it has products in localStorage
+        const storeSlug = currentMerchant?.subdomain || merchantId;
+        const storedProducts = localStorage.getItem(`store_products_${storeSlug}`);
+
+        if (!storedProducts || JSON.parse(storedProducts).length === 0) {
+          // New store with no products yet
+          setUnavailableOrdersCount(0);
+        } else {
+          // Existing store - simulate some unavailable orders (1-3 for demo)
+          const randomCount = Math.floor(Math.random() * 3) + 1;
+          setUnavailableOrdersCount(randomCount);
+        }
+      } catch (error) {
+        setUnavailableOrdersCount(0);
+      }
+    };
+
+    calculateUnavailableOrders();
+    // Recalculate every 60 seconds
+    const interval = setInterval(calculateUnavailableOrders, 60000);
+
+    return () => clearInterval(interval);
+  }, [storeProducts, currentMerchant, merchantId]);
+
+  // Dynamic notifications
+  useEffect(() => {
+    const generateNotifications = () => {
+      const newNotifications = [];
+
+      // Check if this is a new store
+      const storeSlug = currentMerchant?.subdomain || merchantId;
+      const storedProducts = localStorage.getItem(`store_products_${storeSlug}`);
+      const isNewStore = !storedProducts || JSON.parse(storedProducts || '[]').length === 0;
+
+      if (isNewStore) {
+        // Welcome notifications for new stores
+        newNotifications.push({
+          id: 1,
+          type: 'welcome',
+          title: 'مرحباً بك في منصة إشرو!',
+          message: 'ابدأ بإضافة منتجاتك الأولى لتفعيل متجرك',
+          time: 'منذ دقيقة',
+          color: 'blue'
+        });
+        newNotifications.push({
+          id: 2,
+          type: 'setup',
+          title: 'إعداد المتجر',
+          message: 'أكمل إعدادات متجرك لتحسين ظهوره للعملاء',
+          time: 'منذ 5 دقائق',
+          color: 'green'
+        });
+      } else {
+        // Shipping and order notifications for existing stores
+        const shippingStatuses = ['تم الشحن', 'قيد التوصيل', 'تم التسليم', 'في انتظار الشحن'];
+        const customers = ['أحمد محمد', 'فاطمة علي', 'محمد حسن', 'سارة أحمد'];
+
+        // Generate 2-4 random shipping notifications
+        const numNotifications = Math.floor(Math.random() * 3) + 2;
+        for (let i = 0; i < numNotifications; i++) {
+          const status = shippingStatuses[Math.floor(Math.random() * shippingStatuses.length)];
+          const customer = customers[Math.floor(Math.random() * customers.length)];
+          const product = storeProducts[Math.floor(Math.random() * storeProducts.length)]?.name || 'منتج';
+
+          newNotifications.push({
+            id: i + 1,
+            type: 'shipping',
+            title: `تحديث الشحنة - ${status}`,
+            message: `${customer} - ${product}`,
+            time: `منذ ${Math.floor(Math.random() * 60) + 1} دقيقة`,
+            color: status === 'تم التسليم' ? 'green' : status === 'قيد التوصيل' ? 'blue' : 'purple'
+          });
+        }
+      }
+
+      setNotifications(newNotifications);
+    };
+
+    generateNotifications();
+    // Update notifications every 2 minutes
+    const interval = setInterval(generateNotifications, 120000);
+
+    return () => clearInterval(interval);
+  }, [storeProducts, currentMerchant, merchantId]);
 
   // Product Modal State
   const [productName, setProductName] = useState('');
@@ -3033,10 +3213,27 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
             <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
               {/* System Status */}
               <div className="relative">
-                <button className={`p-2 rounded-full ${systemStatus === 'online' ? 'text-green-600 hover:bg-green-50' : 'text-red-600 hover:bg-red-50'}`} title="حالة النظام">
-                  {systemStatus === 'online' ? <Wifi className="h-5 w-5" /> : <WifiOff className="h-5 w-5" />}
+                <button
+                  className={`p-2 rounded-full ${
+                    systemStatus === 'online' ? 'text-green-600 hover:bg-green-50' :
+                    systemStatus === 'maintenance' ? 'text-yellow-600 hover:bg-yellow-50' :
+                    'text-red-600 hover:bg-red-50'
+                  }`}
+                  title={`حالة النظام: ${
+                    systemStatus === 'online' ? 'متصل' :
+                    systemStatus === 'maintenance' ? 'صيانة' :
+                    'غير متصل'
+                  }`}
+                >
+                  {systemStatus === 'online' ? <Wifi className="h-5 w-5" /> :
+                   systemStatus === 'maintenance' ? <AlertTriangle className="h-5 w-5" /> :
+                   <WifiOff className="h-5 w-5" />}
                 </button>
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+                  systemStatus === 'online' ? 'bg-green-500' :
+                  systemStatus === 'maintenance' ? 'bg-yellow-500' :
+                  'bg-red-500'
+                }`}></div>
               </div>
 
               {/* Unavailable Orders */}
@@ -3064,7 +3261,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                 >
                   <Bell className="h-5 w-5" />
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
-                    3
+                    {notifications.length}
                   </span>
                 </button>
 
@@ -3076,23 +3273,27 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                     </div>
 
                     <div className="space-y-1">
-                      <div className="p-3 hover:bg-gray-50 border-r-4 border-r-green-500 cursor-pointer">
-                        <p className="text-sm font-medium text-gray-800">طلب جديد</p>
-                        <p className="text-xs text-gray-600">أحمد محمد طلب فستان صيفي</p>
-                        <p className="text-xs text-gray-500">منذ دقيقة واحدة</p>
-                      </div>
-
-                      <div className="p-3 hover:bg-gray-50 border-r-4 border-r-blue-500 cursor-pointer">
-                        <p className="text-sm font-medium text-gray-800">تحديث المخزون</p>
-                        <p className="text-xs text-gray-600">تم تحديث كمية منتج في المخزن</p>
-                        <p className="text-xs text-gray-500">منذ 5 دقائق</p>
-                      </div>
-
-                      <div className="p-3 hover:bg-gray-50 border-r-4 border-r-purple-500 cursor-pointer">
-                        <p className="text-sm font-medium text-gray-800">تقييم جديد</p>
-                        <p className="text-xs text-gray-600">عميل جديد قيم المنتج بـ 5 نجوم</p>
-                        <p className="text-xs text-gray-500">منذ 10 دقائق</p>
-                      </div>
+                      {notifications.length > 0 ? (
+                        notifications.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={`p-3 hover:bg-gray-50 border-r-4 cursor-pointer ${
+                              notification.color === 'green' ? 'border-r-green-500' :
+                              notification.color === 'blue' ? 'border-r-blue-500' :
+                              notification.color === 'purple' ? 'border-r-purple-500' :
+                              'border-r-gray-500'
+                            }`}
+                          >
+                            <p className="text-sm font-medium text-gray-800">{notification.title}</p>
+                            <p className="text-xs text-gray-600">{notification.message}</p>
+                            <p className="text-xs text-gray-500">{notification.time}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-3 text-center text-gray-500">
+                          <p className="text-sm">لا توجد إشعارات جديدة</p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="px-4 py-2 border-t border-gray-100">
@@ -3136,16 +3337,36 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                       <h3 className="font-bold text-gray-800">المساعد الآلي</h3>
                       <p className="text-xs text-gray-600">كيف يمكنني مساعدتك اليوم؟</p>
                     </div>
-                    <div className="p-4 max-h-64 overflow-y-auto">
-                      <div className="space-y-3">
-                        <div className="p-3 bg-indigo-50 rounded-lg">
-                          <p className="text-sm text-gray-800">مرحباً! أنا مساعدك الآلي في منصة إشرو</p>
-                        </div>
-                        <div className="text-center">
-                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
-                            ابدأ المحادثة
+                    <div className="flex flex-col h-80">
+                      <div className="flex-1 p-4 overflow-y-auto space-y-3">
+                        {chatMessages.map((message) => (
+                          <div
+                            key={message.id}
+                            className={`p-3 rounded-lg max-w-[80%] ${
+                              message.sender === 'bot'
+                                ? 'bg-indigo-50 text-gray-800 mr-auto'
+                                : 'bg-green-50 text-gray-800 ml-auto'
+                            }`}
+                          >
+                            <p className="text-sm">{message.text}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {message.timestamp.toLocaleTimeString('ar-LY', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="p-4 border-t border-gray-100">
+                        <form onSubmit={handleChatSubmit} className="flex gap-2">
+                          <Input
+                            value={chatInput}
+                            onChange={(e) => setChatInput(e.target.value)}
+                            placeholder="اكتب رسالتك هنا..."
+                            className="flex-1 text-sm"
+                          />
+                          <Button type="submit" size="sm" className="bg-indigo-600 hover:bg-indigo-700">
+                            <Send className="h-4 w-4" />
                           </Button>
-                        </div>
+                        </form>
                       </div>
                     </div>
                   </div>
@@ -3154,9 +3375,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
 
               {/* Return to Store */}
               <a
-                href={`/store/${merchantStoreSlug}`}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/"
                 className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-full"
                 title="العودة للمتجر"
               >
@@ -3168,7 +3387,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
                 <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center">
                   <User className="h-4 w-4 text-white" />
                 </div>
-                <span className="text-sm font-medium text-gray-700 hidden sm:block">محمد التاجر</span>
+                <span className="text-sm font-medium text-gray-700 hidden sm:block">{merchantOwnerName}</span>
                 <Button
                   variant="ghost"
                   size="sm"
