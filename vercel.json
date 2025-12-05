@@ -5,9 +5,9 @@
   "outputDirectory": "dist",
   "installCommand": "npm ci --include=dev",
   "env": {
-    "VITE_API_URL": "@vite_api_url",
     "FRONTEND_PRODUCTION_URL": "@frontend_production_url",
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "VITE_APP_API_URL": "@vite_api_url"
   },
   "rewrites": [
     {
@@ -15,5 +15,7 @@
       "destination": "/index.html"
     }
   ],
-  "regions": ["iad1"]
+  "regions": [
+    "iad1"
+  ]
 }
