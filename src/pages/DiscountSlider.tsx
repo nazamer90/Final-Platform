@@ -61,9 +61,9 @@ const leftVerticalSlides = [
 
 // بيانات السلايدرات الثابتة (يمين - 3 سلايدرات)
 const rightStaticSlides = [
-  { id: 1, image: '/assets/DiscountSlider/WD90T654DBN.jpg', alt: 'Samsung WD90', discount: '200', badge: '4' },
-  { id: 2, image: '/assets/DiscountSlider/GSTN180CR.jpg', alt: 'General Supreme', discount: '200', badge: '3' },
-  { id: 3, image: '/assets/DiscountSlider/TOSHIBA-Ref.jpg', alt: 'Toshiba', discount: '200', badge: '2' },
+  { id: 1, image: '/assets/DiscountSlider/WD90T654DBN.jpg', alt: 'Samsung WD90', discount: '200'},
+  { id: 2, image: '/assets/DiscountSlider/GSTN180CR.jpg', alt: 'General Supreme', discount: '200'},
+  { id: 3, image: '/assets/DiscountSlider/TOSHIBA-Ref.jpg', alt: 'Toshiba', discount: '200'},
 ];
 
 export default function DiscountSlider() {
@@ -124,7 +124,7 @@ export default function DiscountSlider() {
                   <img
                     src={slide.image}
                     alt={slide.alt}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
@@ -198,7 +198,7 @@ export default function DiscountSlider() {
                     <img
                       src={slide.image}
                       alt={slide.alt}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
@@ -243,7 +243,7 @@ export default function DiscountSlider() {
                   <img
                     src={slide.image}
                     alt={slide.alt}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 ease-out"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = 'none';
@@ -252,7 +252,7 @@ export default function DiscountSlider() {
 
                   {/* Badge الترتيب */}
                   <div className="absolute top-4 left-4 bg-emerald-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-black text-lg shadow-xl">
-                    {slide.badge}
+                    {slide.discount}
                   </div>
 
                   {/* Overlay عند Hover */}
