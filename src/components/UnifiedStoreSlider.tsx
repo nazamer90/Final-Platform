@@ -58,10 +58,33 @@ const UnifiedStoreSlider: React.FC<UnifiedStoreSliderProps> = ({
   }, [storeSlug]);
 
   const loadSliders = async () => {
+    const storageKey = `eshro_store_sliders_${storeSlug}`;
+  
+    // Show static/cached data immediately
+    if (staticConfig?.sliders) {
+      setSliders(staticConfig.sliders);
+    } else {
+      const savedSliders = localStorage.getItem(storageKey);
+      if (savedSliders) {
+        try {
+          const parsed = JSON.parse(savedSliders);
+          setSliders(parsed);
+        } catch {}
+      }
+    }
+  
+    // Fetch API data in background with timeout
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${apiUrl}/sliders/store/${storeSlug}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+  
+      const response = await fetch(`${apiUrl}/sliders/store/${storeSlug}`, {
+        signal: controller.signal
+      });
       
+      clearTimeout(timeoutId);
+  
       if (response.ok) {
         const result = await response.json();
         const loadedSliders = result.data.map((slider: any) => ({
@@ -76,29 +99,13 @@ const UnifiedStoreSlider: React.FC<UnifiedStoreSliderProps> = ({
         
         loadedSliders.sort((a: Slider, b: Slider) => (a.sortOrder || 0) - (b.sortOrder || 0));
         setSliders(loadedSliders);
-        localStorage.setItem(`eshro_store_sliders_${storeSlug}`, JSON.stringify(loadedSliders));
-        return;
+        localStorage.setItem(storageKey, JSON.stringify(loadedSliders));
       }
     } catch (error) {
       console.error('Error loading sliders from backend:', error);
     }
-
-    const storageKey = `eshro_store_sliders_${storeSlug}`;
-    const savedSliders = localStorage.getItem(storageKey);
-    if (savedSliders) {
-      try {
-        const parsed = JSON.parse(savedSliders);
-        setSliders(parsed);
-        return;
-      } catch {
-        // Parse error
-      }
-    }
-
-    if (staticConfig?.sliders) {
-      setSliders(staticConfig.sliders);
-    }
   };
+  
 
   useEffect(() => {
     if (typeof window === 'undefined') {

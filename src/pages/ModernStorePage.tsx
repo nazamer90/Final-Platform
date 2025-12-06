@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import LazyImage from '@/components/LazyImage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -870,12 +871,12 @@ const ProductCard: React.FC<{
           {product.images && product.images.length > 0 ? (
             <div className="relative w-full h-48 overflow-hidden">
               {/* الصورة الحالية */}
-              <img
+              <LazyImage
                 key={`${product.id}-${currentImageIndex}`}
                 src={product.images[currentImageIndex]}
                 alt={`${product.name} - صورة ${currentImageIndex + 1}`}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => handleImageError(e, storeSlug)}
+                onError={(e) => handleImageError(e, storeSlug)}              
               />
               
               {/* أزرار التنقل بين الصور */}
@@ -1108,14 +1109,14 @@ const ProductCard: React.FC<{
               {/* صورة المنتج */}
               <div className="w-full h-64 bg-gray-100 relative">
                 {product.images && product.images.length > 0 ? (
-                  <img
+                  <LazyImage
                     src={product.images[currentImageIndex]}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     onError={(e) => handleImageError(e, storeSlug)}
                   />
                 ) : (
-                  <img
+                  <LazyImage
                     src={getDefaultProductImageSync(storeSlug)}
                     alt={product.name}
                     className="w-full h-full object-cover"
