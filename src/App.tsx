@@ -4,31 +4,36 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import PartnersPage from "@/pages/PartnersPage";
-import DiscountSlider from "@/pages/DiscountSlider";
-import ModernStorePage from "@/pages/ModernStorePage";
-import EnhancedProductPage from "@/pages/EnhancedProductPage";
-import CartPage from "@/pages/CartPage";
-import EnhancedCheckoutPage from "@/pages/EnhancedCheckoutPage";
-import CompleteOrdersPage from "@/pages/CompleteOrdersPage";
-import ShopLoginPage from "@/pages/ShopLoginPage";
-import CreateStorePage from "@/pages/CreateStorePage";
-import AccountTypeSelectionPage from "@/pages/AccountTypeSelectionPage";
-import VisitorRegistrationPage from "@/pages/VisitorRegistrationPage";
-import MerchantTermsAcceptance from "@/pages/MerchantTermsAcceptance";
-import MerchantPersonalInfo, { PersonalInfoData } from "@/pages/MerchantPersonalInfo";
-import MerchantStoreInfo, { StoreInfoData } from "@/pages/MerchantStoreInfo";
-import MerchantStoreSuccess from "@/pages/MerchantStoreSuccess";
-import CreateStoreWizard from "@/pages/CreateStoreWizard";
-import StoreCreationSuccessPage from "@/pages/StoreCreationSuccessPage";
-import MerchantProductManagement from "@/pages/MerchantProductManagement";
-import TermsAndConditionsPage from "@/pages/TermsAndConditionsPage";
-import EnhancedMerchantDashboard from "@/pages/EnhancedMerchantDashboard";
-import MerchantAnalytics from "@/pages/MerchantAnalytics";
-import MerchantFinance from "@/pages/MerchantFinance";
-import MerchantSettings from "@/pages/MerchantSettings";
-import AdminPortal from "@/pages/AdminPortal";
-import CustomerDashboard, { CreateOrderPayload, OrderRecord } from "@/pages/CustomerDashboard";
+import {
+  PartnersPageLazy,
+  DiscountSliderLazy,
+  ModernStorePageLazy,
+  EnhancedProductPageLazy,
+  CartPageLazy,
+  EnhancedCheckoutPageLazy,
+  CompleteOrdersPageLazy,
+  ShopLoginPageLazy,
+  CreateStorePageLazy,
+  AccountTypeSelectionPageLazy,
+  VisitorRegistrationPageLazy,
+  MerchantTermsAcceptanceLazy,
+  MerchantPersonalInfoLazy,
+  MerchantStoreInfoLazy,
+  MerchantStoreSuccessLazy,
+  CreateStoreWizardLazy,
+  StoreCreationSuccessPageLazy,
+  MerchantProductManagementLazy,
+  TermsAndConditionsPageLazy,
+  EnhancedMerchantDashboardLazy,
+  MerchantAnalyticsLazy,
+  MerchantFinanceLazy,
+  MerchantSettingsLazy,
+  AdminPortalLazy,
+  CustomerDashboardLazy,
+} from "@/components/LazyPages";
+import type { PersonalInfoData } from "@/pages/MerchantPersonalInfo";
+import type { StoreInfoData } from "@/pages/MerchantStoreInfo";
+import type { CreateOrderPayload, OrderRecord } from "@/pages/CustomerDashboard";
 import { merchants as merchantProfiles } from "@/components/admin/merchantConfig";
 import AddToCartPopup from "@/components/AddToCartPopup";
 import AddToCartSuccessModal from "@/components/AddToCartSuccessModal";
@@ -2377,7 +2382,7 @@ export default function Home() {
   // عرض بوابة الإدارة (Admin Portal)
   if (currentPage === 'admin') {
     return (
-      <AdminPortal
+      <AdminPortalLazy
         onLogout={() => {
           setCurrentPage('login');
         }}
@@ -2394,7 +2399,7 @@ export default function Home() {
     
 
     return (
-      <EnhancedMerchantDashboard
+      <EnhancedMerchantDashboardLazy
         currentMerchant={currentMerchant}
         onLogout={() => {
           
@@ -2452,7 +2457,7 @@ export default function Home() {
     
 
     return (
-      <CustomerDashboard
+      <CustomerDashboardLazy
         customerData={customerData}
         favorites={favorites}
         orders={validOrders}
@@ -2477,7 +2482,7 @@ export default function Home() {
   // عرض صفحة تسجيل الدخول
   if (currentPage === 'login') {
     return (
-      <ShopLoginPage
+      <ShopLoginPageLazy
         onBack={handleBackToHome}
         onLogin={handleLogin}
         onNavigateToRegister={() => setCurrentPage('register')}
@@ -2489,7 +2494,7 @@ export default function Home() {
   // عرض صفحة اختيار نوع الحساب
   if (currentPage === 'account-type-selection') {
     return (
-      <AccountTypeSelectionPage
+      <AccountTypeSelectionPageLazy
         onBack={handleBackToHome}
         onSelectMerchant={() => setCurrentPage('register')}
         onSelectVisitor={() => setCurrentPage('visitor-register')}
@@ -2504,7 +2509,7 @@ export default function Home() {
   // عرض صفحة اتفاقية شروط التاجر
   if (currentPage === 'merchant-flow' && merchantFlowStep === 'terms') {
     return (
-      <MerchantTermsAcceptance
+      <MerchantTermsAcceptanceLazy
         onBack={() => {
           setMerchantFlowStep(null);
           setMerchantFlowData({});
@@ -2518,7 +2523,7 @@ export default function Home() {
   // عرض صفحة معلومات التاجر الشخصية
   if (currentPage === 'merchant-flow' && merchantFlowStep === 'personal') {
     return (
-      <MerchantPersonalInfo
+      <MerchantPersonalInfoLazy
         onBack={() => setMerchantFlowStep('terms')}
         onNext={(personalInfo) => {
           setMerchantFlowData(prev => ({ ...prev, personalInfo }));
@@ -2532,7 +2537,7 @@ export default function Home() {
   // عرض صفحة معلومات المتجر
   if (currentPage === 'merchant-flow' && merchantFlowStep === 'store') {
     return (
-      <MerchantStoreInfo
+      <MerchantStoreInfoLazy
         onBack={() => setMerchantFlowStep('personal')}
         onNext={(storeInfo) => {
           setMerchantFlowData(prev => ({ ...prev, storeInfo }));
@@ -2569,7 +2574,7 @@ export default function Home() {
   // عرض صفحة نجاح إنشاء المتجر
   if (currentPage === 'merchant-store-success' && currentMerchant) {
     return (
-      <MerchantStoreSuccess
+      <MerchantStoreSuccessLazy
         storeData={currentMerchant}
         onDashboard={() => {
           setIsLoggedInAsMerchant(true);
@@ -2586,7 +2591,7 @@ export default function Home() {
   // عرض صفحة إنشاء حساب الزائر
   if (currentPage === 'visitor-register') {
     return (
-      <VisitorRegistrationPage
+      <VisitorRegistrationPageLazy
         onBack={handleBackToHome}
         onRegister={(userData) => {
           
@@ -2623,7 +2628,7 @@ export default function Home() {
   // عرض صفحة معالج إنشاء المتجر الجديد
   if (currentPage === 'create-store-wizard') {
     return (
-      <CreateStorePage
+      <CreateStorePageLazy
         onBack={() => {
           setMerchantFlowStep('terms');
           setCurrentPage('merchant-flow');
@@ -2717,7 +2722,7 @@ export default function Home() {
   // عرض صفحة نجاح إنشاء المتجر
   if (currentPage === 'store-creation-success' && storeCreationData) {
     return (
-      <StoreCreationSuccessPage
+      <StoreCreationSuccessPageLazy
         storeData={storeCreationData}
         onNavigateToHome={handleBackToHome}
         onNavigateToLogin={() => {
@@ -2745,7 +2750,7 @@ export default function Home() {
     } : null;
 
     return (
-      <MerchantProductManagement
+      <MerchantProductManagementLazy
         storeData={storeCreationData}
         merchantData={merchantData}
         onBack={() => setCurrentPage('store-creation-success')}
@@ -2860,13 +2865,13 @@ export default function Home() {
 
   // عرض صفحة شركاء النجاح
   if (currentPage === 'partners') {
-    return <PartnersPage onBack={handleBackToHome} />;
+    return <PartnersPageLazy onBack={handleBackToHome} />;
   }
 
   // عرض صفحة الشروط والأحكام
   if (currentPage === 'terms') {
     return (
-      <TermsAndConditionsPage
+      <TermsAndConditionsPageLazy
         onBack={handleBackToHome}
       />
     );
@@ -2875,7 +2880,7 @@ export default function Home() {
   // عرض صفحة المتجر
   if (currentPage === 'store' && currentStore) {
     return (
-      <ModernStorePage 
+      <ModernStorePageLazy 
         storeSlug={currentStore} 
         onBack={handleBackToHome}
         onProductClick={handleProductClick}
@@ -2953,7 +2958,7 @@ export default function Home() {
     }
 
     return (
-      <EnhancedProductPage
+      <EnhancedProductPageLazy
         product={selectedProduct}
         onBack={currentStore ? handleBackToStore : handleBackToHome}
         onAddToCart={handleAddToCart}
@@ -2981,7 +2986,7 @@ export default function Home() {
   // عرض صفحة السلة
   if (currentPage === 'cart') {
     return (
-      <CartPage
+      <CartPageLazy
         cartItems={cartItems}
         onBack={handleBackToHome}
         onUpdateQuantity={handleUpdateCartQuantity}
@@ -2994,7 +2999,7 @@ export default function Home() {
   // عرض صفحة إتمام الطلب
   if (currentPage === 'checkout') {
     return (
-      <EnhancedCheckoutPage
+      <EnhancedCheckoutPageLazy
         cartItems={cartItems}
         onBack={() => setCurrentPage('cart')}
         onOrderComplete={(orderData) => {
@@ -3013,7 +3018,7 @@ export default function Home() {
   // عرض صفحة الطلبات - إرجاع المكون الأصلي بالكامل
   if (currentPage === 'orders') {
     return (
-      <CompleteOrdersPage
+      <CompleteOrdersPageLazy
         orders={validOrders}
         favorites={favorites}
         unavailableItems={unavailableItems}
@@ -3187,7 +3192,7 @@ export default function Home() {
       <HeroSection />
       <ServicesSection onNavigate={handleNavigation} />
       <EnhancedStoresCarousel onStoreClick={handleStoreClick} />
-      <DiscountSlider />
+      <DiscountSliderLazy />
       <PartnersSection onNavigate={handleNavigation} />
       <Footer />
       
