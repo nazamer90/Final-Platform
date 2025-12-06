@@ -1,4 +1,19 @@
 import type { Product } from '@/data/storeProducts';
+import { nawaemProducts } from '@/data/stores/nawaem/products';
+import { sheirineProducts } from '@/data/stores/sheirine/products';
+import { prettyProducts } from '@/data/stores/pretty/products';
+import { deltaProducts } from '@/data/stores/delta-store/products';
+import { magnaBeautyProducts } from '@/data/stores/magna-beauty/products';
+import { indeeshProducts } from '@/data/stores/indeesh/products';
+
+const storesProductsMap: Record<string, Product[]> = {
+  'nawaem': nawaemProducts,
+  'sheirine': sheirineProducts,
+  'pretty': prettyProducts,
+  'delta-store': deltaProducts,
+  'magna-beauty': magnaBeautyProducts,
+  'indeesh': indeeshProducts
+};
 
 interface StoreData {
   id: number;
@@ -72,17 +87,7 @@ function normalizeImagePaths(data: any, apiBase: string, slug: string, isServedS
   return data;
 }
 
-async function checkIfStoreIsServedStatic(slug: string, apiBase: string): Promise<boolean> {
-  try {
-    const response = await fetch(`${apiBase}/assets/${slug}/store.json`);
-    if (response.ok) {
-      return true;
-    }
-  } catch (error) {
-    return false;
-  }
-  return false;
-}
+
 
 function loadStoreFromLocalStorage(slug: string): StoreData | null {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
@@ -142,89 +147,48 @@ function loadStoreFromLocalStorage(slug: string): StoreData | null {
 
 async function initializeCache(): Promise<void> {
   if (cacheInitialized) return;
-  
-  const apiBase = getApiBase();
-  
-  try {
-    let response = await fetch(`${apiBase}/assets/stores/index.json`);
-    if (!response.ok) {
-      response = await fetch(`${apiBase}/index.json`);
-    }
-    if (response.ok) {
-      try {
-        const json = await response.json();
-        if (Array.isArray(json)) {
-          cachedStoreIndex = json;
-        } else if (json && typeof json === 'object' && Array.isArray((json as any).stores)) {
-          cachedStoreIndex = (json as any).stores;
-        } else {
-          cachedStoreIndex = [];
-        }
-        cacheInitialized = true;
-      } catch (parseError) {
-        cachedStoreIndex = [];
-        cacheInitialized = true;
-      }
-    } else {
-      cacheInitialized = true;
-    }
-  } catch (error) {
-    cacheInitialized = true;
-  }
+  cachedStoreIndex = Object.keys(storesProductsMap).map(slug => ({
+    slug: slug,
+    name: slug,
+    nameAr: slug,
+    nameEn: slug,
+    description: '',
+    logo: '/assets/default-store.png',
+    categories: [],
+    productsCount: storesProductsMap[slug]?.length || 0,
+    lastUpdated: new Date().toISOString()
+  }));
+  cacheInitialized = true;
 }
 
 export async function loadStoreBySlug(slug: string): Promise<StoreData | null> {
-  await initializeCache();
-  
   if (cachedStores.has(slug)) {
     return cachedStores.get(slug) || null;
   }
   
-  const apiBase = getApiBase();
+  const products = storesProductsMap[slug];
   
-  try {
-    const isServedStatic = await checkIfStoreIsServedStatic(slug, apiBase);
-    const response = await fetch(`${apiBase}/assets/${slug}/store.json`);
-    if (response.ok) {
-      try {
-        const storeData: StoreData = await response.json();
-        
-        if (!storeData || typeof storeData !== 'object') {
-          throw new Error('Invalid store data format');
-        }
-        
-        const normalizedStore: StoreData = {
-          id: storeData.id || storeData.storeId || 0,
-          storeId: storeData.storeId || storeData.id || 0,
-          slug: slug,
-          name: storeData.name || slug,
-          nameAr: storeData.nameAr || slug,
-          nameEn: storeData.nameEn || slug,
-          description: storeData.description || '',
-          icon: storeData.icon || '🏪',
-          color: storeData.color || 'from-blue-400 to-blue-600',
-          logo: storeData.logo || '/assets/default-store.png',
-          categories: Array.isArray(storeData.categories) ? storeData.categories : [],
-          products: Array.isArray(storeData.products) ? storeData.products : [],
-          sliderImages: Array.isArray(storeData.sliderImages) ? storeData.sliderImages : []
-        };
-        
-        const normalizedWithPaths = normalizeImagePaths(normalizedStore, apiBase, slug, isServedStatic);
-        
-        cachedStores.set(slug, normalizedWithPaths);
-        return normalizedWithPaths;
-      } catch (parseError) {
-        // Handle parse error silently
-      }
-    } else if (response.status === 404) {
-      // Store not found, will try localStorage fallback
-    } else {
-      // Other HTTP error, will try localStorage fallback
-    }
-  } catch (error) {
-    // Handle network error silently
+  if (products && Array.isArray(products)) {
+    const storeData: StoreData = {
+      id: 0,
+      storeId: 0,
+      slug: slug,
+      name: slug,
+      nameAr: slug,
+      nameEn: slug,
+      description: '',
+      icon: '🏪',
+      color: 'from-blue-400 to-blue-600',
+      logo: '/assets/default-store.png',
+      categories: [],
+      products: products,
+      sliderImages: []
+    };
+    
+    cachedStores.set(slug, storeData);
+    return storeData;
   }
-
+  
   const localStoreData = loadStoreFromLocalStorage(slug);
   if (localStoreData) {
     cachedStores.set(slug, localStoreData);
@@ -263,19 +227,13 @@ export async function getStoreConfig(slug: string): Promise<any> {
 }
 
 export async function getAllStoreProducts(): Promise<Product[]> {
-  await initializeCache();
-  
   const allProducts: Product[] = [];
-  const storeIndexEntries = cachedStoreIndex || [];
   
-  for (const storeEntry of storeIndexEntries) {
-    try {
-      const products = await getStoreProducts(storeEntry.slug);
+  Object.values(storesProductsMap).forEach(products => {
+    if (Array.isArray(products)) {
       allProducts.push(...products);
-    } catch (error) {
-      // Handle product loading error silently
     }
-  }
+  });
   
   return allProducts;
 }
