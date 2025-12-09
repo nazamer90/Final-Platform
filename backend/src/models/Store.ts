@@ -43,6 +43,7 @@ Store.init(
     merchantId: {
       type: DataTypes.UUID,
       allowNull: false,
+      field: 'merchant_id',
       references: {
         model: 'users',
         key: 'id',
@@ -76,6 +77,7 @@ Store.init(
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
+      field: 'is_active',
     },
     rating: {
       type: DataTypes.DECIMAL(3, 1),
@@ -84,6 +86,14 @@ Store.init(
         min: 0,
         max: 5,
       },
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
     },
   },
   {
@@ -95,7 +105,7 @@ Store.init(
     collate: 'utf8mb4_unicode_ci',
     indexes: [
       {
-        fields: ['merchantId'],
+        fields: ['merchant_id'],
       },
     ],
   }

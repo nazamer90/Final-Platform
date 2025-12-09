@@ -255,7 +255,7 @@ const EnhancedStorePage: React.FC<EnhancedStorePageProps> = ({
 
       <div className="mb-6">
         <div className="container mx-auto px-4">
-          <StoreAds storeId={store.id} />
+          <StoreAds storeId={storeSlug} />
         </div>
       </div>
 

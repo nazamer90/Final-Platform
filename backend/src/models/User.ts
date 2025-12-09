@@ -71,10 +71,12 @@ User.init(
     firstName: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      field: 'first_name',
     },
     lastName: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      field: 'last_name',
     },
     phone: {
       type: DataTypes.STRING(20),
@@ -87,31 +89,46 @@ User.init(
     storeName: {
       type: DataTypes.STRING(255),
       allowNull: true,
+      field: 'store_name',
     },
     storeSlug: {
       type: DataTypes.STRING(255),
       unique: true,
       allowNull: true,
+      field: 'store_slug',
     },
     storeCategory: {
       type: DataTypes.STRING(100),
       allowNull: true,
+      field: 'store_category',
     },
     storeDescription: {
       type: DataTypes.TEXT,
       allowNull: true,
+      field: 'store_description',
     },
     storeLogo: {
       type: DataTypes.STRING(500),
       allowNull: true,
+      field: 'store_logo',
     },
     merchantVerified: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+      field: 'merchant_verified',
     },
     lastLogin: {
       type: DataTypes.DATE,
       allowNull: true,
+      field: 'last_login',
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
     },
   },
   {

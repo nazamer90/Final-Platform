@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار تحميل صور الإعلانات</title>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .image-container {
+            width: 100%;
+            height: 200px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .status {
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            background: #f9f9f9;
+        }
+        .status.loading {
+            color: #ff9800;
+        }
+        .status.success {
+            color: #4CAF50;
+            background: #e8f5e9;
+        }
+        .status.error {
+            color: #f44336;
+            background: #ffebee;
+        }
+        .summary {
+            background: #f0f7ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 4px;
+        }
+        .summary h3 {
+            margin-top: 0;
+            color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ اختبار تحميل صور قوالب الإعلانات</h1>
+        <div class="grid" id="imageGrid"></div>
+        <div class="summary" id="summary"></div>
+    </div>
+
+    <script>
+        const images = [
+            'adv1.jpg', 'adv2.jpg', 'adv3.jpg', 'adv4.jpg', 'adv5.jpg',
+            'adv6.jpg', 'adv7.jpg', 'adv8.jpg', 'adv9.jpg', 'adv10.jpg', 'adv11.jpg'
+        ];
+
+        let loadedCount = 0;
+        let errorCount = 0;
+
+        function testImage(filename) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'image-container';
+
+                const imgElement = document.createElement('img');
+                imgElement.src = `/AdsForms/${filename}`;
+
+                const status = document.createElement('div');
+                status.className = 'status loading';
+                status.textContent = '⏳ جاري التحميل...';
+
+                imgContainer.appendChild(imgElement);
+                card.appendChild(imgContainer);
+                card.appendChild(status);
+                document.getElementById('imageGrid').appendChild(card);
+
+                img.onload = () => {
+                    status.className = 'status success';
+                    status.textContent = '✅ تم تحميل بنجاح';
+                    loadedCount++;
+                    resolve(true);
+                };
+
+                img.onerror = () => {
+                    status.className = 'status error';
+                    status.textContent = '❌ فشل التحميل';
+                    imgElement.style.display = 'none';
+                    errorCount++;
+                    resolve(false);
+                };
+
+                img.src = `/AdsForms/${filename}`;
+            });
+        }
+
+        async function runTests() {
+            console.log('🔍 بدء اختبار تحميل الصور...');
+            
+            for (const filename of images) {
+                await testImage(filename);
+            }
+
+            // Update summary
+            const summary = document.getElementById('summary');
+            const total = images.length;
+            const successRate = ((loadedCount / total) * 100).toFixed(0);
+            
+            let summaryHTML = `
+                <h3>📊 نتائج الاختبار</h3>
+                <p><strong>إجمالي الصور:</strong> ${total}</p>
+                <p><strong>تم تحميلها بنجاح:</strong> <span style="color: #4CAF50;">${loadedCount}</span></p>
+                <p><strong>فشل التحميل:</strong> <span style="color: #f44336;">${errorCount}</span></p>
+                <p><strong>معدل النجاح:</strong> ${successRate}%</p>
+            `;
+
+            if (loadedCount === total) {
+                summaryHTML += `<p style="color: #4CAF50; font-weight: bold;">✅ جميع الصور تعمل بشكل صحيح!</p>`;
+            } else if (errorCount > 0) {
+                summaryHTML += `<p style="color: #f44336; font-weight: bold;">⚠️ بعض الصور لم تحمّل. تأكد من أن:/AdsForms موجود في مجلد public</p>`;
+            }
+
+            summary.innerHTML = summaryHTML;
+            console.log(`✅ اكتمل الاختبار: ${loadedCount}/${total} صور تم تحميلها بنجاح`);
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

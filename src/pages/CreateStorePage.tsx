@@ -587,6 +587,8 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
         id: storeId.toString(),
         storeId: storeId,
         storeSlug: formData.subdomain,
+        subdomain: formData.subdomain,
+        slug: formData.subdomain,
         storeName: formData.nameAr,
         storeNameEn: formData.nameEn,
         description: formData.description,

@@ -95,7 +95,7 @@ const InventoryNotificationsView: React.FC<InventoryNotificationsViewProps> = ({
         setLowStockAlerts(result.data || []);
       }
     } catch (err) {
-      console.error('Error fetching low stock products:', err);
+      // Error fetching low stock products
     } finally {
       setLoading(false);
     }

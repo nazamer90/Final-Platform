@@ -48,25 +48,25 @@ const SheirineSlider: React.FC<SheirineSliderProps> = ({
       id: 'banner1',
       image: getImageUrl('/assets/sherine/sliders/slider1.webp').primary,
       fallbackImage: getImageUrl('/assets/sherine/sliders/slider1.webp').fallback,
-      title: 'مجموعة العطور الفاخرة في شيرين'
+      title: 'مجموعة ملابس الفاخرة في شيرين'
     },
     {
       id: 'banner2',
-      image: getImageUrl('/assets/sherine/sliders/slider3.webp').primary,
+      image: getImageUrl('/assets/sherine/sliders/slider2.jpg').primary,
       fallbackImage: getImageUrl('/assets/sherine/sliders/slider3.webp').fallback,
-      title: 'عطور نسائية أنيقة'
+      title: 'فساتين نسائية أنيقة'
     },
     {
       id: 'banner3',
       image: getImageUrl('/assets/sherine/sliders/slider4.webp').primary,
       fallbackImage: getImageUrl('/assets/sherine/sliders/slider4.webp').fallback,
-      title: 'عطور رجالية مميزة'
+      title: 'ملابس نسائية مميزة'
     },
     {
       id: 'banner4',
-      image: getImageUrl('/assets/sherine/sliders/slider1.webp').primary,
+      image: getImageUrl('/assets/sherine/sliders/slider3.webp').primary,
       fallbackImage: getImageUrl('/assets/sherine/sliders/slider1.webp').fallback,
-      title: 'مجموعات عطور خاصة'
+      title: 'مجموعات فساتين خاصة'
     },
   ];
 

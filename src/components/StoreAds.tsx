@@ -12,6 +12,7 @@ interface Ad {
   createdAt: string;
   views: number;
   clicks: number;
+   storeId?: number;
 }
 
 interface StoreAdsProps {
@@ -40,21 +41,30 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
 
   const loadAds = async () => {
     try {
-      if (storeId) {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-        const response = await fetch(`${apiUrl}/ads/store/${storeId}`);
-        if (response.ok) {
-          const result = await response.json();
-          const activeAds = result.data.filter((ad: Ad) => ad.isActive);
-          setAds(activeAds);
-          setBannerAds(activeAds.filter(ad => ad.placement === 'banner' || !ad.placement));
-          setBetweenProductsAds(activeAds.filter(ad => ad.placement === 'between_products'));
-          localStorage.setItem(`eshro_store_ads_${storeId}`, JSON.stringify(activeAds));
-          return;
-        }
+      if (!storeId) {
+        return;
+      }
+
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${apiUrl}/ads/store/${storeId}`);
+      
+      if (response.ok) {
+        const result = await response.json();
+        
+        const adsData = Array.isArray(result.data) ? result.data : [];
+        const activeAds = adsData.filter((ad: Ad) => ad.isActive === true);
+        
+        const bannerAds = activeAds.filter(ad => ad.placement === 'banner' || ad.placement === 'floating' || !ad.placement);
+        const betweenAds = activeAds.filter(ad => ad.placement === 'between_products' || ad.placement === 'grid');
+        
+        setAds(activeAds);
+        setBannerAds(bannerAds);
+        setBetweenProductsAds(betweenAds);
+        localStorage.setItem(`eshro_store_ads_${storeId}`, JSON.stringify(activeAds));
+        return;
       }
     } catch (error) {
-      console.error('Error loading ads from API:', error);
+      // Error loading ads from API - will use localStorage fallback
     }
 
     const storageKey = `eshro_store_ads_${storeId}`;
@@ -62,12 +72,12 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
     if (savedAds) {
       try {
         const parsedAds = JSON.parse(savedAds);
-        const activeAds = parsedAds.filter((ad: Ad) => ad.isActive);
+        const activeAds = parsedAds.filter((ad: Ad) => ad.isActive === true);
         setAds(activeAds);
-        setBannerAds(activeAds.filter(ad => ad.placement === 'banner' || !ad.placement));
-        setBetweenProductsAds(activeAds.filter(ad => ad.placement === 'between_products'));
+        setBannerAds(activeAds.filter(ad => ad.placement === 'banner' || ad.placement === 'floating' || !ad.placement));
+        setBetweenProductsAds(activeAds.filter(ad => ad.placement === 'between_products' || ad.placement === 'grid'));
       } catch (error) {
-        console.error('Error parsing saved ads:', error);
+        // Error parsing saved ads
       }
     }
   };
@@ -82,7 +92,7 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
     }
   };
 
-  if (bannerAds.length === 0) {
+  if (bannerAds.length === 0 && betweenProductsAds.length === 0) {
     return null;
   }
 
@@ -90,9 +100,11 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
     <div className={`space-y-6 ${className}`}>
       {bannerAds.length > 0 && (
         <div className="space-y-4">
-          {bannerAds.map((ad) => (
+          {bannerAds.map((ad, index) => {
+            const adKey = ad.id || `banner-ad-${index}-${ad.title}`;
+            return (
             <div
-              key={ad.id}
+              key={adKey}
               className="relative w-full h-40 md:h-48 lg:h-56 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer group"
               onClick={() => handleAdClick(ad)}
             >
@@ -122,15 +134,18 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
       {betweenProductsAds.length > 0 && (
         <div className="space-y-4" data-placement="between-products">
-          {betweenProductsAds.map((ad) => (
+          {betweenProductsAds.map((ad, index) => {
+            const adKey = ad.id || `between-ad-${index}-${ad.title}`;
+            return (
             <div
-              key={ad.id}
+              key={adKey}
               className="w-full bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => handleAdClick(ad)}
             >
@@ -157,7 +172,8 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

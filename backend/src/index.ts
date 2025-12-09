@@ -5,6 +5,9 @@ import config from '@config/environment';
 import logger from '@utils/logger';
 import { populateSliders } from '@migrations/populateSliders';
 import { fixSliderPaths } from '@migrations/fixSliderPaths';
+import { addStoreAdColumns } from '@migrations/addStoreAdColumns';
+import runMigrations from '@database/migrate';
+import seedDatabase from '@database/seed';
 
 const PORT = config.port;
 
@@ -24,10 +27,24 @@ const startServer = async (): Promise<void> => {
       throw new Error('Database connection failed');
     }
 
+    logger.info('🔄 Running database migrations...');
+    try {
+      await runMigrations();
+    } catch (error) {
+      logger.warn('⚠️ Database migration error (tables may already exist):', error);
+    }
+
     logger.info('📊 Synchronizing database schema...');
     await syncDatabase(false).catch((error) => {
       logger.warn('⚠️ Database sync failed, continuing without sync:', error.message);
     });
+
+    logger.info('🌱 Seeding database with initial data...');
+    try {
+      await seedDatabase();
+    } catch (error) {
+      logger.warn('⚠️ Database seeding failed, continuing:', error);
+    }
 
     logger.info('📦 Fixing slider paths and populating default sliders for existing stores...');
     try {
@@ -35,6 +52,13 @@ const startServer = async (): Promise<void> => {
       await populateSliders();
     } catch (error) {
       logger.warn('⚠️ Slider migration failed, continuing:', error);
+    }
+
+    logger.info('📦 Adding missing store_ads table columns...');
+    try {
+      await addStoreAdColumns();
+    } catch (error) {
+      logger.warn('⚠️ Store ads columns migration failed, continuing:', error);
     }
 
     const server = app.listen(PORT, (): void => {

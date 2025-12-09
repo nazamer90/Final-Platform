@@ -15,6 +15,7 @@ import { cleaningMaterialsSubcategories, getCleaningSubcategoryOptions } from '@
 import StoreSyncManager from '@/utils/storeSyncManager';
 import { categoryImageStorage } from '@/utils/categoryImageStorage';
 import { getDefaultProductImageSync, handleImageError } from '@/utils/imageUtils';
+import AdsManagementView from '@/components/AdsManagementView';
 
 // Google Maps API types declaration
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -1072,34 +1073,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
     gemini: ''
   });
 
-  const adTemplates = [
-    { id: 'adv1', image: '/Backup-platform/adv1.jpg' },
-    { id: 'adv2', image: '/Backup-platform/adv2.jpg' },
-    { id: 'adv3', image: '/Backup-platform/adv3.jpg' },
-    { id: 'adv4', image: '/Backup-platform/adv4.jpg' },
-    { id: 'adv5', image: '/Backup-platform/adv5.jpg' },
-    { id: 'adv6', image: '/Backup-platform/adv6.jpg' },
-    { id: 'adv7', image: '/Backup-platform/adv7.jpg' },
-    { id: 'adv8', image: '/Backup-platform/adv8.jpg' },
-    { id: 'adv9', image: '/Backup-platform/adv9.jpg' },
-    { id: 'adv10', image: '/Backup-platform/adv10.jpg' },
-    { id: 'adv11', image: '/Backup-platform/adv11.jpg' },
-    { id: 'adv12', image: '/Backup-platform/adv12.jpg' },
-  ];
 
-  const [adStep, setAdStep] = useState<'list' | 'create-step1' | 'create-step2'>('list');
-  const [selectedAdTemplate, setSelectedAdTemplate] = useState('');
-  const [adTitle, setAdTitle] = useState('');
-  const [adDescription, setAdDescription] = useState('');
-  const [adPlacement, setAdPlacement] = useState<'floating' | 'grid'>('floating');
-  const [publishedAds, setPublishedAds] = useState<Array<{
-    id: string;
-    templateId: string;
-    title: string;
-    description: string;
-    placement: 'floating' | 'grid';
-    createdAt: string;
-  }>>([]);
 
   // إصلاح أيقونة Leaflet
   React.useEffect(() => {
@@ -1975,28 +1949,7 @@ useEffect(() => {
     setAdModalOpen(true);
   };
 
-  const handleDeleteAd = async (adId: string | number) => {
-    if (confirm('هل أنت متأكد من حذف هذا الإعلان؟')) {
-      try {
-        const storeId = merchantStoreData?.storeId || merchantStoreData?.id || currentMerchant?.id;
-        if (!storeId) return;
 
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-        const response = await fetch(`${apiUrl}/ads/store/${storeId}/${adId}`, {
-          method: 'DELETE',
-        });
-
-        if (response.ok) {
-          setPublishedAds(publishedAds.filter(ad => ad.id !== String(adId)));
-          alert('تم حذف الإعلان بنجاح');
-        } else {
-          alert('فشل حذف الإعلان');
-        }
-      } catch (error) {
-        alert('حدث خطأ أثناء حذف الإعلان');
-      }
-    }
-  };
 
   const handleSaveAd = () => {
     if (!adForm.name.trim()) {
@@ -2030,98 +1983,7 @@ useEffect(() => {
     setCurrentAd(null);
   };
 
-  const loadPublishedAds = async () => {
-    try {
-      const storeId = merchantStoreData?.storeId || merchantStoreData?.id || currentMerchant?.id;
-      if (!storeId) return;
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${apiUrl}/ads/store/${storeId}`);
-      if (response.ok) {
-        const result = await response.json();
-        setPublishedAds(result.data || []);
-      }
-    } catch (error) {
-      // Silently fail to load ads
-    }
-  };
-
-  const handleStartAd = () => {
-    setAdStep('create-step1');
-    setSelectedAdTemplate('');
-    setAdTitle('');
-    setAdDescription('');
-  };
-
-  const handleSelectTemplate = (templateId: string) => {
-    setSelectedAdTemplate(templateId);
-  };
-
-  const handleSaveAdDraft = () => {
-    if (!adTitle.trim() || !adDescription.trim()) {
-      alert('يرجى ملء جميع الحقول');
-      return;
-    }
-    setAdStep('create-step2');
-  };
-
-  const handlePublishAd = async () => {
-    if (!selectedAdTemplate) {
-      alert('يرجى اختيار قالب');
-      return;
-    }
-
-    if (!adTitle.trim() || !adDescription.trim()) {
-      alert('يرجى ملء جميع الحقول المطلوبة');
-      return;
-    }
-
-    try {
-      const storeId = merchantStoreSlug || merchantStoreData?.slug || merchantStoreData?.storeSlug || merchantStoreData?.storeId || merchantStoreData?.id;
-      if (!storeId) {
-        alert('يرجى تحديد المتجر. تأكد من تسجيل دخولك بشكل صحيح');
-        return;
-      }
-
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${apiUrl}/ads/store/${storeId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          templateId: selectedAdTemplate,
-          title: adTitle,
-          description: adDescription,
-          placement: adPlacement,
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setPublishedAds([...publishedAds, result.data || {
-          id: `ad-${Date.now()}`,
-          templateId: selectedAdTemplate,
-          title: adTitle,
-          description: adDescription,
-          placement: adPlacement,
-          createdAt: new Date().toISOString()
-        }]);
-
-        setAdStep('list');
-        setSelectedAdTemplate('');
-        setAdTitle('');
-        setAdDescription('');
-        setAdPlacement('floating');
-
-        alert('تم نشر الإعلان بنجاح');
-      } else {
-        alert(`فشل نشر الإعلان: ${response.statusText}`);
-      }
-    } catch (error) {
-      alert('حدث خطأ أثناء نشر الإعلان. تحقق من اتصالك بالإنترنت');
-    }
-  };
 
   // Header state
   const [systemStatus, setSystemStatus] = useState<'online' | 'offline' | 'maintenance'>('online');
@@ -2625,11 +2487,7 @@ useEffect(() => {
     }
   }, [showLogisticsMapModal, initializeLogisticsMap]);
 
-  useEffect(() => {
-    if (activeSection === 'settings-ads') {
-      loadPublishedAds();
-    }
-  }, [merchantId, activeSection]);
+
 
   // OpenStreetMap initialization (no external callbacks needed)
 
@@ -3284,7 +3142,7 @@ useEffect(() => {
 
             <div className="space-y-4">
               {/* Map Container */}
-              <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ height: '450px' }}>
+              <div className="relative bg-gray-100 rounded-lg overflow-hidden h-[450px]">
                 <MapContainer
                   center={[32.8872, 13.1913]}
                   zoom={7}
@@ -7820,7 +7678,12 @@ useEffect(() => {
                 <div className="space-y-6">
                   <UnavailableOrdersView
                     storeSlug={merchantStoreSlug || undefined}
-                    storeData={{ slug: merchantStoreSlug, name: merchantStoreName }}
+                    storeData={{ 
+                      id: merchantStoreData?.storeId || merchantStoreData?.id || currentMerchant?.id,
+                      slug: merchantStoreSlug, 
+                      name: merchantStoreName,
+                      storeId: merchantStoreData?.storeId || merchantStoreData?.id || currentMerchant?.id
+                    }}
                     setStoreData={() => {}}
                     onSave={() => {}}
                   />
@@ -10437,243 +10300,7 @@ useEffect(() => {
                 )
               )}
 
-              {activeSection === 'settings-ads' && (
-                <div className="space-y-6">
-                  {!merchantStoreSlug ? (
-                    <Card className="border-2 border-red-300 bg-red-50">
-                      <CardContent className="py-12 text-center">
-                        <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                        <h3 className="text-xl font-semibold text-red-900 mb-2">لم يتم تحديد المتجر</h3>
-                        <p className="text-red-700 mb-4">لا يمكن الوصول إلى بيانات متجرك. يرجى التأكد من تسجيل الدخول بشكل صحيح</p>
-                        <Button onClick={() => window.location.reload()} className="bg-red-600 hover:bg-red-700">
-                          إعادة تحميل الصفحة
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <>
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h2 className="text-2xl font-bold">إدارة الإعلانات</h2>
-                          <p className="text-gray-600">أنشئ وأدر إعلانات متجرك بسهولة</p>
-                        </div>
-                        <Button onClick={handleStartAd} className="bg-green-600 hover:bg-green-700">
-                          <Plus className="h-4 w-4 ml-2" />
-                          إعلان جديد
-                        </Button>
-                      </div>
 
-                      {publishedAds.length === 0 ? (
-                        <Card className="border-dashed border-2">
-                          <CardContent className="py-12 text-center">
-                            <Megaphone className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                            <h3 className="text-xl font-semibold mb-2">لا توجد إعلانات منشورة</h3>
-                            <p className="text-gray-600 mb-6">ابدأ بإنشاء إعلانك الأول</p>
-                            <Button onClick={handleStartAd} className="bg-blue-600 hover:bg-blue-700">
-                              <Plus className="h-4 w-4 ml-2" />
-                              إنشاء إعلان
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {publishedAds.map(ad => {
-                            const template = adTemplates.find(t => t.id === ad.templateId);
-                            return (
-                              <Card key={ad.id} className="overflow-hidden">
-                                <div className="aspect-video bg-gray-100 overflow-hidden">
-                                  <img src={template?.image} alt={ad.title} className="w-full h-full object-cover" />
-                                </div>
-                                <CardContent className="p-4">
-                                  <h3 className="font-semibold mb-2">{ad.title}</h3>
-                                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">{ad.description}</p>
-                                  <div className="flex gap-2">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="flex-1 text-red-600 hover:text-red-700"
-                                      onClick={() => handleDeleteAd(ad.id)}
-                                    >
-                                      <Trash2 className="h-4 w-4 ml-1" />
-                                      حذف
-                                    </Button>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {adStep === 'create-step1' && (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h2 className="text-2xl font-bold">الخطوة 1: اختيار القالب والنص</h2>
-                          <p className="text-gray-600">اختر قالباً وأضف نصوص إعلانك</p>
-                        </div>
-                        <Button variant="outline" onClick={() => setAdStep('list')}>
-                          <X className="h-4 w-4 ml-2" />
-                          إلغاء
-                        </Button>
-                      </div>
-
-                      <div className="space-y-6">
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>النصوص الإعلانية</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                              <div>
-                                <label className="block font-semibold mb-2">عنوان الإعلان</label>
-                                <Input
-                                  value={adTitle}
-                                  onChange={(e) => setAdTitle(e.target.value.slice(0, 100))}
-                                  placeholder="أدخل عنوان جذاب..."
-                                  maxLength={100}
-                                />
-                                <p className="text-xs text-gray-500 mt-1">{adTitle.length} / 100</p>
-                              </div>
-                              <div>
-                                <label className="block font-semibold mb-2">نص الإعلان</label>
-                                <Textarea
-                                  value={adDescription}
-                                  onChange={(e) => setAdDescription(e.target.value.slice(0, 300))}
-                                  placeholder="اكتب نص الإعلان..."
-                                  rows={3}
-                                  maxLength={300}
-                                />
-                                <p className="text-xs text-gray-500 mt-1">{adDescription.length} / 300</p>
-                              </div>
-                            </div>
-                            <div className="flex gap-3 pt-4">
-                              <Button onClick={handleSaveAdDraft} className="flex-1 bg-green-600 hover:bg-green-700">
-                                <Check className="h-4 w-4 ml-2" />
-                                متابعة
-                              </Button>
-                              <Button variant="outline" onClick={() => setAdStep('list')} className="flex-1">
-                                إلغاء
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>اختيار القالب</CardTitle>
-                            <p className="text-sm text-gray-600 mt-1">اختر أحد القوالب المتاحة أدناه</p>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="overflow-x-auto pb-2">
-                              <div className="flex gap-4 pb-2 min-w-max">
-                                {adTemplates.map(template => (
-                                  <button
-                                    key={template.id}
-                                    onClick={() => handleSelectTemplate(template.id)}
-                                    className={`flex-shrink-0 rounded-lg border-2 transition overflow-hidden ${
-                                      selectedAdTemplate === template.id
-                                        ? 'border-blue-500 ring-2 ring-blue-300'
-                                        : 'border-gray-200 hover:border-blue-300'
-                                    }`}
-                                  >
-                                    <div className="w-48 h-32 bg-gray-100">
-                                      <img src={template.image} alt={template.id} className="w-full h-full object-cover" />
-                                    </div>
-                                    <div className="p-2 bg-white">
-                                      <p className="text-xs font-semibold text-center">{template.id}</p>
-                                    </div>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </>
-                  )}
-
-                  {adStep === 'create-step2' && (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h2 className="text-2xl font-bold">الخطوة 2: اختيار مكان الظهور</h2>
-                          <p className="text-gray-600">حدد أين سيظهر إعلانك في متجرك</p>
-                        </div>
-                        <Button variant="outline" onClick={() => setAdStep('create-step1')}>
-                          <ChevronLeft className="h-4 w-4 ml-2" />
-                          رجوع
-                        </Button>
-                      </div>
-
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>ملخص الإعلان</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="p-4 bg-gray-50 rounded-lg">
-                              <img src={adTemplates.find(t => t.id === selectedAdTemplate)?.image} alt="preview" className="w-full h-32 object-cover rounded mb-4" />
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">العنوان</p>
-                              <p className="font-semibold">{adTitle}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">النص</p>
-                              <p className="text-sm text-gray-700">{adDescription}</p>
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card>
-                          <CardHeader>
-                            <CardTitle>مكان الظهور</CardTitle>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-3">
-                              <button
-                                onClick={() => setAdPlacement('floating')}
-                                className={`w-full p-4 rounded-lg border-2 transition text-left ${
-                                  adPlacement === 'floating'
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-200 hover:border-gray-300'
-                                }`}
-                              >
-                                <p className="font-semibold">🎯 شريط عائم في الأعلى</p>
-                                <p className="text-sm text-gray-600">يظهر في أعلى الصفحة</p>
-                              </button>
-                              <button
-                                onClick={() => setAdPlacement('grid')}
-                                className={`w-full p-4 rounded-lg border-2 transition text-left ${
-                                  adPlacement === 'grid'
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-200 hover:border-gray-300'
-                                }`}
-                              >
-                                <p className="font-semibold">📦 بين المنتجات</p>
-                                <p className="text-sm text-gray-600">يظهر وسط قائمة المنتجات</p>
-                              </button>
-                            </div>
-
-                            <div className="pt-4 border-t space-y-3">
-                              <Button onClick={handlePublishAd} className="w-full bg-green-600 hover:bg-green-700">
-                                <Upload className="h-4 w-4 ml-2" />
-                                المزامنة والنشر
-                              </Button>
-                              <Button variant="outline" onClick={() => setAdStep('create-step1')} className="w-full">
-                                إلغاء
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
 
               {activeSection === 'analytics-sales' && (
                 <div className="flex">
@@ -13937,7 +13564,15 @@ useEffect(() => {
                     </CardContent>
                   </Card>
                 </div>
+
               )}
+                        {activeSection === 'settings-ads' && hasModuleAccess('settings-ads') && (
+                        <AdsManagementView 
+                        storeData={merchantStoreData || currentMerchant}
+                        setStoreData={() => {}} 
+                        onSave={() => {}}
+                       />
+                      )}
 
               {activeSection === 'customer-service' && (
                 <div>

@@ -224,10 +224,10 @@ const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, for
   try {
     setLoading(true);
     const formData = new FormData();
-    formData.append('sliderImage_0', file);
+    formData.append('image', file);
     
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    const uploadResponse = await fetch(`${apiUrl}/stores/${storeId}/upload-slider-image`, {
+    const uploadResponse = await fetch(`${apiUrl}/sliders/store/${storeId}/upload`, {
       method: 'POST',
       body: formData
     });

@@ -28,6 +28,7 @@ import { indeeshProducts } from '@/data/stores/indeesh/products';
 import { nawaemStoreConfig } from '@/data/stores/nawaem/config';
 import { sheirineStoreConfig } from '@/data/stores/sheirine/config';
 import { magnaStoreConfig } from '@/data/stores/magna-beauty/config';
+import SheirineSlider from '@/data/stores/sheirine/Slider';
 import { getTagColor, calculateBadge, getButtonConfig, applyAutoBadges } from '@/utils/badgeCalculator';
 
 interface StorePageProps {
@@ -47,15 +48,16 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
 
   const fetchAds = async () => {
     try {
-      if (store?.id) {
-        const response = await fetch(`/api/ads/store/${storeSlug}`);
+      if (storeSlug) {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const fetchUrl = `${apiUrl}/ads/store/${storeSlug}`;
+        const response = await fetch(fetchUrl);
         if (response.ok) {
           const result = await response.json();
           setStoreAds(result.data || []);
         }
       }
     } catch (error) {
-      // Failed to fetch ads
     }
   };
 
@@ -76,7 +78,7 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
   useEffect(() => {
     fetchAds();
     fetchProducts();
-  }, [store?.id]);
+  }, [storeSlug]);
 
   useEffect(() => {
     const handleProductUpdate = () => {
@@ -92,6 +94,22 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
       window.removeEventListener('storeAdsUpdated', handleProductUpdate as EventListener);
     };
   }, []);
+
+  const getTextPositionStyle = (position?: string) => {
+    const baseClasses = "absolute text-center";
+    const positionMap: Record<string, string> = {
+      'top-left': 'top-2 left-2 text-left',
+      'top-center': 'top-2 left-1/2 -translate-x-1/2',
+      'top-right': 'top-2 right-2 text-right',
+      'center-left': 'top-1/2 -translate-y-1/2 left-2 text-left',
+      'center': 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+      'center-right': 'top-1/2 -translate-y-1/2 right-2 text-right',
+      'bottom-left': 'bottom-2 left-2 text-left',
+      'bottom-center': 'bottom-2 left-1/2 -translate-x-1/2',
+      'bottom-right': 'bottom-2 right-2 text-right',
+    };
+    return `${baseClasses} ${positionMap[position || 'center']}`;
+  };
 
   const getStoreConfig = (slug: string) => {
     switch (slug) {
@@ -198,6 +216,17 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
         </div>
       </header>
 
+      {storeSlug === 'sheirine' && (
+        <SheirineSlider 
+          products={storeProducts}
+          storeSlug={storeSlug}
+          onProductClick={onProductClick}
+          onAddToCart={() => {}}
+          onToggleFavorite={() => {}}
+          favorites={[]}
+        />
+      )}
+
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -246,30 +275,34 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
         </div>
       </div>
 
-      {storeAds.filter(ad => ad.placement === 'floating').length > 0 && (
+      {storeAds.filter(ad => ad.placement === 'banner').length > 0 && (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
           <div className="container mx-auto px-4 py-4">
             <div className="flex gap-4 overflow-x-auto pb-2">
-              {storeAds.filter(ad => ad.placement === 'floating').map(ad => {
+              {storeAds.filter(ad => ad.placement === 'banner').map(ad => {
                 const template = [
-                  { id: 'adv1', image: '/Backup-platform/adv1.jpg' },
-                  { id: 'adv2', image: '/Backup-platform/adv2.jpg' },
-                  { id: 'adv3', image: '/Backup-platform/adv3.jpg' },
-                  { id: 'adv4', image: '/Backup-platform/adv4.jpg' },
-                  { id: 'adv5', image: '/Backup-platform/adv5.jpg' },
-                  { id: 'adv6', image: '/Backup-platform/adv6.jpg' },
-                  { id: 'adv7', image: '/Backup-platform/adv7.jpg' },
-                  { id: 'adv8', image: '/Backup-platform/adv8.jpg' },
-                  { id: 'adv9', image: '/Backup-platform/adv9.jpg' },
-                  { id: 'adv10', image: '/Backup-platform/adv10.jpg' },
-                  { id: 'adv11', image: '/Backup-platform/adv11.jpg' },
-                  { id: 'adv12', image: '/Backup-platform/adv12.jpg' },
+                  { id: 'adv1', image: '/AdsForms/adv1.jpg' },
+                  { id: 'adv2', image: '/AdsForms/adv2.jpg' },
+                  { id: 'adv3', image: '/AdsForms/adv3.jpg' },
+                  { id: 'adv4', image: '/AdsForms/adv4.jpg' },
+                  { id: 'adv5', image: '/AdsForms/adv5.jpg' },
+                  { id: 'adv6', image: '/AdsForms/adv6.jpg' },
+                  { id: 'adv7', image: '/AdsForms/adv7.jpg' },
+                  { id: 'adv8', image: '/AdsForms/adv8.jpg' },
+                  { id: 'adv9', image: '/AdsForms/adv9.jpg' },
+                  { id: 'adv10', image: '/AdsForms/adv10.jpg' },
+                  { id: 'adv11', image: '/AdsForms/adv11.jpg' },
+                  { id: 'adv12', image: '/AdsForms/adv12.jpg' },
                 ].find(t => t.id === ad.templateId);
                 return (
-                  <div key={ad.id} className="flex-shrink-0 bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                    <img src={template?.image} alt={ad.title} className="w-64 h-24 object-cover" />
-                    <div className="p-3">
-                      <h4 className="font-semibold text-sm text-gray-900">{ad.title}</h4>
+                  <div key={ad.id} className="flex-shrink-0 bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer" onClick={() => ad.linkUrl && window.open(ad.linkUrl, '_blank')}>
+                    <div className="relative w-64 h-24">
+                      <img src={template?.image} alt={ad.title} className="w-full h-full object-cover" />
+                      <div className={`${getTextPositionStyle(ad.textPosition)} max-w-[95%]`} style={{ color: ad.textColor || '#ffffff', fontFamily: 'Cairo, sans-serif', fontWeight: 600 }}>
+                        <h4 className="text-sm font-semibold line-clamp-2">{ad.title}</h4>
+                      </div>
+                    </div>
+                    <div className="p-2 bg-white">
                       <p className="text-xs text-gray-600 line-clamp-1">{ad.description}</p>
                     </div>
                   </div>
@@ -294,31 +327,33 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
           }>
             {filteredProducts.map((product, index) => (
               <React.Fragment key={`product-${product.id}`}>
-                {index === 4 && storeAds.filter(ad => ad.placement === 'grid').length > 0 && (
+                {((index + 1) % 4 === 0) && storeAds.filter(ad => ad.placement === 'between_products').length > 0 && (
                   <div className="col-span-2 md:col-span-3 lg:col-span-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {storeAds.filter(ad => ad.placement === 'grid').map(ad => {
+                      {storeAds.filter(ad => ad.placement === 'between_products').map(ad => {
                         const template = [
-                          { id: 'adv1', image: '/Backup-platform/adv1.jpg' },
-                          { id: 'adv2', image: '/Backup-platform/adv2.jpg' },
-                          { id: 'adv3', image: '/Backup-platform/adv3.jpg' },
-                          { id: 'adv4', image: '/Backup-platform/adv4.jpg' },
-                          { id: 'adv5', image: '/Backup-platform/adv5.jpg' },
-                          { id: 'adv6', image: '/Backup-platform/adv6.jpg' },
-                          { id: 'adv7', image: '/Backup-platform/adv7.jpg' },
-                          { id: 'adv8', image: '/Backup-platform/adv8.jpg' },
-                          { id: 'adv9', image: '/Backup-platform/adv9.jpg' },
-                          { id: 'adv10', image: '/Backup-platform/adv10.jpg' },
-                          { id: 'adv11', image: '/Backup-platform/adv11.jpg' },
-                          { id: 'adv12', image: '/Backup-platform/adv12.jpg' },
+                          { id: 'adv1', image: '/AdsForms/adv1.jpg' },
+                          { id: 'adv2', image: '/AdsForms/adv2.jpg' },
+                          { id: 'adv3', image: '/AdsForms/adv3.jpg' },
+                          { id: 'adv4', image: '/AdsForms/adv4.jpg' },
+                          { id: 'adv5', image: '/AdsForms/adv5.jpg' },
+                          { id: 'adv6', image: '/AdsForms/adv6.jpg' },
+                          { id: 'adv7', image: '/AdsForms/adv7.jpg' },
+                          { id: 'adv8', image: '/AdsForms/adv8.jpg' },
+                          { id: 'adv9', image: '/AdsForms/adv9.jpg' },
+                          { id: 'adv10', image: '/AdsForms/adv10.jpg' },
+                          { id: 'adv11', image: '/AdsForms/adv11.jpg' },
+                          { id: 'adv12', image: '/AdsForms/adv12.jpg' },
                         ].find(t => t.id === ad.templateId);
                         return (
-                          <Card key={ad.id} className="overflow-hidden">
-                            <div className="aspect-video bg-gray-100">
+                          <Card key={ad.id} className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={() => ad.linkUrl && window.open(ad.linkUrl, '_blank')}>
+                            <div className="relative aspect-video bg-gray-100">
                               <img src={template?.image} alt={ad.title} className="w-full h-full object-cover" />
+                              <div className={`${getTextPositionStyle(ad.textPosition)} w-full px-3`} style={{ color: ad.textColor || '#ffffff', fontFamily: 'Cairo, sans-serif', fontWeight: 600 }}>
+                                <h3 className="font-semibold mb-1 text-sm line-clamp-2">{ad.title}</h3>
+                              </div>
                             </div>
-                            <CardContent className="p-4">
-                              <h3 className="font-semibold mb-2 text-sm">{ad.title}</h3>
+                            <CardContent className="p-3">
                               <p className="text-xs text-gray-600 line-clamp-2">{ad.description}</p>
                             </CardContent>
                           </Card>

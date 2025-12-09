@@ -22,22 +22,7 @@ import {
   X
 } from 'lucide-react';
 
-// تعريف أنواع Google
-declare global {
-  interface Window {
-    google: {
-      accounts: {
-        id: {
-          initialize: (config: any) => void;
-          prompt: () => void;
-        };
-        oauth2: {
-          initTokenClient: (config: any) => any;
-        };
-      };
-    };
-  }
-}
+
 
 interface ShopLoginPageProps {
   onBack: () => void;
@@ -331,58 +316,29 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
     setIsGoogleLoading(true);
     try {
       const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-      // التحقق من وجود client ID صالح
-      if (!clientId || clientId === 'your_google_client_id_here' || clientId.includes('demo')) {
-        showGoogleSetupInstructions();
+      const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || (window.location.origin + '/auth/google/callback');
+      
+      if (!clientId) {
+        setError('لم يتم تكوين Google OAuth بشكل صحيح. يرجى الاتصال بالدعم الفني.');
         setIsGoogleLoading(false);
         return;
       }
 
-      // التحقق من صحة تنسيق client ID
-      if (!clientId.includes('.') || clientId.split('.').length !== 2) {
-        showGoogleSetupInstructions();
-        setIsGoogleLoading(false);
-        return;
-      }
+      const state = btoa(JSON.stringify({
+        timestamp: Date.now(),
+        returnTo: window.location.pathname
+      }));
 
-      // محاولة استخدام Google Identity Services
-      if (typeof window !== 'undefined') {
-        try {
-          // تحميل Google Identity Services SDK
-          await loadGoogleSDK();
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${encodeURIComponent(clientId)}&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+        `scope=${encodeURIComponent('openid email profile')}&` +
+        `response_type=code&` +
+        `state=${encodeURIComponent(state)}&` +
+        `access_type=offline&` +
+        `prompt=consent`;
 
-          // تهيئة Google Sign-In
-          const tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
-            client_id: clientId,
-            scope: 'openid email profile',
-            callback: (response: any) => {
-              if (response.error) {
-                setError(`خطأ في Google OAuth: ${response.error_description || response.error}`);
-                setIsGoogleLoading(false);
-                return;
-              }
-
-              // نجح في الحصول على التوكن
-              handleGoogleAuthSuccess(response);
-            },
-            state: btoa(JSON.stringify({
-              timestamp: Date.now(),
-              platform: 'eshro'
-            }))
-          });
-
-          // طلب الوصول
-          tokenClient.requestAccessToken();
-
-        } catch (sdkError) {
-          // الرجوع للطريقة التقليدية
-          redirectToGoogleOAuth(clientId);
-        }
-      } else {
-        // بيئة الخادم - إعادة توجيه مباشرة
-        redirectToGoogleOAuth(clientId);
-      }
+      window.location.href = authUrl;
 
     } catch (error) {
       setError('فشل في تسجيل الدخول عبر Google. يرجى المحاولة مرة أخرى.');
@@ -390,132 +346,9 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
     }
   };
 
-  const redirectToGoogleOAuth = (clientId: string) => {
-    // إنشاء رابط OAuth تقليدي
-    const redirectUri = encodeURIComponent(window.location.origin + '/auth/google/callback');
-    const state = btoa(JSON.stringify({
-      timestamp: Date.now(),
-      returnTo: window.location.pathname
-    }));
 
-    const authUrl = `https://accounts.google.com/oauth/authorize?` +
-      `client_id=${encodeURIComponent(clientId)}&` +
-      `redirect_uri=${redirectUri}&` +
-      `scope=${encodeURIComponent('openid email profile')}&` +
-      `response_type=code&` +
-      `state=${encodeURIComponent(state)}&` +
-      `access_type=offline&` +
-      `prompt=consent`;
 
-    // فتح في نفس النافذة لتجنب مشاكل popup blockers
-    window.location.href = authUrl;
-  };
 
-  const loadGoogleSDK = async () => {
-    return new Promise((resolve, reject) => {
-      // التحقق إذا كان SDK محمل مسبقاً
-      if (window.google && window.google.accounts) {
-        resolve(true);
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-
-      script.onload = () => {
-        // تهيئة Google Identity Services
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'demo-client-id',
-          callback: handleGoogleCredentialResponse,
-          auto_select: false,
-          cancel_on_tap_outside: true
-        });
-        resolve(true);
-      };
-
-      script.onerror = () => {
-        reject(new Error('فشل في تحميل Google SDK'));
-      };
-
-      document.head.appendChild(script);
-    });
-  };
-
-  const handleGoogleCredentialResponse = (response: any) => {
-    if (response.credential) {
-      // فك شيفرة JWT token للحصول على بيانات المستخدم
-      try {
-        const base64Payload = response.credential.split('.')[1];
-        const payload = JSON.parse(atob(base64Payload));
-
-        const userInfo = {
-          id: payload.sub,
-          name: payload.name,
-          email: payload.email,
-          picture: payload.picture,
-          verified: payload.email_verified
-        };
-
-        handleGoogleSignInSuccess({ access_token: response.credential, user: userInfo });
-      } catch (error) {
-        setError('فشل في معالجة بيانات Google.');
-        setIsGoogleLoading(false);
-      }
-    }
-  };
-
-  const handleGoogleSignInSuccess = (authResponse: any) => {
-    // محاكاة نجاح تسجيل الدخول
-    alert('تم تسجيل الدخول بنجاح عبر Google! 🎉');
-
-    // في التطبيق الحقيقي، سيتم إرسال التوكن للخادم للتحقق
-    // وإنشاء/تحديث حساب المستخدم
-
-    setIsGoogleLoading(false);
-  };
-
-  const showGoogleSetupInstructions = () => {
-    const setupInstructions = `
-🔧 إعداد Google OAuth مطلوب
-
-لاستخدام تسجيل الدخول عبر Google، يرجى اتباع الخطوات التالية:
-
-1️⃣ اذهب لـ Google Cloud Console:
-   https://console.cloud.google.com/
-
-2️⃣ أنشئ مشروع جديد أو اختر موجود
-
-3️⃣ فعل Google+ API:
-   APIs & Services > Library > Google+ API > Enable
-
-4️⃣ أنشئ بيانات OAuth 2.0:
-   APIs & Services > Credentials > Create Credentials > OAuth 2.0 Client IDs
-
-5️⃣ أضف الإعدادات التالية:
-   • Application type: Web application
-   • Authorized redirect URIs:
-     ${window.location.origin}/auth/google/callback
-
-6️⃣ انسخ Client ID وأضفه في ملف .env:
-   VITE_GOOGLE_CLIENT_ID=your_actual_client_id_here
-
-7️⃣ أعد تشغيل الخادم بعد إضافة Client ID
-
-💡 للاختبار الحالي، يمكنك استخدام النموذج العادي لتسجيل الدخول
-    `;
-
-    alert(setupInstructions);
-  };
-
-  const handleGoogleAuthSuccess = (response: any) => {
-    // في التطبيق الحقيقي، سيتم إرسال التوكن للخادم للتحقق
-    // وإنشاء/تحديث حساب المستخدم
-
-    alert('تم تسجيل الدخول بنجاح عبر Google! 🎉');
-    setIsGoogleLoading(false);
-  };
 
   const resetForgotPasswordState = () => {
     setForgotPasswordStep('method');

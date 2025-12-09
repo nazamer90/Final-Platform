@@ -2,32 +2,30 @@ import sequelize from '@config/database';
 import logger from '@utils/logger';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import User from '@models/User';
+import Store from '@models/Store';
 
 const seedDatabase = async (): Promise<void> => {
   try {
     logger.info('🌱 Starting database seeding...');
 
-    // Seed admin user
     const adminPassword = await bcrypt.hash('admin123', 10);
     const adminId = uuidv4();
 
-    await sequelize.query(`
-      INSERT IGNORE INTO users (id, email, password, first_name, last_name, phone, role, merchant_verified)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, {
-      replacements: [
-        adminId,
-        'admin@eishro.ly',
-        adminPassword,
-        'مدير',
-        'النظام',
-        '+21891000000',
-        'admin',
-        true
-      ]
+    await User.findOrCreate({
+      where: { email: 'admin@eishro.ly' },
+      defaults: {
+        id: adminId,
+        email: 'admin@eishro.ly',
+        password: adminPassword,
+        firstName: 'مدير',
+        lastName: 'النظام',
+        phone: '+21891000000',
+        role: 'admin',
+        merchantVerified: true,
+      }
     });
 
-    // Seed sample merchants
     const merchants = [
       {
         id: uuidv4(),
@@ -36,10 +34,10 @@ const seedDatabase = async (): Promise<void> => {
         firstName: 'أحمد',
         lastName: 'التاجر',
         phone: '+21891000001',
-        storeName: 'متجر نواعم',
+        storeName: 'نواعم',
         storeSlug: 'nawaem',
         storeCategory: 'ملابس نسائية',
-        storeDescription: 'متجر متخصص في الملابس النسائية الأنيقة'
+        storeDescription: 'متجر متخصص في الملابس النسائية الأنيقة والعصرية'
       },
       {
         id: uuidv4(),
@@ -48,48 +46,85 @@ const seedDatabase = async (): Promise<void> => {
         firstName: 'فاطمة',
         lastName: 'التاجرة',
         phone: '+21891000002',
-        storeName: 'متجر شيرين',
+        storeName: 'شيرين',
         storeSlug: 'sheirine',
-        storeCategory: 'إكسسوارات',
-        storeDescription: 'متجر متخصص في الإكسسوارات والمجوهرات'
+        storeCategory: 'إكسسوارات ومجوهرات',
+        storeDescription: 'متجر متخصص في الإكسسوارات والمجوهرات الراقية'
+      },
+      {
+        id: uuidv4(),
+        email: 'merchant3@eishro.ly',
+        password: await bcrypt.hash('merchant123', 10),
+        firstName: 'علي',
+        lastName: 'البائع',
+        phone: '+21891000003',
+        storeName: 'Pretty',
+        storeSlug: 'pretty',
+        storeCategory: 'عطور وجمال',
+        storeDescription: 'متجر متخصص في العطور ومنتجات الجمال'
+      },
+      {
+        id: uuidv4(),
+        email: 'merchant4@eishro.ly',
+        password: await bcrypt.hash('merchant123', 10),
+        firstName: 'محمود',
+        lastName: 'التجار',
+        phone: '+21891000004',
+        storeName: 'Delta Store',
+        storeSlug: 'delta-store',
+        storeCategory: 'إلكترونيات وأجهزة',
+        storeDescription: 'متجر متخصص في الإلكترونيات والأجهزة الكهربائية'
+      },
+      {
+        id: uuidv4(),
+        email: 'merchant5@eishro.ly',
+        password: await bcrypt.hash('merchant123', 10),
+        firstName: 'سارة',
+        lastName: 'الجمالية',
+        phone: '+21891000005',
+        storeName: 'Magna Beauty',
+        storeSlug: 'magna-beauty',
+        storeCategory: 'مستحضرات تجميل',
+        storeDescription: 'متجر متخصص في مستحضرات التجميل والعناية بالبشرة'
       }
     ];
 
     for (const merchant of merchants) {
-      await sequelize.query(`
-        INSERT IGNORE INTO users (id, email, password, first_name, last_name, phone, role, store_name, store_slug, store_category, store_description, merchant_verified)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, {
-        replacements: [
-          merchant.id,
-          merchant.email,
-          merchant.password,
-          merchant.firstName,
-          merchant.lastName,
-          merchant.phone,
-          'merchant',
-          merchant.storeName,
-          merchant.storeSlug,
-          merchant.storeCategory,
-          merchant.storeDescription,
-          true
-        ]
-      });
+      try {
+        const [user] = await User.findOrCreate({
+          where: { email: merchant.email },
+          defaults: {
+            id: merchant.id,
+            email: merchant.email,
+            password: merchant.password,
+            firstName: merchant.firstName,
+            lastName: merchant.lastName,
+            phone: merchant.phone,
+            role: 'merchant',
+            storeName: merchant.storeName,
+            storeSlug: merchant.storeSlug,
+            storeCategory: merchant.storeCategory,
+            storeDescription: merchant.storeDescription,
+            merchantVerified: true,
+          }
+        });
 
-      // Create store entry
-      await sequelize.query(`
-        INSERT IGNORE INTO stores (merchant_id, name, slug, category, description, is_active)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `, {
-        replacements: [
-          merchant.id,
-          merchant.storeName,
-          merchant.storeSlug,
-          merchant.storeCategory,
-          merchant.storeDescription,
-          true
-        ]
-      });
+        await Store.findOrCreate({
+          where: { slug: merchant.storeSlug },
+          defaults: {
+            merchantId: user.id,
+            name: merchant.storeName,
+            slug: merchant.storeSlug,
+            category: merchant.storeCategory,
+            description: merchant.storeDescription,
+            isActive: true,
+          }
+        });
+
+        logger.info(`✅ Merchant and store created/verified: ${merchant.storeSlug}`);
+      } catch (error) {
+        logger.warn(`⚠️ Error creating merchant ${merchant.storeSlug}:`, error);
+      }
     }
 
     // Seed sample customers
@@ -113,107 +148,18 @@ const seedDatabase = async (): Promise<void> => {
     ];
 
     for (const customer of customers) {
-      await sequelize.query(`
-        INSERT IGNORE INTO users (id, email, password, first_name, last_name, phone, role)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `, {
-        replacements: [
-          customer.id,
-          customer.email,
-          customer.password,
-          customer.firstName,
-          customer.lastName,
-          customer.phone,
-          'customer'
-        ]
-      });
-    }
-
-    // Seed sample products
-    const products = [
-      {
-        name: 'فستان صيفي أنيق',
-        description: 'فستان صيفي مريح وأنيق للمناسبات',
-        price: 150.000,
-        category: 'ملابس نسائية',
-        brand: 'نواعم',
-        in_stock: true,
-        quantity: 25,
-        sku: 'DRESS001'
-      },
-      {
-        name: 'حقيبة يد أنيقة',
-        description: 'حقيبة يد جلدية فاخرة',
-        price: 200.000,
-        category: 'إكسسوارات',
-        brand: 'شيرين',
-        in_stock: true,
-        quantity: 15,
-        sku: 'BAG001'
-      },
-      {
-        name: 'عقد ذهبي',
-        description: 'عقد ذهبي أنيق مع حجر طبيعي',
-        price: 300.000,
-        category: 'مجوهرات',
-        brand: 'شيرين',
-        in_stock: true,
-        quantity: 8,
-        sku: 'NECK001'
-      }
-    ];
-
-    for (const product of products) {
-      await sequelize.query(`
-        INSERT IGNORE INTO products (name, description, price, category, brand, in_stock, quantity, sku)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `, {
-        replacements: [
-          product.name,
-          product.description,
-          product.price,
-          product.category,
-          product.brand,
-          product.in_stock,
-          product.quantity,
-          product.sku
-        ]
-      });
-    }
-
-    // Seed sample coupons
-    const coupons = [
-      {
-        code: 'WELCOME10',
-        description: 'خصم 10% للعملاء الجدد',
-        discount_percentage: 10,
-        min_order_amount: 100.000,
-        max_uses: 100,
-        is_active: true
-      },
-      {
-        code: 'SUMMER20',
-        description: 'خصم 20% على الملابس الصيفية',
-        discount_percentage: 20,
-        min_order_amount: 200.000,
-        max_uses: 50,
-        is_active: true
-      }
-    ];
-
-    for (const coupon of coupons) {
-      await sequelize.query(`
-        INSERT IGNORE INTO coupons (code, description, discount_percentage, min_order_amount, max_uses, is_active)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `, {
-        replacements: [
-          coupon.code,
-          coupon.description,
-          coupon.discount_percentage,
-          coupon.min_order_amount,
-          coupon.max_uses,
-          coupon.is_active
-        ]
+      await User.findOrCreate({
+        where: { email: customer.email },
+        defaults: {
+          id: customer.id,
+          email: customer.email,
+          password: customer.password,
+          firstName: customer.firstName,
+          lastName: customer.lastName,
+          phone: customer.phone,
+          role: 'customer',
+          merchantVerified: false,
+        }
       });
     }
 

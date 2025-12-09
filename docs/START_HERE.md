@@ -33,6 +33,7 @@
 
 ```
 docs/
+├── ANNOUNCEMENTS/         📢 التحديثات والإعلانات الأخيرة
 ├── SETUP_GUIDES/          📦 أدلة الإعداد والتثبيت
 ├── DEPLOYMENT/            🚀 نشر والإنتاج
 ├── FEATURES/              ⭐ توثيق الميزات الرئيسية
@@ -52,6 +53,7 @@ docs/
 
 | الموضوع | الملف |
 |--------|------|
+| **التحديثات الأخيرة 🔥** | [ANNOUNCEMENTS/INDEX.md](ANNOUNCEMENTS/INDEX.md) |
 | إعداد البيئة المحلية | [LOCAL_DEVELOPMENT.md](SETUP_GUIDES/LOCAL_DEVELOPMENT.md) |
 | نشر على السحابة | [CLOUD_DEPLOYMENT.md](DEPLOYMENT/CLOUD_DEPLOYMENT.md) |
 | تشخيص سريع للمشاكل | [QUICK_DIAGNOSIS.md](TROUBLESHOOTING/QUICK_DIAGNOSIS.md) |

@@ -13,6 +13,7 @@ import {
   EnhancedCheckoutPageLazy,
   CompleteOrdersPageLazy,
   ShopLoginPageLazy,
+  AuthCallbackPageLazy,
   CreateStorePageLazy,
   AccountTypeSelectionPageLazy,
   VisitorRegistrationPageLazy,
@@ -1241,6 +1242,138 @@ export default function Home() {
   }>({});
   const [storeCreationData, setStoreCreationData] = useState<any>(null);
   const validOrders = useMemo(() => orders.filter(order => order && order.id), [orders]);
+  // Filtering functions for data isolation by merchant
+  const filteredOrders = useMemo(() => {
+    if (!currentMerchant?.id) return validOrders;
+    return validOrders.filter(order => order?.storeId === currentMerchant.id);
+  }, [validOrders, currentMerchant?.id]);
+
+  const filteredFavorites = useMemo(() => {
+    if (!currentMerchant?.id) return favorites;
+    return favorites.filter(fav => fav?.storeId === currentMerchant.id);
+  }, [favorites, currentMerchant?.id]);
+
+  const filteredUnavailableItems = useMemo(() => {
+    if (!currentMerchant?.id) return unavailableItems;
+    return unavailableItems.filter(item => item?.storeId === currentMerchant.id);
+  }, [unavailableItems, currentMerchant?.id]);
+
+
+  // تحديث الـ URL حسب الصفحة والمتجر الحالي
+  useEffect(() => {
+    let newPath = '/';
+    
+    if (currentPage === 'home') {
+      newPath = '/';
+    } else if (currentPage === 'store' && currentStore) {
+      newPath = `/${currentStore}`;
+    } else if (currentPage === 'product' && currentProduct) {
+      newPath = currentStore ? `/${currentStore}/product/${currentProduct}` : `/product/${currentProduct}`;
+    } else if (currentPage === 'cart') {
+      newPath = '/cart';
+    } else if (currentPage === 'checkout') {
+      newPath = '/checkout';
+    } else if (currentPage === 'orders') {
+      newPath = '/orders';
+    } else if (currentPage === 'contact-us') {
+      newPath = '/contact-us';
+    } else if (currentPage === 'partners') {
+      newPath = '/partner-success';
+    } else if (currentPage === 'terms') {
+      newPath = '/terms';
+    } else if (currentPage === 'merchant-dashboard') {
+      newPath = '/merchant/dashboard';
+    } else if (currentPage === 'merchant-login') {
+      newPath = '/merchant/login';
+    } else if (currentPage === 'merchant-register') {
+      newPath = '/merchant/register';
+    } else if (currentPage === 'admin') {
+      newPath = '/admin';
+    } else if (currentPage === 'auth-callback') {
+      newPath = '/auth/google/callback';
+    } else if (currentPage === 'customer-dashboard') {
+      newPath = '/customer/dashboard';
+    } else if (currentPage === 'customer-login') {
+      newPath = '/customer/login';
+    } else if (currentPage === 'customer-register') {
+      newPath = '/customer/register';
+    }
+    
+    window.history.pushState({ page: currentPage, store: currentStore, product: currentProduct }, '', newPath);
+  }, [currentPage, currentStore, currentProduct]);
+
+  // معالجة URL والـ routing
+  const handleRouting = (pathname: string) => {
+    if (pathname === '/' || pathname === '') {
+      setCurrentPage('home');
+      setCurrentStore(null);
+      setCurrentProduct(null);
+    } else if (pathname === '/cart') {
+      setCurrentPage('cart');
+    } else if (pathname === '/checkout') {
+      setCurrentPage('checkout');
+    } else if (pathname === '/orders') {
+      setCurrentPage('orders');
+    } else if (pathname === '/contact-us') {
+      setCurrentPage('contact-us');
+    } else if (pathname === '/partner-success') {
+      setCurrentPage('partners');
+    } else if (pathname === '/terms') {
+      setCurrentPage('terms');
+    } else if (pathname === '/admin') {
+      setCurrentPage('admin');
+    } else if (pathname === '/auth/google/callback') {
+      setCurrentPage('auth-callback');
+    } else if (pathname.startsWith('/merchant/')) {
+      const subPath = pathname.replace('/merchant/', '');
+      if (subPath === 'dashboard') setCurrentPage('merchant-dashboard');
+      else if (subPath === 'login') setCurrentPage('merchant-login');
+      else if (subPath === 'register') setCurrentPage('merchant-register');
+    } else if (pathname.startsWith('/customer/')) {
+      const subPath = pathname.replace('/customer/', '');
+      if (subPath === 'dashboard') setCurrentPage('customer-dashboard');
+      else if (subPath === 'login') setCurrentPage('customer-login');
+      else if (subPath === 'register') setCurrentPage('customer-register');
+    } else if (pathname.startsWith('/product/')) {
+      const productId = parseInt(pathname.replace('/product/', ''));
+      setCurrentPage('product');
+      setCurrentProduct(productId);
+    } else {
+      const storeMatch = pathname.match(/^\/([^/]+)(?:\/product\/(\d+))?$/);
+      if (storeMatch) {
+        const store = storeMatch[1] || '';
+        const productId = storeMatch[2] ? parseInt(storeMatch[2]) : null;
+        
+        setCurrentStore(store);
+        if (productId) {
+          setCurrentPage('product');
+          setCurrentProduct(productId);
+        } else {
+          setCurrentPage('store');
+          setCurrentProduct(null);
+        }
+      }
+    }
+  };
+
+  // معالجة زر الرجوع في المتصفح
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      const pathname = window.location.pathname;
+      handleRouting(pathname);
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // معالجة URL عند تحميل الصفحة الأولى
+  useEffect(() => {
+    const pathname = window.location.pathname;
+    if (pathname && pathname !== '/') {
+      handleRouting(pathname);
+    }
+  }, []);
 
   // عرض النافذة الترحيبية في كل مرة يتم فتح المنصة (لأغراض التسويق وتشجيع الاشتراك)
   useEffect(() => {
@@ -1834,7 +1967,7 @@ export default function Home() {
   const handleOrderComplete = (orderData: any) => {
     if (orderData) {
       // إضافة الطلب للطلبات المكتملة
-      setOrders(prev => [...prev, orderData]);
+      setOrders(prev => [...prev, { ...orderData, storeId: currentMerchant?.id || currentMerchant?.storeId }]);
       
       // إفراغ السلة
       setCartItems([]);
@@ -2479,6 +2612,11 @@ export default function Home() {
     );
   }
 
+  // عرض صفحة معالجة Google OAuth Callback
+  if (currentPage === 'auth-callback') {
+    return <AuthCallbackPageLazy />;
+  }
+
   // عرض صفحة تسجيل الدخول
   if (currentPage === 'login') {
     return (
@@ -2893,7 +3031,8 @@ export default function Home() {
             } else {
               const productWithDate = {
                 ...product,
-                addedDate: new Date().toISOString()
+                addedDate: new Date().toISOString(),
+                storeId: currentMerchant?.id || currentMerchant?.storeId
               };
               setFavorites(prev => [...prev, productWithDate]);
             }
@@ -2969,7 +3108,7 @@ export default function Home() {
             if (favorites.find(f => f.id === productId)) {
               setFavorites(prev => prev.filter(f => f.id !== productId));
             } else {
-              setFavorites(prev => [...prev, product]);
+              setFavorites(prev => [...prev, { ...product, storeId: currentMerchant?.id || currentMerchant?.storeId }]);
             }
           }
         }}
@@ -3004,7 +3143,7 @@ export default function Home() {
         onBack={() => setCurrentPage('cart')}
         onOrderComplete={(orderData) => {
           if (orderData) {
-            setOrders(prev => [...prev, orderData]);
+            setOrders(prev => [...prev, { ...orderData, storeId: currentMerchant?.id || currentMerchant?.storeId }]);
             setCartItems([]); // تصفير السلة
             setShowOrderSuccess(orderData);
           }
@@ -3019,9 +3158,9 @@ export default function Home() {
   if (currentPage === 'orders') {
     return (
       <CompleteOrdersPageLazy
-        orders={validOrders}
-        favorites={favorites}
-        unavailableItems={unavailableItems}
+        orders={filteredOrders}
+        favorites={filteredFavorites}
+        unavailableItems={filteredUnavailableItems}
         onBack={handleBackToHome}
         onAddToCart={(product) => {
           const cartItem = { id: Date.now(), product, size: 'M', color: 'أسود', quantity: 1 };
@@ -3034,7 +3173,7 @@ export default function Home() {
             if (favorites.find(f => f.id === productId)) {
               setFavorites(prev => prev.filter(f => f.id !== productId));
             } else {
-              setFavorites(prev => [...prev, product]);
+              setFavorites(prev => [...prev, { ...product, storeId: currentMerchant?.id || currentMerchant?.storeId }]);
             }
           }
         }}

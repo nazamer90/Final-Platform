@@ -29,6 +29,7 @@ import type { Product } from '@/data/storeProducts';
 import EnhancedNotifyModal from '@/components/EnhancedNotifyModal';
 import ShareMenu from '@/components/ShareMenu';
 import UnifiedStoreSlider from '@/components/UnifiedStoreSlider';
+import SheirineSlider from '@/data/stores/sheirine/Slider';
 import { getDefaultProductImageSync, handleImageError } from '@/utils/imageUtils';
 import { getTagColor, calculateBadge } from '@/utils/badgeCalculator';
 
@@ -83,6 +84,9 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [dynamicStoreData, setDynamicStoreData] = useState<any>(null);
   const [loadingStore, setLoadingStore] = useState(false);
+  const [storeAds, setStoreAds] = useState<any[]>([]);
+  const [adCarouselSlide, setAdCarouselSlide] = useState(0);
+  const [isAdHovering, setIsAdHovering] = useState(false);
 
   const getDynamicStores = () => {
     try {
@@ -309,7 +313,8 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
     };
     
     loadDynamicStoreData();
-  }, [store?.slug]);
+    fetchAds();
+  }, [storeSlug, store?.slug]);
 
   /**
    * Detect and clear cache corruption for a specific store
@@ -367,6 +372,22 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
     }
   };
 
+  const fetchAds = async () => {
+    try {
+      if (storeSlug) {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const fetchUrl = `${apiUrl}/ads/store/${storeSlug}`;
+        const response = await fetch(fetchUrl);
+        if (response.ok) {
+          const result = await response.json();
+          setStoreAds(result.data || []);
+        }
+      }
+    } catch (error) {
+      void 0;
+    }
+  };
+
   // تلقائي للسلايدر
   useEffect(() => {
     if (sliderImages.length > 1) {
@@ -376,6 +397,15 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
       return () => clearInterval(interval);
     }
   }, [sliderImages.length]);
+
+  useEffect(() => {
+    const betweenProductAds = storeAds.filter(ad => ad.placement === 'between_products').slice(0, 3);
+    if (isAdHovering || betweenProductAds.length <= 1) return;
+    const interval = setInterval(() => {
+      setAdCarouselSlide((prev) => (prev + 1) % betweenProductAds.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isAdHovering, storeAds]);
 
   if (!store) {
     return (
@@ -491,7 +521,16 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
       </div>
 
       {/* السلايدر الموحد - يستخدم الإعدادات المركزية */}
-      {storeConfig ? (
+      {storeSlug === 'sheirine' && storeConfig ? (
+        <SheirineSlider 
+          products={storeProducts}
+          storeSlug={storeSlug}
+          onProductClick={onProductClick}
+          onAddToCart={(product) => onAddToCart(product, '', '', 1)}
+          onToggleFavorite={onToggleFavorite}
+          favorites={favorites}
+        />
+      ) : storeConfig ? (
         <UnifiedStoreSlider storeSlug={store.slug} />
       ) : sliderImages.length > 0 ? (
         /* السلايدر العادي للمتاجر الديناميكية بدون إعدادات مركزية */
@@ -640,6 +679,8 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
         ) : null
       }
 
+
+
       {/* قسم المنتجات */}
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
@@ -663,17 +704,120 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {displayProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                isFavorite={favorites.includes(product.id)}
-                onProductClick={() => onProductClick(product.id)}
-                onAddToCart={() => handleAddToCart(product)}
-                onToggleFavorite={() => onToggleFavorite(product.id)}
-                onNotifyWhenAvailable={() => handleNotifyWhenAvailable(product)}
-                storeSlug={store?.slug}
-              />
+            {displayProducts.map((product, index) => (
+              <React.Fragment key={`product-${product.id}`}>
+                {(index === 3) && storeAds.filter(ad => ad.placement === 'between_products').length > 0 && (
+                  <div 
+                    className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4"
+                    onMouseEnter={() => setIsAdHovering(true)}
+                    onMouseLeave={() => setIsAdHovering(false)}
+                  >
+                    {(() => {
+                      const betweenProductAds = storeAds.filter(ad => ad.placement === 'between_products').slice(0, 3);
+                      const currentAd = betweenProductAds[adCarouselSlide];
+                      
+                      const getTemplateImage = (templateId: string) => {
+                        const templates: Record<string, string> = {
+                          'adv1': '/AdsForms/adv1.jpg',
+                          'adv2': '/AdsForms/adv2.jpg',
+                          'adv3': '/AdsForms/adv3.jpg',
+                          'adv4': '/AdsForms/adv4.jpg',
+                          'adv5': '/AdsForms/adv5.jpg',
+                          'adv6': '/AdsForms/adv6.jpg',
+                          'adv7': '/AdsForms/adv7.jpg',
+                          'adv8': '/AdsForms/adv8.jpg',
+                          'adv9': '/AdsForms/adv9.jpg',
+                          'adv10': '/AdsForms/adv10.jpg',
+                          'adv11': '/AdsForms/adv11.jpg',
+                        };
+                        return templates[templateId] || '/AdsForms/adv1.jpg';
+                      };
+
+                      return (
+                        <Card className="relative overflow-hidden rounded-2xl border-none shadow-2xl group w-full" style={{ aspectRatio: '1920 / 450', minHeight: '250px' }}>
+                          <div className="relative w-full h-full">
+                            {betweenProductAds.map((ad, adIndex) => (
+                              <div
+                                key={ad.id}
+                                className={`absolute inset-0 transition-all duration-1000 bg-gray-900 flex items-center justify-center ${
+                                  adIndex === adCarouselSlide 
+                                    ? 'opacity-100 scale-100 z-10' 
+                                    : 'opacity-0 scale-95 z-0'
+                                }`}
+                              >
+                                <img
+                                  src={getTemplateImage(ad.templateId)}
+                                  alt={ad.title}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                                
+                                <div className="absolute inset-0 flex items-center justify-center p-4 text-white">
+                                  <div className="text-center">
+                                    <h3 className="text-lg md:text-xl font-bold drop-shadow-lg mb-1">{ad.title}</h3>
+                                    <p className="text-sm md:text-base text-white/90 drop-shadow-lg line-clamp-2">{ad.description}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {betweenProductAds.length > 1 && (
+                            <>
+                              <button
+                                onClick={() => setAdCarouselSlide((prev) => (prev - 1 + betweenProductAds.length) % betweenProductAds.length)}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 z-20"
+                                title="السابق"
+                                aria-label="السابق"
+                              >
+                                <ArrowLeft className="h-6 w-6 text-gray-800" />
+                              </button>
+                              <button
+                                onClick={() => setAdCarouselSlide((prev) => (prev + 1) % betweenProductAds.length)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 z-20"
+                                title="التالي"
+                                aria-label="التالي"
+                              >
+                                <ArrowRight className="h-6 w-6 text-gray-800" />
+                              </button>
+                            </>
+                          )}
+
+                          {betweenProductAds.length > 1 && (
+                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                              {betweenProductAds.map((_, adIndex) => (
+                                <button
+                                  key={adIndex}
+                                  onClick={() => setAdCarouselSlide(adIndex)}
+                                  className={`transition-all duration-300 rounded-full ${
+                                    adCarouselSlide === adIndex
+                                      ? 'w-10 h-3 bg-white shadow-lg'
+                                      : 'w-3 h-3 bg-white/50 hover:bg-white/80'
+                                  }`}
+                                  aria-label={`الإعلان ${adIndex + 1}`}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </Card>
+                      );
+                    })()}
+                  </div>
+                )}
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isFavorite={favorites.includes(product.id)}
+                  onProductClick={() => onProductClick(product.id)}
+                  onAddToCart={() => handleAddToCart(product)}
+                  onToggleFavorite={() => onToggleFavorite(product.id)}
+                  onNotifyWhenAvailable={() => handleNotifyWhenAvailable(product)}
+                  storeSlug={store?.slug}
+                />
+              </React.Fragment>
             ))}
           </div>
         )}

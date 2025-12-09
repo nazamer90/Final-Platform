@@ -26,24 +26,35 @@ function copyDirSync(src: string, dest: string) {
 const syncAssetsPlugin: Plugin = {
   name: "sync-assets",
   apply: "serve",
-  async config() {
-    const backendAssets = path.resolve(__dirname, "./backend/public/assets");
-    const publicAssets = path.resolve(__dirname, "./public/assets");
-    
-    if (fs.existsSync(backendAssets)) {
-      try {
-        copyDirSync(backendAssets, publicAssets);
-      } catch (error) {
-        // Asset sync failed
-      }
-    } else {
-      // Backend assets not found
-    }
-  },
-  transformIndexHtml(html) {
-    return html;
+  configResolved() {
+    syncAssetsOnStartup();
   }
 };
+
+function syncAssetsOnStartup() {
+  const backendAssets = path.resolve(__dirname, "./backend/public/assets");
+  const publicAssets = path.resolve(__dirname, "./public/assets");
+  
+  if (fs.existsSync(backendAssets)) {
+    try {
+      copyDirSync(backendAssets, publicAssets);
+    } catch (error) {
+      console.warn("Asset sync failed");
+    }
+  }
+
+  const adsFormsSource = path.resolve(__dirname, "./AdsForms");
+  const adsFormsDest = path.resolve(__dirname, "./public/AdsForms");
+  
+  if (fs.existsSync(adsFormsSource)) {
+    try {
+      copyDirSync(adsFormsSource, adsFormsDest);
+      console.log("✓ AdsForms synced to public directory");
+    } catch (error) {
+      console.warn("AdsForms sync failed");
+    }
+  }
+}
 
 export default defineConfig({
   plugins: [syncAssetsPlugin, react(), tailwindcss()],

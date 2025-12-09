@@ -45,9 +45,9 @@ const StoreFrontSlider: React.FC<StoreFrontSliderProps> = ({
   }, [storeSlug]);
 
   const loadSliders = async () => {
-    if (storeId) {
+    if (storeSlug) {
       try {
-        const response = await fetch(`/api/sliders/store/${storeId}`);
+        const response = await fetch(`/api/sliders/store/${storeSlug}`);
         if (response.ok) {
           const result = await response.json();
           const mapped = result.data.map((slider: any) => ({

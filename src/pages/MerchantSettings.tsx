@@ -656,18 +656,18 @@ const MerchantSettings: React.FC = () => {
   );
 
   const adTemplates = [
-    { id: 1, name: 'قالب 1', image: '/Backup-platform/adv1.jpg' },
-    { id: 2, name: 'قالب 2', image: '/Backup-platform/adv2.jpg' },
-    { id: 3, name: 'قالب 3', image: '/Backup-platform/adv3.jpg' },
-    { id: 4, name: 'قالب 4', image: '/Backup-platform/adv4.jpg' },
-    { id: 5, name: 'قالب 5', image: '/Backup-platform/adv5.jpg' },
-    { id: 6, name: 'قالب 6', image: '/Backup-platform/adv6.jpg' },
-    { id: 7, name: 'قالب 7', image: '/Backup-platform/adv7.jpg' },
-    { id: 8, name: 'قالب 8', image: '/Backup-platform/adv8.jpg' },
-    { id: 9, name: 'قالب 9', image: '/Backup-platform/adv9.jpg' },
-    { id: 10, name: 'قالب 10', image: '/Backup-platform/adv10.jpg' },
-    { id: 11, name: 'قالب 11', image: '/Backup-platform/adv11.jpg' },
-    { id: 12, name: 'قالب 12', image: '/Backup-platform/adv12.jpg' }
+    { id: 1, name: 'قالب 1', image: '/AdsForms/adv1.jpg' },
+    { id: 2, name: 'قالب 2', image: '/AdsForms/adv2.jpg' },
+    { id: 3, name: 'قالب 3', image: '/AdsForms/adv3.jpg' },
+    { id: 4, name: 'قالب 4', image: '/AdsForms/adv4.jpg' },
+    { id: 5, name: 'قالب 5', image: '/AdsForms/adv5.jpg' },
+    { id: 6, name: 'قالب 6', image: '/AdsForms/adv6.jpg' },
+    { id: 7, name: 'قالب 7', image: '/AdsForms/adv7.jpg' },
+    { id: 8, name: 'قالب 8', image: '/AdsForms/adv8.jpg' },
+    { id: 9, name: 'قالب 9', image: '/AdsForms/adv9.jpg' },
+    { id: 10, name: 'قالب 10', image: '/AdsForms/adv10.jpg' },
+    { id: 11, name: 'قالب 11', image: '/AdsForms/adv11.jpg' },
+    { id: 12, name: 'قالب 12', image: '/AdsForms/adv12.jpg' }
   ];
 
   const [adStep, setAdStep] = useState<'list' | 'create-step1' | 'create-step2'>('list');

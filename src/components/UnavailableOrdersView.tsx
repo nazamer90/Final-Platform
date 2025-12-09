@@ -36,6 +36,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from './ui/badge';
 import { Textarea } from './ui/textarea';
 import { StoreIntegrationHelper } from '@/utils/storeIntegrationHelper';
+import LazyImage from '@/components/LazyImage';
 
 interface UnavailableOrder {
   id: string | number;
@@ -75,12 +76,6 @@ const UnavailableOrdersView: React.FC<UnavailableOrdersViewProps> = ({ storeData
   const [unavailableOrders, setUnavailableOrders] = useState<UnavailableOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadUnavailableItems();
-    window.addEventListener('unavailableItemsUpdated', loadUnavailableItems);
-    return () => window.removeEventListener('unavailableItemsUpdated', loadUnavailableItems);
-  }, []);
-
   const loadUnavailableItems = () => {
     const items = StoreIntegrationHelper.getUnavailableItems();
     const storeId = storeData?.id;
@@ -109,6 +104,15 @@ const UnavailableOrdersView: React.FC<UnavailableOrdersViewProps> = ({ storeData
     setUnavailableOrders(orders);
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadUnavailableItems();
+  }, [storeData?.id]);
+
+  useEffect(() => {
+    window.addEventListener('unavailableItemsUpdated', loadUnavailableItems);
+    return () => window.removeEventListener('unavailableItemsUpdated', loadUnavailableItems);
+  }, []);
 
   const filteredOrders = unavailableOrders.filter(order => {
     const matchesSearch =
@@ -281,7 +285,7 @@ const UnavailableOrdersView: React.FC<UnavailableOrdersViewProps> = ({ storeData
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                             {order.productImage ? (
-                              <img src={order.productImage} alt={order.productName} className="w-full h-full object-cover" />
+                              <LazyImage src={order.productImage || ''} alt={order.productName} className="w-full h-full object-cover" />
                             ) : (
                               <Image className="h-6 w-6 text-gray-400" />
                             )}
@@ -383,19 +387,19 @@ const UnavailableOrdersView: React.FC<UnavailableOrdersViewProps> = ({ storeData
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-gray-600">المنتج</p>
-                      <p className="font-semibold">{selectedOrder.productName}</p>
+                      <p className="font-semibold">{selectedOrder?.productName || ''}</p>
                     </div>
                     <div>
                       <p className="text-gray-600">العميل</p>
-                      <p className="font-semibold">{selectedOrder.customerName}</p>
+                      <p className="font-semibold">{selectedOrder?.customerName || ''}</p>
                     </div>
                     <div>
                       <p className="text-gray-600">الكمية المطلوبة</p>
-                      <p className="font-semibold">{selectedOrder.requestedQuantity}</p>
+                      <p className="font-semibold">{selectedOrder?.requestedQuantity || ''}</p>
                     </div>
                     <div>
                       <p className="text-gray-600">البريد الإلكتروني</p>
-                      <p className="font-semibold text-blue-600">{selectedOrder.customerEmail}</p>
+                      <p className="font-semibold text-blue-600">{selectedOrder?.customerEmail || ''}</p>
                     </div>
                   </div>
                 </div>
@@ -464,9 +468,9 @@ const UnavailableOrdersView: React.FC<UnavailableOrdersViewProps> = ({ storeData
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm font-semibold mb-2">معاينة الرسالة:</p>
                   <div className="p-3 bg-white border rounded text-sm text-gray-700 whitespace-pre-wrap">
-                    {responseStatus === 'available' && `مرحباً ${selectedOrder.customerName}، المنتج "${selectedOrder.productName}" أصبح متوفراً الآن!`}
-                    {responseStatus === 'upcoming' && `مرحباً ${selectedOrder.customerName}، سيتم توفير "${selectedOrder.productName}" قريباً جداً.`}
-                    {responseStatus === 'cancelled' && `مرحباً ${selectedOrder.customerName}، للأسف المنتج "${selectedOrder.productName}" غير متوفر حالياً.`}
+                    {responseStatus === 'available' && `مرحباً ${selectedOrder?.customerName || ''}, المنتج "${selectedOrder?.productName || ''}" أصبح متوفراً الآن!`}
+                    {responseStatus === 'upcoming' && `مرحباً ${selectedOrder?.customerName || ''}, سيتم توفير "${selectedOrder?.productName || ''}" قريباً جداً.`}
+                    {responseStatus === 'cancelled' && `مرحباً ${selectedOrder?.customerName || ''}, للأسف المنتج "${selectedOrder?.productName || ''}" غير متوفر حالياً.`}
                     {responseMessage && `\n\nملاحظات: ${responseMessage}`}
                   </div>
                 </div>

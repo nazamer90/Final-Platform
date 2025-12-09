@@ -42,6 +42,7 @@ StoreSlider.init(
     storeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      field: 'store_id',
     },
     title: {
       type: DataTypes.STRING(255),
@@ -54,19 +55,30 @@ StoreSlider.init(
     buttonText: {
       type: DataTypes.STRING(128),
       allowNull: true,
+      field: 'button_text',
     },
     imagePath: {
       type: DataTypes.STRING(1024),
       allowNull: false,
+      field: 'image_path',
     },
     sortOrder: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
+      field: 'sort_order',
     },
     metadata: {
       type: DataTypes.JSON,
       allowNull: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'created_at',
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updated_at',
     },
   },
   {
