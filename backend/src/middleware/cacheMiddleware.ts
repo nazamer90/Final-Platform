@@ -33,7 +33,8 @@ export const cacheMiddleware = (config: CacheConfig = {}) => {
         logger.debug(`Cache hit for ${cacheKey}`);
         res.setHeader('X-Cache', 'HIT');
         res.setHeader('X-Cache-Key', cacheKey);
-        return res.json(cachedData);
+        res.json(cachedData);
+        return;
       }
 
       logger.debug(`Cache miss for ${cacheKey}`);

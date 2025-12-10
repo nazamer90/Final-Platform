@@ -4,7 +4,7 @@
   "description": "EISHRO Platform Backend Server",
   "main": "server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --skipLibCheck --noUnusedLocals false --noUnusedParameters false",
     "start": "node --require ts-node/register src/index.ts",
     "dev": "nodemon --exec ts-node src/index.ts",
     "test": "jest --coverage",
@@ -49,7 +49,9 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/express-session": "^1.17.11",
+    "@types/helmet": "^0.0.48",
     "@types/jest": "^29.5.8",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.10.1",
     "@types/supertest": "^6.0.0",

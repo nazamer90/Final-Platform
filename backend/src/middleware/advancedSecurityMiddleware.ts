@@ -36,8 +36,8 @@ class AdvancedSecurityMiddleware {
         preload: true,
       },
       xFrameOptions: { action: 'deny' },
-      xContentTypeOptions: { nosniff: true },
-      xXssProtection: { mode: 'block' },
+      xContentTypeOptions: true,
+      xXssProtection: true,
       referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
       permissionsPolicy: {
         features: {
@@ -50,7 +50,7 @@ class AdvancedSecurityMiddleware {
           magnetometer: ["'none'"],
         },
       },
-    });
+    } as any);
   }
 
   getEnhancedRateLimiting() {

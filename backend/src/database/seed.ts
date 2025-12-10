@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import User from '@models/User';
 import Store from '@models/Store';
+import { UserRole } from '@shared-types/index';
 
 const seedDatabase = async (): Promise<void> => {
   try {
@@ -21,7 +22,7 @@ const seedDatabase = async (): Promise<void> => {
         firstName: 'مدير',
         lastName: 'النظام',
         phone: '+21891000000',
-        role: 'admin',
+        role: UserRole.ADMIN,
         merchantVerified: true,
       }
     });
@@ -100,7 +101,7 @@ const seedDatabase = async (): Promise<void> => {
             firstName: merchant.firstName,
             lastName: merchant.lastName,
             phone: merchant.phone,
-            role: 'merchant',
+            role: UserRole.MERCHANT,
             storeName: merchant.storeName,
             storeSlug: merchant.storeSlug,
             storeCategory: merchant.storeCategory,
@@ -157,7 +158,7 @@ const seedDatabase = async (): Promise<void> => {
           firstName: customer.firstName,
           lastName: customer.lastName,
           phone: customer.phone,
-          role: 'customer',
+          role: UserRole.CUSTOMER,
           merchantVerified: false,
         }
       });

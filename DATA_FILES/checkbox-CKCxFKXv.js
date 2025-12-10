@@ -1,0 +1,1 @@
+import{r as e,j as x,H as p}from"./index-CcNjQh2v.js";const b=e.forwardRef(({className:s,checked:t,onCheckedChange:r,...o},a)=>x.jsx("input",{ref:a,type:"checkbox",className:p("h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500",s),checked:!!t,onChange:c=>r==null?void 0:r(c.target.checked),...o}));b.displayName="Checkbox";export{b as C};
