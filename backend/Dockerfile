@@ -23,7 +23,7 @@ COPY --from=builder /app/loader.js ./
 COPY --from=builder /app/healthcheck.js ./
 COPY --from=builder /app/start.js ./
 
-EXPOSE 8000
+EXPOSE 8000 8080
 
 ENV NODE_ENV=production
 ENV PORT=8000

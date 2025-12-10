@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
-process.env.PORT = process.env.PORT || '8000';
+if (!process.env.PORT) {
+  process.env.PORT = '8000';
+}
 process.env.LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 
 console.log('🔧 Environment Variables:');
