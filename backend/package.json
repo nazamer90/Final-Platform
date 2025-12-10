@@ -41,6 +41,7 @@
     "redis": "^4.6.11",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
+    "tsconfig-paths": "^4.2.0",
     "uuid": "^13.0.0",
     "winston": "^3.18.3",
     "xss": "^1.0.14"
@@ -62,7 +63,6 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
   },
   "engines": {
