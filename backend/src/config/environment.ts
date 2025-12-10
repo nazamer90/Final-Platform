@@ -1,10 +1,16 @@
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+const isProduction = process.env.NODE_ENV === 'production';
+
+if (!isProduction) {
+  const envPath = path.resolve(process.cwd(), '.env');
+  dotenv.config({ path: envPath });
+}
 
 export const config = {
   environment: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '5000', 10),
+  port: parseInt(process.env.PORT || '8000', 10),
   apiPrefix: process.env.API_PREFIX || '/api',
 
   database: {

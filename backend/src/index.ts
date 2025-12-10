@@ -71,12 +71,11 @@ const initializeDatabase = async (): Promise<void> => {
 
 const startServer = (): void => {
   try {
-    logger.info('🚀 Starting EISHRO Backend Server...');
-    logger.info(`📡 Environment: ${config.environment}`);
-    logger.info(`🔌 Port: ${PORT}`);
-
-    const server = app.listen(PORT, (): void => {
-      logger.info(`✅ Server is running on http://localhost:${PORT}`);
+    const server = app.listen(PORT, '0.0.0.0', (): void => {
+      logger.info('🚀 Starting EISHRO Backend Server...');
+      logger.info(`📡 Environment: ${config.environment}`);
+      logger.info(`🔌 Port: ${PORT}`);
+      logger.info(`✅ Server is running on http://0.0.0.0:${PORT}`);
       logger.info(`🏥 Health check: http://localhost:${PORT}/health`);
       logger.info(`📚 API prefix: ${config.apiPrefix}`);
     });
