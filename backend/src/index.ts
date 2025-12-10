@@ -21,44 +21,50 @@ const startServer = async (): Promise<void> => {
     initializeModels();
 
     logger.info('🔗 Testing database connection...');
-    const connected = await testConnection();
-
-    if (!connected) {
-      throw new Error('Database connection failed');
+    let dbConnected = false;
+    try {
+      dbConnected = await testConnection();
+      if (!dbConnected) {
+        logger.warn('⚠️ Database connection failed, continuing without database');
+      }
+    } catch (dbError) {
+      logger.warn('⚠️ Database error:', dbError);
     }
 
-    logger.info('🔄 Running database migrations...');
-    try {
-      await runMigrations();
-    } catch (error) {
-      logger.warn('⚠️ Database migration error (tables may already exist):', error);
-    }
+    if (dbConnected) {
+      logger.info('🔄 Running database migrations...');
+      try {
+        await runMigrations();
+      } catch (error) {
+        logger.warn('⚠️ Database migration error (tables may already exist):', error);
+      }
 
-    logger.info('📊 Synchronizing database schema...');
-    await syncDatabase(false).catch((error) => {
-      logger.warn('⚠️ Database sync failed, continuing without sync:', error.message);
-    });
+      logger.info('📊 Synchronizing database schema...');
+      await syncDatabase(false).catch((error) => {
+        logger.warn('⚠️ Database sync failed, continuing without sync:', error.message);
+      });
 
-    logger.info('🌱 Seeding database with initial data...');
-    try {
-      await seedDatabase();
-    } catch (error) {
-      logger.warn('⚠️ Database seeding failed, continuing:', error);
-    }
+      logger.info('🌱 Seeding database with initial data...');
+      try {
+        await seedDatabase();
+      } catch (error) {
+        logger.warn('⚠️ Database seeding failed, continuing:', error);
+      }
 
-    logger.info('📦 Fixing slider paths and populating default sliders for existing stores...');
-    try {
-      await fixSliderPaths();
-      await populateSliders();
-    } catch (error) {
-      logger.warn('⚠️ Slider migration failed, continuing:', error);
-    }
+      logger.info('📦 Fixing slider paths and populating default sliders for existing stores...');
+      try {
+        await fixSliderPaths();
+        await populateSliders();
+      } catch (error) {
+        logger.warn('⚠️ Slider migration failed, continuing:', error);
+      }
 
-    logger.info('📦 Adding missing store_ads table columns...');
-    try {
-      await addStoreAdColumns();
-    } catch (error) {
-      logger.warn('⚠️ Store ads columns migration failed, continuing:', error);
+      logger.info('📦 Adding missing store_ads table columns...');
+      try {
+        await addStoreAdColumns();
+      } catch (error) {
+        logger.warn('⚠️ Store ads columns migration failed, continuing:', error);
+      }
     }
 
     const server = app.listen(PORT, (): void => {
