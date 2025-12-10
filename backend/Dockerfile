@@ -19,9 +19,9 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/loader.js ./loader.js
 
-EXPOSE 8080
+EXPOSE 8000
 
 ENV NODE_ENV=production
-ENV PORT=8080
+ENV PORT=8000
 
 CMD ["node", "-r", "./loader.js", "dist/index.js"]
