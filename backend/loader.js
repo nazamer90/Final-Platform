@@ -1,16 +1,22 @@
+const path = require('path');
+
 const moduleAlias = require('module-alias');
 
+const appRoot = __dirname;
+const distPath = path.join(appRoot, 'dist');
+
 moduleAlias.addAliases({
-  '@config': __dirname + '/dist/config',
-  '@models': __dirname + '/dist/models',
-  '@controllers': __dirname + '/dist/controllers',
-  '@services': __dirname + '/dist/services',
-  '@middleware': __dirname + '/dist/middleware',
-  '@routes': __dirname + '/dist/routes',
-  '@validators': __dirname + '/dist/validators',
-  '@utils': __dirname + '/dist/utils',
-  '@migrations': __dirname + '/dist/migrations',
-  '@database': __dirname + '/dist/database',
-  '@security': __dirname + '/dist/security',
-  '@shared-types': __dirname + '/dist/types',
+  '@config': path.join(distPath, 'config'),
+  '@models': path.join(distPath, 'models'),
+  '@controllers': path.join(distPath, 'controllers'),
+  '@services': path.join(distPath, 'services'),
+  '@middleware': path.join(distPath, 'middleware'),
+  '@routes': path.join(distPath, 'routes'),
+  '@validators': path.join(distPath, 'validators'),
+  '@utils': path.join(distPath, 'utils'),
+  '@migrations': path.join(distPath, 'migrations'),
+  '@database': path.join(distPath, 'database'),
+  '@security': path.join(distPath, 'security'),
+  '@shared-types': path.join(distPath, 'types'),
+  '@': distPath,
 });

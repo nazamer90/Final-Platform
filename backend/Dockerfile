@@ -17,11 +17,11 @@ RUN npm ci --only=production
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/loader.js ./
 
 EXPOSE 8000
 
 ENV NODE_ENV=production
 ENV PORT=8000
-ENV NODE_OPTIONS="-r tsconfig-paths/register"
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "-r", "./loader.js", "dist/index.js"]
