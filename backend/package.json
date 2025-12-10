@@ -4,6 +4,7 @@
   "description": "EISHRO Platform Backend Server",
   "main": "server.js",
   "scripts": {
+    "build": "tsc",
     "start": "node --require ts-node/register src/index.ts",
     "dev": "nodemon --exec ts-node src/index.ts",
     "test": "jest --coverage",
