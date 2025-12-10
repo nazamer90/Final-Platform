@@ -11,12 +11,8 @@ import seedDatabase from '@database/seed';
 
 const PORT = config.port;
 
-const startServer = async (): Promise<void> => {
+const initializeDatabase = async (): Promise<void> => {
   try {
-    logger.info('🚀 Starting EISHRO Backend Server...');
-    logger.info(`📡 Environment: ${config.environment}`);
-    logger.info(`🔌 Port: ${PORT}`);
-
     logger.info('🔄 Initializing database models...');
     initializeModels();
 
@@ -26,9 +22,11 @@ const startServer = async (): Promise<void> => {
       dbConnected = await testConnection();
       if (!dbConnected) {
         logger.warn('⚠️ Database connection failed, continuing without database');
+        return;
       }
     } catch (dbError) {
       logger.warn('⚠️ Database error:', dbError);
+      return;
     }
 
     if (dbConnected) {
@@ -66,6 +64,16 @@ const startServer = async (): Promise<void> => {
         logger.warn('⚠️ Store ads columns migration failed, continuing:', error);
       }
     }
+  } catch (error) {
+    logger.error('❌ Database initialization error:', error);
+  }
+};
+
+const startServer = (): void => {
+  try {
+    logger.info('🚀 Starting EISHRO Backend Server...');
+    logger.info(`📡 Environment: ${config.environment}`);
+    logger.info(`🔌 Port: ${PORT}`);
 
     const server = app.listen(PORT, (): void => {
       logger.info(`✅ Server is running on http://localhost:${PORT}`);
@@ -94,6 +102,8 @@ const startServer = async (): Promise<void> => {
         process.exit(0);
       });
     });
+
+    initializeDatabase();
   } catch (error) {
     logger.error('❌ Failed to start server:', error);
     process.exit(1);
