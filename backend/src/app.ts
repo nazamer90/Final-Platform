@@ -50,6 +50,10 @@ const corsOptions = {
       config.frontend.development,
       'http://localhost:5173',
       'http://localhost:5174',
+      'https://ishro.ly',
+      'https://www.ishro.ly',
+      'http://ishro.ly',
+      'http://www.ishro.ly',
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {

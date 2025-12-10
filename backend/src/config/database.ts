@@ -8,11 +8,34 @@ if (!isProduction) {
   dotenv.config();
 }
 
-const DB_DIALECT = (process.env.DB_DIALECT || 'mysql') as 'mysql' | 'sqlite';
+const DB_DIALECT = (process.env.DB_DIALECT || 'sqlite') as 'postgres' | 'mysql' | 'sqlite';
 
 let sequelize: Sequelize;
 
-if (DB_DIALECT === 'mysql') {
+if (DB_DIALECT === 'postgres') {
+  sequelize = new Sequelize(
+    process.env.DB_NAME || 'postgres',
+    process.env.DB_USER || 'postgres',
+    process.env.DB_PASSWORD || '',
+    {
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      dialect: 'postgres',
+      logging: process.env.DB_LOGGING === 'true' ? console.log : false,
+      define: {
+        timestamps: true,
+        underscored: false,
+      },
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+      },
+      ssl: isProduction ? { rejectUnauthorized: false } : false,
+    }
+  );
+} else if (DB_DIALECT === 'mysql') {
   sequelize = new Sequelize(
     process.env.DB_NAME || 'eishro_db',
     process.env.DB_USER || 'root',
