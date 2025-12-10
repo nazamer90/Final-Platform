@@ -1,359 +1,167 @@
-# 🚀 دليل نشر Backend على Koyeb - خطوة بخطوة
+# 🚀 دليل نشر EISHRO على Koyeb
 
-**التاريخ:** ديسمبر 10، 2025  
-**الحالة:** جاهز 100%  
-**الوقت المتوقع:** 30 دقيقة فقط
+## ✅ الملفات المضافة والمعدلة
 
----
+### الملفات الجديدة:
+1. **`backend/start.js`** - Wrapper script لتهيئة environment variables
+2. **`backend/healthcheck.js`** - Health check endpoint checker
+3. **`DEPLOYMENT_REPORT_PHASE_1.md`** - تقرير المرحلة الأولى
+4. **`KOYEB_DEPLOYMENT_GUIDE.md`** - هذا الملف
 
-## 📋 المحتويات
-
-1. [ما هو Koyeb؟](#ما-هو-koyeb)
-2. [المتطلبات](#المتطلبات)
-3. [الخطوة 1: إنشاء حساب](#الخطوة-1-إنشاء-حساب-koyeb)
-4. [الخطوة 2: ربط GitHub](#الخطوة-2-ربط-github)
-5. [الخطوة 3: إنشاء Service](#الخطوة-3-إنشاء-service)
-6. [الخطوة 4: إضافة متغيرات البيئة](#الخطوة-4-إضافة-متغيرات-البيئة)
-7. [الخطوة 5: النشر والاختبار](#الخطوة-5-النشر-والاختبار)
-8. [استكشاف الأخطاء](#استكشاف-الأخطاء)
-
----
-
-## ما هو Koyeb؟
-
-**Koyeb** هي منصة نشر مجانية وسهلة لتطبيقات Node.js والـ Docker:
-
-| الميزة | الوصف |
-|--------|--------|
-| 💰 **التكلفة** | مجاني دائم |
-| ⚡ **الأداء** | سريع جداً |
-| 🔄 **التحديث** | auto-deploy من GitHub |
-| 📊 **الموثوقية** | uptime 99.9% |
-| 🌍 **المناطق** | أوروبا، آسيا، أمريكا |
+### الملفات المعدلة:
+1. **`backend/src/config/database.ts`** ✅ **الأهم** - تم تصحيحها لاستخدام MySQL بدلاً من SQLite
+2. **`backend/src/config/environment.ts`** - منع تحميل .env في production
+3. **`backend/src/index.ts`** - الاستماع على 0.0.0.0
+4. **`backend/loader.js`** - Module aliases resolver
+5. **`backend/Dockerfile`** - Multi-stage build مع health check ديناميكي
+6. **`backend/package.json`** - تحديث start script
 
 ---
 
-## المتطلبات
+## 🔑 متغيرات البيئة المطلوبة على Koyeb
 
-قبل البدء تأكد من:
-
-- ✅ حساب بريد إلكتروني
-- ✅ حساب **GitHub** مع المشروع
-- ✅ بيانات CPanel MySQL جاهزة:
-  - Host
-  - Database Name
-  - Username
-  - Password
-- ✅ VS Code أو أي محرر
-
-**ملاحظة:** لا تحتاج بطاقة ائتمان! Koyeb مجاني تماماً
-
----
-
-## الخطوة 1: إنشاء حساب Koyeb
-
-### 1.1 افتح موقع Koyeb
-
-اذهب إلى: **https://www.koyeb.com**
-
-### 1.2 اضغط "Sign Up" أو "Get Started"
-
-### 1.3 اختر طريقة التسجيل
-
-**الأسهل:** اختر **"Sign up with GitHub"**
-
-```
-1. اضغط "Continue with GitHub"
-2. سجل دخول حساب GitHub الخاص بك
-3. اسمح لـ Koyeb بالوصول
-4. ✅ تم التسجيل!
+### قاعدة البيانات (MySQL على CPanel):
+```env
+DB_DIALECT=mysql
+DB_HOST=your-cpanel-domain.com           # مثال: mysql.yourdomain.com
+DB_PORT=3306
+DB_NAME=your_database_name
+DB_USER=your_db_username
+DB_PASSWORD=your_db_password
+DB_LOGGING=false
 ```
 
-### 1.4 تحقق من البريد الإلكتروني (إذا لزم)
-
-قد يطلب تأكيد البريد - افتحه وأكد.
-
----
-
-## الخطوة 2: ربط GitHub
-
-### 2.1 في لوحة Koyeb Dashboard
-
-بعد التسجيل ستجد:
-
-```
-Dashboard → Services → Create a Service
+### الخادم:
+```env
+NODE_ENV=production
+PORT=8080                               # Koyeb يفرض هذا أحياناً
+LOG_LEVEL=info
 ```
 
-### 2.2 اختر "Git Repository"
-
-```
-Deploy from Git → Select Git provider → GitHub
-```
-
-### 2.3 اختر مستودعك
-
-```
-Repository: Eishro-Platform_V7
-Branch: main (أو أي branch تستخدمه)
+### JWT (Security):
+```env
+JWT_SECRET=your_super_secret_jwt_key_change_this
+JWT_REFRESH_SECRET=your_refresh_token_secret
 ```
 
-### 2.4 اختر المجلد (Root Directory)
-
-```
-Root Directory: ./backend
-```
-
-**مهم جداً:** تأكد من اختيار `./backend` لأن كود Backend موجود فيه!
-
----
-
-## الخطوة 3: إنشاء Service
-
-### 3.1 نوع الخدمة (Service Type)
-
-```
-Build and Deploy from source code
-```
-
-اختر هذا الخيار (سيختار Dockerfile تلقائياً)
-
-### 3.2 Builder
-
-```
-Builder: Dockerfile
-```
-
-Koyeb سيجد `Dockerfile` في مجلد `backend` تلقائياً
-
-### 3.3 معلومات الـ Service
-
-```
-Service name: eishro-backend (أو أي اسم)
-Instance type: Free (مجاني)
-```
-
-### 3.4 اختر Region (المنطقة)
-
-```
-Region: Germany (eu-fra) ← الأقرب لليبيا
-```
-
-أو اختر أقرب منطقة لك.
-
-### 3.5 اضغط "Create and Deploy"
-
-Koyeb سيبدأ النشر الآن! (قد يستغرق 3-5 دقائق)
-
----
-
-## الخطوة 4: إضافة متغيرات البيئة
-
-### 4.1 أثناء النشر أو بعده
-
-في Dashboard:
-```
-Services → eishro-backend → Settings → Environment Variables
-```
-
-### 4.2 أضف المتغيرات واحداً تلو الآخر:
-
-#### أ) بيانات قاعدة البيانات MySQL (من CPanel):
-
-```
-DB_HOST = mysql.your-domain.com
-DB_PORT = 3306
-DB_NAME = eishro_production
-DB_USER = eishro_user
-DB_PASSWORD = your-strong-password
-```
-
-**استبدل القيم بالبيانات الحقيقية من CPanel!**
-
-#### ب) متغيرات الأمان:
-
-```
-NODE_ENV = production
-PORT = 8080
-```
-
-#### ج) JWT و Security:
-
-```
-JWT_SECRET = very-long-random-string-min-32-characters-2025
-JWT_EXPIRE = 7d
-SESSION_SECRET = another-random-string-min-32-characters-2025
-ENCRYPTION_KEY = 64-hex-character-string-for-aes256-encryption
-```
-
-**نصيحة:** استخدم مولد مفاتيح عشوائية:
-
-في PowerShell:
-```powershell
--join ((48..57) + (65..90) + (97..122) | Get-Random -Count 32 | % {[char]$_})
-```
-
-#### د) URLs (مؤقت):
-
-```
-FRONTEND_URL = https://temporary.vercel.app
-BACKEND_URL = https://eishro-backend.koyeb.app
-CORS_ORIGIN = https://temporary.vercel.app
-```
-
-**ملاحظة:** سنحدث `FRONTEND_URL` بعد نشر Frontend على Vercel
-
-#### هـ) بوابة الدفع (Moamalat):
-
-```
-MOAMALAT_MID = 10081014649
-MOAMALAT_TID = 99179395
-MOAMALAT_SECRET = 3a488a89b3f7993476c252f017c488bb
-MOAMALAT_ENV = production
-```
-
-#### و) Google OAuth (اختياري):
-
-إذا كان لديك:
-```
-GOOGLE_CLIENT_ID = your-client-id
-GOOGLE_CLIENT_SECRET = your-client-secret
-```
-
-### 4.3 اضغط "Save"
-
-Koyeb سيعيد تشغيل التطبيق بالمتغيرات الجديدة.
-
----
-
-## الخطوة 5: النشر والاختبار
-
-### 5.1 تحقق من حالة النشر
-
-```
-Dashboard → Services → eishro-backend → Logs
-```
-
-يجب أن ترى:
-```
-✓ Build successful
-✓ Deployment successful
-✓ Server is running
-```
-
-### 5.2 احصل على URL التطبيق
-
-في Dashboard ستجد URL مثل:
-```
-https://eishro-backend-xxxx.koyeb.app
-```
-
-احفظ هذا URL! ستحتاجه لاحقاً.
-
-### 5.3 اختبر Health Endpoint
-
-افتح في المتصفح:
-```
-https://eishro-backend-xxxx.koyeb.app/health
-```
-
-يجب أن ترى:
-```json
-{
-  "status": "ok",
-  "timestamp": "2025-12-10T...",
-  "environment": "production"
-}
-```
-
-✅ **إذا رأيت هذا، Backend يعمل بنجاح!**
-
-### 5.4 اختبر API endpoints
-
-```
-https://eishro-backend-xxxx.koyeb.app/api/products
-https://eishro-backend-xxxx.koyeb.app/api/users/profile
+### Frontend URLs:
+```env
+FRONTEND_URL=http://localhost:5174
+FRONTEND_PRODUCTION_URL=https://your-frontend-domain.vercel.app
 ```
 
 ---
 
-## استكشاف الأخطاء
+## 🔧 خطوات النشر على Koyeb
 
-### المشكلة: Build Failed
+### الخطوة 1: ربط GitHub
+1. اذهب إلى [Koyeb Console](https://app.koyeb.com)
+2. اختر **Create Service**
+3. اختر **GitHub** كـ Source
+4. ربط حسابك بـ GitHub: `https://github.com/bennouba/Final-Platform`
+5. اختر **Branch**: `main`
 
-**الحل:**
-1. اذهب إلى: `Services → Logs`
-2. ابحث عن الخطأ
-3. تأكد من:
-   - `Dockerfile` صحيح
-   - `package.json` موجود
-   - جميع المتطلبات مثبتة
+### الخطوة 2: تكوين البناء والنشر
+- **Builder**: Dockerfile
+- **Dockerfile Path**: `backend/Dockerfile`
+- **Environment**: `production`
 
-### المشكلة: Database Connection Error
+### الخطوة 3: إضافة متغيرات البيئة
+1. اذهب إلى **Environment**
+2. أضف جميع المتغيرات أعلاه
+3. **خاص بـ CPanel MySQL:**
+   - `DB_HOST`: Host من CPanel (في الغالب `localhost` أو domain)
+   - `DB_USER`: User من CPanel
+   - `DB_PASSWORD`: Password من CPanel
+   - `DB_NAME`: Database name من CPanel
 
-**الحل:**
-1. تحقق من بيانات MySQL:
-   ```
-   DB_HOST صحيح؟
-   DB_PORT = 3306؟
-   Username و Password صحيحين؟
-   ```
+### الخطوة 4: النشر
+1. اختر **Deploy Now**
+2. انتظر انتهاء البناء والاختبار
+3. تحقق من الـ logs
 
-2. في CPanel:
-   - اذهب إلى **Remote MySQL**
-   - أضف `%` للسماح بجميع IPs
-   - أو أضف IP الخادم
+---
 
-### المشكلة: "Deployment Timeout"
+## 📊 كيفية مسح Logs من Koyeb
 
-**الحل:**
-- انتظر 5-10 دقائق
-- إذا استمرت المشكلة، اضغط "Redeploy"
-
-### المشكلة: Port Already in Use
-
-**تأكد في `Dockerfile`:**
-```dockerfile
-EXPOSE 8080
+### الطريقة 1: عبر لوحة التحكم (الأسهل)
+```
+1. اذهب إلى Koyeb Console
+2. اختر Service اسمه "eishro"
+3. اضغط على "Logs"
+4. اختر "All instances" من الفلاتر
+5. اضغط على زر التحديث (🔄) لمسح الـ logs
 ```
 
-و في المتغيرات:
+### الطريقة 2: مسح كل الـ logs تلقائياً
 ```
-PORT=8080
+في Koyeb لا توجد طريقة مباشرة لحذف logs، لكن:
+- Logs تُحذف تلقائياً بعد 7 أيام
+- عند إعادة نشر (redeploy) → logs جديدة فقط
+```
+
+### الطريقة 3: بدء نشر جديد يمسح السجل
+```bash
+# اضغط Deploy Now من جديد
+# سيبدأ instance جديد ويُلغي القديم
 ```
 
 ---
 
-## 🎯 الخلاصة
+## 🩺 كيفية تشخيص الأخطاء
 
-بعد إتمام هذه الخطوات:
+### 1. فحص الـ Health Check
+```
+إذا رأيت: "TCP health check failed"
+→ تحقق من أن SERVER تستمع على PORT الصحيح
+→ Koyeb قد يفرض PORT=8080 أو 8000
+```
 
-✅ Backend منشور على Koyeb  
-✅ HTTPS مفعّل تلقائياً  
-✅ auto-deploy من GitHub  
-✅ Database متصل من CPanel  
-✅ Server يعمل 24/7  
+### 2. فحص اتصال Database
+```
+إذا رأيت: "Database connection failed"
+→ تحقق من DB_HOST, DB_USER, DB_PASSWORD
+→ تأكد من أن CPanel MySQL يقبل اتصالات خارجية
+→ جرّب في الـ local أولاً
+```
+
+### 3. فحص Module Aliases
+```
+إذا رأيت: "Cannot find module '@config/database'"
+→ تحقق من وجود loader.js
+→ تحقق من package.json scripts
+```
 
 ---
 
-## 📞 الدعم
+## 📝 ملخص التغييرات الرئيسية
 
-- **Koyeb Docs:** https://docs.koyeb.com
-- **Community:** https://community.koyeb.com
-- **Discord:** https://discord.gg/koyeb
+| الملف | التغيير | السبب |
+|------|--------|------|
+| `database.ts` | استخدام MySQL بدلاً من SQLite | يدعم CPanel MySQL |
+| `environment.ts` | عدم تحميل .env في production | تجنب تضارب متغيرات Koyeb |
+| `index.ts` | الاستماع على 0.0.0.0 | السماح بـ external connections |
+| `Dockerfile` | إضافة DB env vars | تعريف القيم الافتراضية |
+| `start.js` | wrapper script جديد | تهيئة صحيحة للـ environment |
+| `healthcheck.js` | استخدام PORT من env | دعم dynamic ports |
 
 ---
 
-## التالي: نشر Frontend على Vercel
+## 🔗 الروابط المهمة
 
-بعد نشر Backend بنجاح:
+- **Repository**: https://github.com/bennouba/Final-Platform
+- **Koyeb Console**: https://app.koyeb.com
+- **CPanel Database**: تم إضافته من خادمك
 
-1. اذهب إلى Vercel
-2. استيراد Frontend (مجلد الـ root)
-3. إضافة متغيرات البيئة:
-   ```
-   VITE_API_URL = https://eishro-backend-xxxx.koyeb.app/api
-   VITE_BACKEND_URL = https://eishro-backend-xxxx.koyeb.app
-   ```
+---
 
-**الفائدة:** كلاهما مجاني + auto-deploy من GitHub = حل مثالي! 🎉
+## ✨ الحالة النهائية
+
+✅ Backend جاهز للنشر على Koyeb مع MySQL من CPanel
+✅ جميع متغيرات البيئة قابلة للتخصيص
+✅ Health check ديناميكي يدعم جميع الـ ports
+✅ Database connection مع تعامل آمن مع الأخطاء
+
+---
+
+**آخر تحديث:** 10 ديسمبر 2025

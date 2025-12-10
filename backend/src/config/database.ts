@@ -3,17 +3,48 @@ import dotenv from 'dotenv';
 import path from 'path';
 import logger from '@utils/logger';
 
-dotenv.config();
+const isProduction = process.env.NODE_ENV === 'production';
+if (!isProduction) {
+  dotenv.config();
+}
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(process.cwd(), 'database.sqlite'),
-  logging: process.env.DB_LOGGING === 'true' ? console.log : false,
-  define: {
-    timestamps: true,
-    underscored: false,
-  },
-});
+const DB_DIALECT = (process.env.DB_DIALECT || 'mysql') as 'mysql' | 'sqlite';
+
+let sequelize: Sequelize;
+
+if (DB_DIALECT === 'mysql') {
+  sequelize = new Sequelize(
+    process.env.DB_NAME || 'eishro_db',
+    process.env.DB_USER || 'root',
+    process.env.DB_PASSWORD || '',
+    {
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '3306', 10),
+      dialect: 'mysql',
+      logging: process.env.DB_LOGGING === 'true' ? console.log : false,
+      define: {
+        timestamps: true,
+        underscored: false,
+      },
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+      },
+    }
+  );
+} else {
+  sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: path.join(process.cwd(), 'database.sqlite'),
+    logging: process.env.DB_LOGGING === 'true' ? console.log : false,
+    define: {
+      timestamps: true,
+      underscored: false,
+    },
+  });
+}
 
 export const testConnection = async (): Promise<boolean> => {
   try {
