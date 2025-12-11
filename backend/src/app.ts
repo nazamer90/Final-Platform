@@ -54,6 +54,7 @@ const corsOptions = {
       'https://www.ishro.ly',
       'http://ishro.ly',
       'http://www.ishro.ly',
+      'https://frontend-qf33q78b6-bennoubas-projects.vercel.app',
     ];
 
     if (!origin || allowedOrigins.includes(origin)) {
