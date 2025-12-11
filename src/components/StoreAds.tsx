@@ -12,13 +12,96 @@ interface Ad {
   createdAt: string;
   views: number;
   clicks: number;
-   storeId?: number;
+  storeId?: number;
+  textPosition?: 'top-left' | 'top-center' | 'top-right' | 'center-left' | 'center' | 'center-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+  textColor?: string;
+  textFont?: string;
+  mainTextSize?: 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+  subTextSize?: 'xs' | 'sm' | 'base';
 }
 
 interface StoreAdsProps {
   storeId?: string | number;
   className?: string;
 }
+
+const getTextPositionClass = (position?: string): string => {
+  switch (position) {
+    case 'top-left':
+      return 'top-0 left-0';
+    case 'top-center':
+      return 'top-0 left-1/2 -translate-x-1/2';
+    case 'top-right':
+      return 'top-0 right-0';
+    case 'center-left':
+      return 'top-1/2 -translate-y-1/2 left-0';
+    case 'center':
+      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+    case 'center-right':
+      return 'top-1/2 -translate-y-1/2 right-0';
+    case 'bottom-left':
+      return 'bottom-0 left-0';
+    case 'bottom-center':
+      return 'bottom-0 left-1/2 -translate-x-1/2';
+    case 'bottom-right':
+      return 'bottom-0 right-0';
+    default:
+      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+  }
+};
+
+const getMainTextSizeClass = (size?: string): string => {
+  switch (size) {
+    case 'sm':
+      return 'text-sm';
+    case 'base':
+      return 'text-base';
+    case 'lg':
+      return 'text-lg';
+    case 'xl':
+      return 'text-xl';
+    case '2xl':
+      return 'text-2xl';
+    default:
+      return 'text-lg';
+  }
+};
+
+const getSubTextSizeClass = (size?: string): string => {
+  switch (size) {
+    case 'xs':
+      return 'text-xs';
+    case 'sm':
+      return 'text-sm';
+    case 'base':
+      return 'text-base';
+    default:
+      return 'text-base';
+  }
+};
+
+const getFontClass = (font?: string): string => {
+  switch (font) {
+    case 'Cairo-Light':
+      return 'font-light';
+    case 'Cairo-ExtraLight':
+      return 'font-extralight';
+    case 'Cairo-Regular':
+      return 'font-normal';
+    case 'Cairo-Medium':
+      return 'font-medium';
+    case 'Cairo-SemiBold':
+      return 'font-semibold';
+    case 'Cairo-Bold':
+      return 'font-bold';
+    case 'Cairo-ExtraBold':
+      return 'font-extrabold';
+    case 'Cairo-Black':
+      return 'font-black';
+    default:
+      return 'font-semibold';
+  }
+};
 
 const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
   const [ads, setAds] = useState<Ad[]>([]);
@@ -102,6 +185,12 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
         <div className="space-y-4">
           {bannerAds.map((ad, index) => {
             const adKey = ad.id || `banner-ad-${index}-${ad.title}`;
+            const textColor = ad.textColor || '#ffffff';
+            const positionClass = getTextPositionClass(ad.textPosition);
+            const mainSizeClass = getMainTextSizeClass(ad.mainTextSize);
+            const subSizeClass = getSubTextSizeClass(ad.subTextSize);
+            const fontClass = getFontClass(ad.textFont);
+            
             return (
             <div
               key={adKey}
@@ -125,10 +214,10 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
 
               {ad.imageUrl && (
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <div className="text-center text-white">
-                    <h3 className="font-bold text-lg md:text-xl mb-1">{ad.title}</h3>
+                  <div className={`absolute ${positionClass} text-center p-4`} style={{ color: textColor }}>
+                    <h3 className={`${fontClass} ${mainSizeClass} md:text-xl mb-1`}>{ad.title}</h3>
                     {ad.description && (
-                      <p className="text-sm md:text-base opacity-90 px-4 line-clamp-2">{ad.description}</p>
+                      <p className={`${fontClass} ${subSizeClass} md:text-base opacity-90 px-4 line-clamp-2`}>{ad.description}</p>
                     )}
                   </div>
                 </div>
@@ -143,6 +232,11 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
         <div className="space-y-4" data-placement="between-products">
           {betweenProductsAds.map((ad, index) => {
             const adKey = ad.id || `between-ad-${index}-${ad.title}`;
+            const textColor = ad.textColor || '#000000';
+            const mainSizeClass = getMainTextSizeClass(ad.mainTextSize);
+            const subSizeClass = getSubTextSizeClass(ad.subTextSize);
+            const fontClass = getFontClass(ad.textFont);
+            
             return (
             <div
               key={adKey}
@@ -159,10 +253,10 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
                     />
                   </div>
                 )}
-                <div className="flex-1 text-center md:text-right">
-                  <h4 className="font-semibold text-gray-900 text-sm md:text-base mb-1">{ad.title}</h4>
+                <div className="flex-1 text-center md:text-right" style={{ color: textColor }}>
+                  <h4 className={`${fontClass} ${mainSizeClass} md:text-base mb-1`}>{ad.title}</h4>
                   {ad.description && (
-                    <p className="text-gray-600 text-xs md:text-sm line-clamp-2">{ad.description}</p>
+                    <p className={`${fontClass} ${subSizeClass} md:text-sm line-clamp-2`} style={{ color: textColor, opacity: 0.8 }}>{ad.description}</p>
                   )}
                 </div>
                 <div className="flex-shrink-0">
