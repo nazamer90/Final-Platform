@@ -49,7 +49,7 @@ export const getStoreAds = async (req: Request, res: Response): Promise<void> =>
       order: [['createdAt', 'DESC']],
     });
 
-    const plainAds = ads.map(ad => ad.toJSON ? ad.toJSON() : ad.get ? ad.get() : ad);
+    const plainAds = ads.map(ad => ad.toJSON());
     res.json({ success: true, data: plainAds });
   } catch (error) {
     logger.error('Error fetching store ads:', error);
@@ -93,7 +93,7 @@ export const createStoreAd = async (req: Request, res: Response): Promise<void> 
       isActive: true,
     });
 
-    const plainAd = ad.toJSON ? ad.toJSON() : ad.get ? ad.get() : ad;
+    const plainAd = ad.toJSON();
     logger.info(`[createStoreAd] Ad created: ${plainAd.id}`);
     res.status(201).json({ success: true, data: plainAd });
   } catch (error) {
@@ -137,7 +137,7 @@ export const updateStoreAd = async (req: Request, res: Response): Promise<void> 
       ...(isActive !== undefined && { isActive }),
     });
 
-    const plainAd = ad.toJSON ? ad.toJSON() : ad.get ? ad.get() : ad;
+    const plainAd = ad.toJSON();
     logger.info(`[updateStoreAd] Ad updated: ${adId}`);
     res.json({ success: true, data: plainAd });
   } catch (error) {

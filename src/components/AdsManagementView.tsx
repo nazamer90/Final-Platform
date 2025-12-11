@@ -22,9 +22,9 @@ interface AdDraft {
   description: string;
   textPosition?: 'top-left' | 'top-center' | 'top-right' | 'center-left' | 'center' | 'center-right' | 'bottom-left' | 'bottom-center' | 'bottom-right' | undefined;
   textColor?: string | undefined;
-  textFont?: 'Cairo-Regular' | 'Cairo-Light' | 'Cairo-ExtraLight' | 'Cairo-Medium' | 'Cairo-SemiBold' | 'Cairo-Bold' | 'Cairo-ExtraBold' | 'Cairo-Black' | undefined;
-  mainTextSize?: 'sm' | 'base' | 'lg' | 'xl' | '2xl' | undefined;
-  subTextSize?: 'xs' | 'sm' | 'base' | undefined;
+  textFont: 'Cairo-Regular' | 'Cairo-Light' | 'Cairo-ExtraLight' | 'Cairo-Medium' | 'Cairo-SemiBold' | 'Cairo-Bold' | 'Cairo-ExtraBold' | 'Cairo-Black';
+  mainTextSize: 'sm' | 'base' | 'lg' | 'xl' | '2xl';
+  subTextSize: 'xs' | 'sm' | 'base';
 }
 
 interface AdWithPlacement extends PublishedAd {
@@ -77,6 +77,8 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
     templateId: '',
     title: '',
     description: '',
+    textPosition: 'center',
+    textColor: '#ffffff',
     textFont: 'Cairo-SemiBold',
     mainTextSize: 'lg',
     subTextSize: 'base',
@@ -135,6 +137,8 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
       templateId: '', 
       title: '', 
       description: '',
+      textPosition: 'center',
+      textColor: '#ffffff',
       textFont: 'Cairo-SemiBold',
       mainTextSize: 'lg',
       subTextSize: 'base',
@@ -193,16 +197,8 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
       if (response.ok) {
         const result = await response.json();
         const newAd: AdWithPlacement = {
-          id: result.data?.id || `ad-${Date.now()}`,
-          templateId: adDraft.templateId,
+          ...result.data,
           layout: 'between_products',
-          title: adDraft.title,
-          description: adDraft.description,
-          isActive: true,
-          placement: selectedDisplayMode,
-          createdAt: result.data?.createdAt || new Date().toISOString(),
-          views: 0,
-          clicks: 0,
         };
 
         const updatedAds = [...publishedAds, newAd];
@@ -221,12 +217,10 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
       } else {
         const errorData = await response.json().catch(() => ({}));
         const errorMsg = errorData.error || errorData.message || response.statusText || 'فشل النشر بدون تفاصيل';
-        console.error('Create ad error:', errorData);
         showNotification(`فشل النشر: ${errorMsg}`, 'error');
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-      console.error('Create ad exception:', error);
       showNotification(`حدث خطأ في النشر: ${errorMessage}`, 'error');
     }
   };
@@ -262,12 +256,10 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
       } else {
         const errorData = await response.json().catch(() => ({}));
         const errorMsg = errorData.error || errorData.message || response.statusText || 'فشل الحذف بدون تفاصيل';
-        console.error('Delete ad error:', errorData);
         showNotification(`فشل الحذف: ${errorMsg}`, 'error');
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-      console.error('Delete ad exception:', error);
       showNotification(`حدث خطأ أثناء الحذف: ${errorMessage}`, 'error');
     }
   };
@@ -418,7 +410,7 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
                   id="textPosition"
                   aria-label="موضع النص على القالب"
                   value={adDraft.textPosition || 'center'}
-                  onChange={(e) => setAdDraft({ ...adDraft, textPosition: e.target.value as AdDraft['textPosition'] })}
+                  onChange={(e) => setAdDraft({ ...adDraft, textPosition: e.target.value as 'top-left' | 'top-center' | 'top-right' | 'center-left' | 'center' | 'center-right' | 'bottom-left' | 'bottom-center' | 'bottom-right' | undefined })}
                   className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md text-sm"
                 >
                   <option value="top-left">أعلى اليسار</option>
@@ -707,6 +699,114 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
                       ✓ سيظهر كـ: <strong>{selectedMode.label}</strong>
                     </p>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>تنسيق النص</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">موضع النص</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: 'top-left', label: '↖ أعلى يسار' },
+                      { value: 'top-center', label: '⬆ أعلى وسط' },
+                      { value: 'top-right', label: '↗ أعلى يمين' },
+                      { value: 'center-left', label: '⬅ وسط يسار' },
+                      { value: 'center', label: '⭕ المركز' },
+                      { value: 'center-right', label: '➡ وسط يمين' },
+                      { value: 'bottom-left', label: '↙ أسفل يسار' },
+                      { value: 'bottom-center', label: '⬇ أسفل وسط' },
+                      { value: 'bottom-right', label: '↘ أسفل يمين' },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => setAdDraft({ ...adDraft, textPosition: option.value as any })}
+                        className={`p-2 text-xs border rounded transition ${
+                          adDraft.textPosition === option.value
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">لون النص</Label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={adDraft.textColor || '#ffffff'}
+                      onChange={(e) => setAdDraft({ ...adDraft, textColor: e.target.value })}
+                      className="h-10 w-16 rounded border border-gray-300 cursor-pointer"
+                      aria-label="اختر لون النص"
+                      title="اختر لون النص"
+                    />
+                    <input
+                      type="text"
+                      value={adDraft.textColor || '#ffffff'}
+                      onChange={(e) => setAdDraft({ ...adDraft, textColor: e.target.value })}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm"
+                      placeholder="#ffffff"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">وزن الخط</Label>
+                  <Select value={adDraft.textFont} onValueChange={(value) => setAdDraft({ ...adDraft, textFont: value as any })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Cairo-Light">خفيف</SelectItem>
+                      <SelectItem value="Cairo-ExtraLight">خفيف جداً</SelectItem>
+                      <SelectItem value="Cairo-Regular">عادي</SelectItem>
+                      <SelectItem value="Cairo-Medium">متوسط</SelectItem>
+                      <SelectItem value="Cairo-SemiBold">شبه غامق</SelectItem>
+                      <SelectItem value="Cairo-Bold">غامق</SelectItem>
+                      <SelectItem value="Cairo-ExtraBold">غامق جداً</SelectItem>
+                      <SelectItem value="Cairo-Black">أسود</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">حجم العنوان</Label>
+                    <Select value={adDraft.mainTextSize} onValueChange={(value) => setAdDraft({ ...adDraft, mainTextSize: value as any })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sm">صغير</SelectItem>
+                        <SelectItem value="base">عادي</SelectItem>
+                        <SelectItem value="lg">كبير</SelectItem>
+                        <SelectItem value="xl">كبير جداً</SelectItem>
+                        <SelectItem value="2xl">ضخم</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">حجم الوصف</Label>
+                    <Select value={adDraft.subTextSize} onValueChange={(value) => setAdDraft({ ...adDraft, subTextSize: value as any })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="xs">صغير جداً</SelectItem>
+                        <SelectItem value="sm">صغير</SelectItem>
+                        <SelectItem value="base">عادي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -28,25 +28,25 @@ interface StoreAdsProps {
 const getTextPositionClass = (position?: string): string => {
   switch (position) {
     case 'top-left':
-      return 'top-0 left-0';
+      return 'top-0 left-0 text-right pt-2 pr-4';
     case 'top-center':
-      return 'top-0 left-1/2 -translate-x-1/2';
+      return 'top-0 left-1/2 -translate-x-1/2 text-center pt-2 px-4';
     case 'top-right':
-      return 'top-0 right-0';
+      return 'top-0 right-0 text-left pt-2 pl-4';
     case 'center-left':
-      return 'top-1/2 -translate-y-1/2 left-0';
+      return 'top-1/2 -translate-y-1/2 left-0 text-right px-2 pr-4';
     case 'center':
-      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center px-4';
     case 'center-right':
-      return 'top-1/2 -translate-y-1/2 right-0';
+      return 'top-1/2 -translate-y-1/2 right-0 text-left px-2 pl-4';
     case 'bottom-left':
-      return 'bottom-0 left-0';
+      return 'bottom-0 left-0 text-right pb-2 pr-4';
     case 'bottom-center':
-      return 'bottom-0 left-1/2 -translate-x-1/2';
+      return 'bottom-0 left-1/2 -translate-x-1/2 text-center pb-2 px-4';
     case 'bottom-right':
-      return 'bottom-0 right-0';
+      return 'bottom-0 right-0 text-left pb-2 pl-4';
     default:
-      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
+      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center px-4';
   }
 };
 
@@ -213,14 +213,15 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
               )}
 
               {ad.imageUrl && (
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <div className={`absolute ${positionClass} text-center p-4`} style={{ color: textColor }}>
-                    <h3 className={`${fontClass} ${mainSizeClass} md:text-xl mb-1`}>{ad.title}</h3>
+                <>
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-all" />
+                  <div className={`absolute ${positionClass} p-4`} style={{ color: textColor, maxWidth: '90%' }}>
+                    <h3 className={`${fontClass} ${mainSizeClass} md:text-xl mb-1 drop-shadow-lg`}>{ad.title}</h3>
                     {ad.description && (
-                      <p className={`${fontClass} ${subSizeClass} md:text-base opacity-90 px-4 line-clamp-2`}>{ad.description}</p>
+                      <p className={`${fontClass} ${subSizeClass} md:text-base opacity-90 px-2 line-clamp-2 drop-shadow-lg`}>{ad.description}</p>
                     )}
                   </div>
-                </div>
+                </>
               )}
             </div>
             );
