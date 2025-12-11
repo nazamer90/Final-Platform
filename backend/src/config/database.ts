@@ -16,9 +16,7 @@ if (DB_DIALECT === 'postgres') {
   const databaseUrl = process.env.DATABASE_URL;
   
   if (databaseUrl) {
-    const sslConfig = isProduction ? { rejectUnauthorized: false } : undefined;
     sequelize = new Sequelize(databaseUrl, {
-      dialect: 'postgres',
       logging: process.env.DB_LOGGING === 'true' ? console.log : false,
       define: {
         timestamps: true,
@@ -30,10 +28,8 @@ if (DB_DIALECT === 'postgres') {
         acquire: 30000,
         idle: 10000,
       },
-      ...(sslConfig && { ssl: sslConfig }),
     });
   } else {
-    const sslConfig = isProduction ? { rejectUnauthorized: false } : false;
     const postgresConfig: any = {
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -49,7 +45,7 @@ if (DB_DIALECT === 'postgres') {
         acquire: 30000,
         idle: 10000,
       },
-      ssl: sslConfig,
+      ssl: isProduction ? { rejectUnauthorized: false } : false,
     };
     
     sequelize = new Sequelize(
