@@ -3,6 +3,15 @@ import crypto from 'crypto';
 import { AuthRequest } from '@shared-types/index';
 import { sendUnauthorized, sendError } from '@utils/response';
 import logger from '@utils/logger';
+import { Session } from 'express-session';
+
+declare global {
+  namespace Express {
+    interface Session {
+      lastActivity?: number;
+    }
+  }
+}
 
 export interface TwoFactorOptions {
   enabled: boolean;
@@ -380,15 +389,16 @@ export const require2FA = (method: 'email' | 'sms' = 'email') => {
  * Middleware: Session Timeout Protection
  */
 export const sessionTimeout = (timeoutMs: number = 30 * 60 * 1000) => {
-  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+  return (req: any, res: Response, next: NextFunction): void => {
     try {
       if (!req.session) {
         next();
         return;
       }
 
-      if (req.session.lastActivity) {
-        const elapsed = Date.now() - req.session.lastActivity;
+      const lastActivity = (req.session as any).lastActivity;
+      if (lastActivity) {
+        const elapsed = Date.now() - lastActivity;
 
         if (elapsed > timeoutMs) {
           logger.info(`Session timeout for user ${req.user?.id}`);
@@ -399,7 +409,7 @@ export const sessionTimeout = (timeoutMs: number = 30 * 60 * 1000) => {
         }
       }
 
-      req.session.lastActivity = Date.now();
+      (req.session as any).lastActivity = Date.now();
       next();
     } catch (error) {
       logger.error('Session timeout middleware error:', error);

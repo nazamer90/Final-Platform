@@ -1,7 +1,7 @@
 import sequelize from '@config/database';
 import logger from '@utils/logger';
 
-const isMySQL = sequelize.options.dialect === 'mysql';
+const isMySQL = ((sequelize as any).options).dialect === 'mysql';
 
 const createTables = async (): Promise<void> => {
   try {

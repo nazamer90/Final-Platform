@@ -46,10 +46,15 @@ class DependencyManagementService {
     try {
       logger.info('🔍 Checking for outdated packages...');
       
-      const output = execSync('npm outdated --json', { 
-        cwd: this.projectRoot,
-        encoding: 'utf-8'
-      }).catch(() => '{}');
+      let output: string;
+      try {
+        output = execSync('npm outdated --json', { 
+          cwd: this.projectRoot,
+          encoding: 'utf-8'
+        });
+      } catch (e) {
+        output = '{}';
+      }
 
       const outdated = JSON.parse(output);
       const packages: DependencyInfo[] = [];
@@ -75,10 +80,15 @@ class DependencyManagementService {
     try {
       logger.info('🔒 Checking for security vulnerabilities...');
       
-      const output = execSync('npm audit --json', { 
-        cwd: this.projectRoot,
-        encoding: 'utf-8'
-      }).catch(() => '{"metadata": {"vulnerabilities": {}}}');
+      let output: string;
+      try {
+        output = execSync('npm audit --json', { 
+          cwd: this.projectRoot,
+          encoding: 'utf-8'
+        });
+      } catch (e) {
+        output = '{"metadata": {"vulnerabilities": {}}}';
+      }
 
       const audit = JSON.parse(output);
       const vulnerabilities = audit.vulnerabilities || {};
@@ -307,10 +317,15 @@ class DependencyManagementService {
     backupCount: number;
     recommendation: string;
   } {
-    const outdated = execSync('npm outdated --json', { 
-      cwd: this.projectRoot,
-      encoding: 'utf-8'
-    }).catch(() => '{}');
+    let outdated: string;
+    try {
+      outdated = execSync('npm outdated --json', { 
+        cwd: this.projectRoot,
+        encoding: 'utf-8'
+      });
+    } catch (e) {
+      outdated = '{}';
+    }
 
     const outdatedCount = Object.keys(JSON.parse(outdated)).length;
     const backups = this.listBackups();

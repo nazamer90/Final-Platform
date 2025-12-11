@@ -20,7 +20,7 @@ class ConcurrencyService {
 
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
-        return await sequelize.transaction({ timeout }, async (t) => {
+        return await sequelize.transaction(async (t) => {
           return await callback(t);
         });
       } catch (error) {

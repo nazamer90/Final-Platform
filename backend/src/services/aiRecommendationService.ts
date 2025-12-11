@@ -46,7 +46,7 @@ export class AIRecommendationService {
     }
 
     const orders = await Order.findAll({
-      where: { userId },
+      where: { userId: userId } as any,
       include: [{ model: OrderItem }]
     });
 
@@ -55,7 +55,7 @@ export class AIRecommendationService {
     let totalSpent = 0;
 
     for (const order of orders) {
-      const items = order.get('OrderItems') || [];
+      const items: any[] = (order.get('OrderItems') as any) || [];
       for (const item of items) {
         const product = await Product.findByPk(item.get('productId'));
         if (product) {

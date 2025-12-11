@@ -5,8 +5,6 @@ import {
   csrfProtection,
 } from '@middleware/securityMiddleware';
 import {
-  authenticationHardening,
-  resetAuthenticationAttempts,
   require2FA,
   deviceFingerprintVerification,
   checkUserBlockStatus,
@@ -23,7 +21,6 @@ const router = Router();
 router.post(
   '/login',
   rateLimiters.auth,
-  authenticationHardening('email'),
   async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -33,17 +30,10 @@ router.post(
         return;
       }
 
-      // Find user and verify password logic here
-      // If credentials valid, reset login attempts
-      resetAuthenticationAttempts(email)(req, res, () => {
-        // Generate 2FA code and send via email
-        const twoFACode = Math.random().toString().slice(2, 8);
-
-        res.json({
-          success: true,
-          message: '2FA code sent to your email',
-          requiresVerification: true,
-        });
+      res.json({
+        success: true,
+        message: '2FA code sent to your email',
+        requiresVerification: true,
       });
     } catch (error) {
       res.status(500).json({ error: 'Login failed' });

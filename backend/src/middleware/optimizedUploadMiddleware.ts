@@ -53,12 +53,15 @@ class OptimizedUploadMiddleware {
 
   createOptimizedStorage(uploadDir: string, config: UploadConfig = defaultConfig) {
     return multer.diskStorage({
-      destination: async (req, file, cb) => {
+      destination: (req, file, cb) => {
         try {
-          await fsPromises.mkdir(uploadDir, { recursive: true });
-          cb(null, uploadDir);
+          fsPromises.mkdir(uploadDir, { recursive: true }).then(() => {
+            cb(null, uploadDir);
+          }).catch((error) => {
+            cb(error as any, '' as any);
+          });
         } catch (error) {
-          cb(error as any);
+          cb(error as any, '' as any);
         }
       },
       filename: (req, file, cb) => {

@@ -5,7 +5,7 @@ export async function addStoreAdColumns() {
   try {
     logger.info('🔄 Starting migration: adding missing columns to store_ads table...');
 
-    const dialect = sequelize.options.dialect;
+    const dialect = ((sequelize as any).options).dialect;
 
     if (dialect === 'sqlite') {
       await addStoreAdColumnsSQLite();

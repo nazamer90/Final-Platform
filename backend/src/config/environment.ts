@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-const isProduction = process.env.NODE_ENV === 'production';
+const env = process.env.NODE_ENV || 'development';
 
-if (!isProduction) {
+if (env !== 'production') {
   const envPath = path.resolve(process.cwd(), '.env');
   dotenv.config({ path: envPath });
 }

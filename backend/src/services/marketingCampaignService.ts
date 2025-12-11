@@ -327,7 +327,7 @@ export class MarketingCampaignService {
     const inactiveUsers = await User.findAll({
       where: {
         lastLoginAt: { [Op.lt]: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) },
-      },
+      } as any,
     });
 
     if (inactiveUsers.length > 0) {

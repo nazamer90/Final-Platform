@@ -7,7 +7,7 @@ export interface CacheOptions {
 }
 
 export class RedisCache {
-  private client: redis.RedisClient;
+  private client: any;
   private isConnected: boolean = false;
 
   private defaultTTL: Record<string, number> = {
@@ -27,24 +27,8 @@ export class RedisCache {
     private db: number = parseInt(process.env.REDIS_DB || '0', 10)
   ) {
     this.client = redis.createClient({
-      host: this.host,
-      port: this.port,
-      password: this.password,
-      db: this.db,
-      retry_strategy: (options) => {
-        if (options.error?.code === 'ECONNREFUSED') {
-          logger.warn('Redis connection refused, retrying...');
-          return Math.min(options.attempt * 100, 3000);
-        }
-        if (options.total_retry_time > 1000 * 60 * 60) {
-          return new Error('Redis retry time exhausted');
-        }
-        if (options.attempt > 10) {
-          return undefined;
-        }
-        return Math.min(options.attempt * 100, 3000);
-      },
-    });
+      url: `redis://${this.password ? `:${this.password}@` : ''}${this.host}:${this.port}/${this.db}`,
+    } as any);
 
     this.setupEventHandlers();
   }

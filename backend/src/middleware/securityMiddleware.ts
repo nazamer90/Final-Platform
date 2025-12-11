@@ -158,7 +158,7 @@ export const authenticationHardening = (identifier: string) => {
       if (!allowed) {
         logger.warn(`Authentication hardening: Account lockout for ${loginIdentifier}`);
         sendUnauthorized(res, 'Too many failed login attempts. Please try again later.');
-        res.setHeader('Retry-After', securityManager.trackLoginAttempt(String(loginIdentifier).toLowerCase()));
+        res.setHeader('Retry-After', String(securityManager.trackLoginAttempt(String(loginIdentifier).toLowerCase())));
         return;
       }
 
