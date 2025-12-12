@@ -1,5 +1,22 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const BACKEND_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const getDefaultApiUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) {
+    return envUrl;
+  }
+  
+  // Detect from current location
+  const currentHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  const port = typeof window !== 'undefined' ? window.location.port : '';
+  
+  if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    return 'http://localhost:5000/api';
+  }
+  
+  return `https://${currentHost}${port ? ':' + port : ''}/api`;
+};
+
+const API_BASE_URL = getDefaultApiUrl();
+const BACKEND_BASE_URL = API_BASE_URL.replace('/api', '');
 
 const MINIMAX_API_CONFIG = {
   baseURL: import.meta.env.VITE_MINIMAX_API_URL || 'https://api.minimax.chat/v1',

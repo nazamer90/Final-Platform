@@ -91,8 +91,17 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
     if (!storeId) return;
     
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${apiUrl}/ads/store/${storeId}`);
+      const apiUrl = import.meta.env.VITE_API_URL || (() => {
+        const currentHost = window.location.hostname;
+        const port = window.location.port;
+        if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+          return 'http://localhost:5000/api';
+        }
+        return `https://${currentHost}${port ? ':' + port : ''}/api`;
+      })();
+      const response = await fetch(`${apiUrl}/ads/store/${storeId}`, {
+        headers: { 'Content-Type': 'application/json' }
+      });
       
       if (response.ok) {
         const result = await response.json();
@@ -177,7 +186,14 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiUrl = import.meta.env.VITE_API_URL || (() => {
+        const currentHost = window.location.hostname;
+        const port = window.location.port;
+        if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+          return 'http://localhost:5000/api';
+        }
+        return `https://${currentHost}${port ? ':' + port : ''}/api`;
+      })();
       const response = await fetch(`${apiUrl}/ads/store/${storeId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -237,7 +253,14 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiUrl = import.meta.env.VITE_API_URL || (() => {
+        const currentHost = window.location.hostname;
+        const port = window.location.port;
+        if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+          return 'http://localhost:5000/api';
+        }
+        return `https://${currentHost}${port ? ':' + port : ''}/api`;
+      })();
       const response = await fetch(`${apiUrl}/ads/store/${storeId}/${adId}`, {
         method: 'DELETE',
       });
