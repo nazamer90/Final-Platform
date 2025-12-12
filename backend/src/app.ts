@@ -135,6 +135,20 @@ logger.info(`   Base Path: ${basePath}`);
 logger.info(`   Public Path: ${publicPath}`);
 logger.info(`   Assets Path: ${assetsPath}`);
 
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const origin = req.get('Origin');
+  if (!origin || origin.includes('vercel.app') || origin === 'http://localhost:5173') {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use('/assets', express.static(assetsPath, { 
   maxAge: '1h',
   etag: false,
