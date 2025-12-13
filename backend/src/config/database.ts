@@ -8,7 +8,11 @@ if (!isProduction) {
   dotenv.config();
 }
 
-const DB_DIALECT = (process.env.DB_DIALECT || 'sqlite') as 'postgres' | 'mysql' | 'sqlite';
+let DB_DIALECT = (process.env.DB_DIALECT || 'sqlite') as 'postgres' | 'mysql' | 'sqlite';
+
+if (process.env.DATABASE_URL && DB_DIALECT === 'sqlite') {
+  DB_DIALECT = 'postgres';
+}
 
 let sequelize: Sequelize;
 
