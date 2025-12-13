@@ -3,7 +3,8 @@
   "buildCommand": "npm run vercel-build",
   "installCommand": "npm ci --include=dev",
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "SKIP_DB_INIT": "true"
   },
   "builds": [
     {
