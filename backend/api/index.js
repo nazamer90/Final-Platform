@@ -1,4 +1,53 @@
 const serverless = require('serverless-http');
-const app = require('../dist/app').default || require('../dist/app');
+const path = require('path');
 
-module.exports = serverless(app);
+const register = require('tsconfig-paths').register;
+
+const tsconfigPath = path.join(__dirname, '../tsconfig.json');
+const baseUrl = path.join(__dirname, '../dist');
+
+register({
+  baseUrl: baseUrl,
+  paths: {
+    '@/*': ['*'],
+    '@config/*': ['config/*'],
+    '@models/*': ['models/*'],
+    '@controllers/*': ['controllers/*'],
+    '@services/*': ['services/*'],
+    '@middleware/*': ['middleware/*'],
+    '@routes/*': ['routes/*'],
+    '@validators/*': ['validators/*'],
+    '@utils/*': ['utils/*'],
+    '@migrations/*': ['migrations/*'],
+    '@database/*': ['database/*'],
+    '@security/*': ['security/*'],
+    '@shared-types/*': ['types/*']
+  }
+});
+
+let app;
+
+try {
+  const appModule = require('../dist/app');
+  app = appModule.default || appModule;
+  
+  if (!app) {
+    throw new Error('App module is empty');
+  }
+} catch (error) {
+  console.error('❌ Error loading app:', error.message);
+  console.error(error.stack);
+  
+  app = require('express')();
+  app.use((req, res) => {
+    res.status(500).json({ 
+      error: 'App initialization failed', 
+      message: error.message,
+      stack: process.env.NODE_ENV === 'production' ? undefined : error.stack
+    });
+  });
+}
+
+module.exports = serverless(app, {
+  binary: ['image/*', 'font/*'],
+});
