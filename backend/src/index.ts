@@ -109,4 +109,8 @@ const startServer = (): void => {
   }
 };
 
-startServer();
+if (process.env.SKIP_DB_INIT !== 'true' && !process.env.VERCEL) {
+  startServer();
+}
+
+export default app;

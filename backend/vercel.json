@@ -4,7 +4,8 @@
   "installCommand": "npm ci --include=dev",
   "env": {
     "NODE_ENV": "production",
-    "SKIP_DB_INIT": "true"
+    "SKIP_DB_INIT": "true",
+    "VERCEL": "true"
   },
   "builds": [
     {
