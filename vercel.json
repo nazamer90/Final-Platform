@@ -6,6 +6,10 @@
   "installCommand": "npm ci --include=dev",
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://final-platform-gamma.vercel.app/api/$1"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }

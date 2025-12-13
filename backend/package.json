@@ -4,7 +4,8 @@
   "description": "EISHRO Platform Backend Server",
   "main": "server.js",
   "scripts": {
-    "build": "tsc --skipLibCheck --noUnusedLocals false --noUnusedParameters false",
+    "build": "tsc --skipLibCheck --noUnusedLocals false --noUnusedParameters false && tsc-alias -p tsconfig.json",
+    "vercel-build": "npm run build",
     "start": "node -r ./loader.js dist/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
     "test": "jest --coverage",
@@ -42,8 +43,10 @@
     "pg": "^8.16.3",
     "redis": "^4.6.11",
     "sequelize": "^6.37.7",
+    "serverless-http": "^3.2.0",
     "sqlite3": "^5.1.7",
     "tsconfig-paths": "^4.2.0",
+    "tsc-alias": "^1.8.8",
     "uuid": "^9.0.0",
     "winston": "^3.18.3",
     "xss": "^1.0.14"
