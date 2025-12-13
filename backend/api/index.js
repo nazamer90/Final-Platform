@@ -25,6 +25,9 @@ register({
   }
 });
 
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+process.env.SKIP_DB_INIT = 'true';
+
 let app;
 
 try {
@@ -34,11 +37,22 @@ try {
   if (!app) {
     throw new Error('App module is empty');
   }
+  
+  console.log('✅ Express app loaded successfully');
 } catch (error) {
   console.error('❌ Error loading app:', error.message);
   console.error(error.stack);
   
   app = require('express')();
+  
+  app.get('/health', (req, res) => {
+    res.status(200).json({ 
+      status: 'ok',
+      error: 'App is in fallback mode',
+      message: error.message
+    });
+  });
+  
   app.use((req, res) => {
     res.status(500).json({ 
       error: 'App initialization failed', 
@@ -50,4 +64,10 @@ try {
 
 module.exports = serverless(app, {
   binary: ['image/*', 'font/*'],
+  request(req) {
+    req.setTimeout(30000);
+  },
+  response(res) {
+    res.setTimeout(30000);
+  }
 });

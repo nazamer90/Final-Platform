@@ -95,6 +95,7 @@ app.get('/health', (req: Request, res: Response): void => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: config.environment,
+    skipDbInit: process.env.SKIP_DB_INIT === 'true'
   });
 });
 
