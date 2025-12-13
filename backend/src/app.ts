@@ -44,29 +44,8 @@ app.use(helmet({
 }));
 
 const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    const allowedOrigins = [
-      config.frontend.production,
-      config.frontend.development,
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'https://ishro.ly',
-      'https://www.ishro.ly',
-      'http://ishro.ly',
-      'http://www.ishro.ly',
-    ];
-
-    if (!origin) {
-      callback(null, true);
-    } else if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else if (origin.includes('vercel.app')) {
-      callback(null, true);
-    } else {
-      callback(null, false);
-    }
-  },
-  credentials: true,
+  origin: '*',
+  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Session-Id'],
   optionsSuccessStatus: 200,
@@ -90,10 +69,7 @@ app.use(
   })
 );
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-  next();
-});
+
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -136,13 +112,9 @@ logger.info(`   Public Path: ${publicPath}`);
 logger.info(`   Assets Path: ${assetsPath}`);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const origin = req.get('Origin');
-  if (!origin || origin.includes('vercel.app') || origin === 'http://localhost:5173') {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-  }
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS, POST, PUT, DELETE, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token');
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
