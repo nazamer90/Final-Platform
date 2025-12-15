@@ -8,10 +8,15 @@ if (!isProduction) {
   dotenv.config();
 }
 
-let DB_DIALECT = (process.env.DB_DIALECT || 'sqlite') as 'postgres' | 'mysql' | 'sqlite';
+const hasDatabaseUrl = !!process.env.DATABASE_URL;
+let DB_DIALECT: 'postgres' | 'mysql' | 'sqlite';
 
-if (process.env.DATABASE_URL && DB_DIALECT === 'sqlite') {
+if (hasDatabaseUrl) {
   DB_DIALECT = 'postgres';
+  logger.info('✅ DATABASE_URL detected: using postgres');
+} else {
+  DB_DIALECT = (process.env.DB_DIALECT || 'sqlite') as 'postgres' | 'mysql' | 'sqlite';
+  logger.info(`ℹ️ Using dialect from env: ${DB_DIALECT}`);
 }
 
 let sequelize: Sequelize;
@@ -20,7 +25,9 @@ if (DB_DIALECT === 'postgres') {
   const databaseUrl = process.env.DATABASE_URL;
   
   if (databaseUrl) {
+    logger.info('🔌 Connecting to Postgres via DATABASE_URL');
     sequelize = new Sequelize(databaseUrl, {
+      dialect: 'postgres',
       logging: process.env.DB_LOGGING === 'true' ? console.log : false,
       define: {
         timestamps: true,
@@ -32,8 +39,15 @@ if (DB_DIALECT === 'postgres') {
         acquire: 30000,
         idle: 10000,
       },
+      dialectOptions: isProduction ? {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+      } : undefined,
     });
   } else {
+    logger.info('🔌 Connecting to Postgres via individual env variables');
     const postgresConfig: any = {
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432', 10),
@@ -49,8 +63,16 @@ if (DB_DIALECT === 'postgres') {
         acquire: 30000,
         idle: 10000,
       },
-      ssl: isProduction ? { rejectUnauthorized: false } : false,
     };
+    
+    if (isProduction) {
+      postgresConfig.dialectOptions = {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+      };
+    }
     
     sequelize = new Sequelize(
       process.env.DB_NAME || 'postgres',
@@ -60,6 +82,7 @@ if (DB_DIALECT === 'postgres') {
     );
   }
 } else if (DB_DIALECT === 'mysql') {
+  logger.info('🔌 Connecting to MySQL');
   sequelize = new Sequelize(
     process.env.DB_NAME || 'eishro_db',
     process.env.DB_USER || 'root',
@@ -82,6 +105,7 @@ if (DB_DIALECT === 'postgres') {
     }
   );
 } else {
+  logger.info('🔌 Connecting to SQLite');
   sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: path.join(process.cwd(), 'database.sqlite'),
