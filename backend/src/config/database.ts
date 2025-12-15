@@ -133,10 +133,11 @@ export const syncDatabase = async (force = false): Promise<void> => {
     const dialect = (sequelize as any).options?.dialect || DB_DIALECT;
     
     if (dialect === 'postgres') {
+      await sequelize.query('SET CONSTRAINTS ALL IMMEDIATE');
       await sequelize.query('SET CONSTRAINTS ALL DEFERRED');
     }
     
-    await sequelize.sync({ force, alter: false });
+    await sequelize.sync({ force: false, alter: false });
     
     logger.info('✅ Database synchronized successfully');
   } catch (error) {
