@@ -4,13 +4,14 @@ import { securityManager } from '@security/index';
 import { sendError, sendUnauthorized } from '@utils/response';
 import logger from '@utils/logger';
 
-export interface SecurityRequest extends Request {
+export type SecurityRequest = Request & {
   csrfToken?: string;
   rateLimitInfo?: {
     remaining: number;
     resetTime: number;
   };
-}
+  sessionID?: string;
+};
 
 /**
  * CSRF Protection Middleware
