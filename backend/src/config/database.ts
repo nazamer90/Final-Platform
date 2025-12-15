@@ -130,7 +130,14 @@ export const testConnection = async (): Promise<boolean> => {
 
 export const syncDatabase = async (force = false): Promise<void> => {
   try {
-    await sequelize.sync({ force });
+    const dialect = (sequelize as any).options?.dialect || DB_DIALECT;
+    
+    if (dialect === 'postgres') {
+      await sequelize.query('SET CONSTRAINTS ALL DEFERRED');
+    }
+    
+    await sequelize.sync({ force, alter: false });
+    
     logger.info('✅ Database synchronized successfully');
   } catch (error) {
     logger.error('❌ Database synchronization failed:', error);
