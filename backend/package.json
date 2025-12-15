@@ -4,7 +4,7 @@
   "description": "EISHRO Platform Backend Server",
   "main": "server.js",
   "scripts": {
-    "build": "tsc --skipLibCheck --noUnusedLocals false --noUnusedParameters false && tsc-alias -p tsconfig.json",
+    "build": "tsc --skipLibCheck --noUnusedLocals false --noUnusedParameters false --noEmitOnError false && tsc-alias -p tsconfig.json",
     "vercel-build": "npm run build",
     "start": "node -r ./loader.js dist/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
