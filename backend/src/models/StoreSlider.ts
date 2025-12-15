@@ -86,9 +86,7 @@ StoreSlider.init(
     tableName: 'store_sliders',
     timestamps: true,
     underscored: false,
-    charset: 'utf8mb4',
-    collate: 'utf8mb4_unicode_ci',
-    indexes: [{ fields: ['storeId'] }, { fields: ['sortOrder'] }],
+    indexes: [{ fields: ['store_id'] }, { fields: ['sort_order'] }],
   }
 );
 

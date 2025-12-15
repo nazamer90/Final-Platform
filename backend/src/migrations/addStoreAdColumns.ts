@@ -11,6 +11,8 @@ export async function addStoreAdColumns() {
       await addStoreAdColumnsSQLite();
     } else if (dialect === 'mysql') {
       await addStoreAdColumnsMySQL();
+    } else if (dialect === 'postgres') {
+      await addStoreAdColumnsPostgres();
     } else {
       throw new Error(`Unsupported database dialect: ${dialect}`);
     }
@@ -117,6 +119,28 @@ async function addStoreAdColumnsSQLite(): Promise<void> {
       } else {
         logger.warn(`⚠️ Error adding column ${column.name}: ${error.message}`);
       }
+    }
+  }
+}
+
+async function addStoreAdColumnsPostgres(): Promise<void> {
+  const columnsToAdd = [
+    { name: 'text_position', definition: "TEXT DEFAULT 'center'" },
+    { name: 'text_color', definition: "VARCHAR(7) DEFAULT '#ffffff'" },
+    { name: 'text_font', definition: "VARCHAR(50) DEFAULT 'Cairo-SemiBold'" },
+    { name: 'main_text_size', definition: "TEXT DEFAULT 'lg'" },
+    { name: 'sub_text_size', definition: "TEXT DEFAULT 'base'" },
+  ];
+
+  for (const col of columnsToAdd) {
+    try {
+      await sequelize.query(`
+        ALTER TABLE store_ads
+        ADD COLUMN IF NOT EXISTS ${col.name} ${col.definition};
+      `);
+      logger.info(`✅ Column ${col.name} added to store_ads table (or already exists)`);
+    } catch (error) {
+      logger.warn(`⚠️ Failed to add column ${col.name}: ${error}`);
     }
   }
 }

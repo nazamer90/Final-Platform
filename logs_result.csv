@@ -1,0 +1,851 @@
+TimeUTC,timestampInMs,requestPath,requestMethod,requestQueryString,responseStatusCode,requestId,requestUserAgent,level,environment,branch,vercelCache,type,function,host,deploymentDomain,deploymentId,durationMs,region,maxMemoryUsed,memorySize,message,projectId,traceId,sessionId,invocationId,instanceId,concurrency
+12/13/2025 13:06,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/favicon.ico,GET,,500,gf2kv-1765631187130-d41985bcd895,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,15,iad1,271,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX3P7GM7APD6DZZN82FS0Q,jIXckqnnohKS,1
+12/13/2025 13:06,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,500,5qnkp-1765631185629-0f8e2b4ca052,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",info,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,,,,,"Fatal error loading app: Please install pg package manually Error: Please install pg package manually    at ConnectionManager._loadDialectModule (/var/task/backend/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:55:15)    at new ConnectionManager (/var/task/backend/node_modules/sequelize/lib/dialects/postgres/connection-manager.js:15:24)    at new PostgresDialect (/var/task/backend/node_modules/sequelize/lib/dialects/postgres/index.js:13:30)    at new Sequelize (/var/task/backend/node_modules/sequelize/lib/sequelize.js:194:20)    at Object.<anonymous> (/var/task/backend/dist/config/database.js:23:21)    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)    at A.l._compile (/opt/rust/bytecode.js:2:3182)    at Object..js (node:internal/modules/cjs/loader:1893:10)    at Module.load (node:internal/modules/cjs/loader:1480:32)    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 13:06,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,500,5qnkp-1765631185629-0f8e2b4ca052,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,36,iad1,270,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX3MW2D0E32T016Q86NDX4,jIXckqnnohKS,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/favicon.png,GET,,500,wf4nz-1765631151244-046e6c18fb78,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,8,iad1,273,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX2K5MWPTGJZ2WCFCWRD3K,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/favicon.png,GET,,500,hn55s-1765631149076-4e51e33ff04e,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,8,iad1,273,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX2H1W0A7CYCWVC6PAPEFG,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/favicon.png,GET,,500,rrf8m-1765631147913-7bf01ef0f9d8,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,6,iad1,273,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX2FXGAW9M8AW1SE5R9NK9,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/favicon.ico,GET,,500,rrf8m-1765631147819-8fe5d64cd00f,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,5,iad1,273,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX2FTJYZVKQS5VSNSFRJE5,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/favicon.ico,GET,,500,mb28s-1765631145704-06ce2dd1a2a0,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,15,iad1,272,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX2DRFBP7RFQ1F7WHWJS0Y,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/favicon.ico,GET,,500,mb28s-1765631144568-60bbac084688,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,7,iad1,272,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX2CNBRRT2Y08BZ48P7ES7,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,,6xx9v-1765631144274-b39ba693df4e,vercel-favicon/1.0,,production,,,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,13,iad1,283,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX2CFE1182XVXYXNX74JFH,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,,tpsj2-1765631143130-bd3daaee5bc4,vercel-favicon/1.0,,production,,,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,53,iad1,291,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX2B88PXYJ31GR3KEXK3M7,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/favicon.ico,GET,,500,tn7rn-1765631115199-99905ba4c2b3,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,7,iad1,289,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX1FZ628PKT1M998C6Z4MV,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/favicon.ico,GET,,,dvbv8-1765631115042-fb2e3be86ff6,vercel-screenshot/1.0,,production,,,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,7,iad1,288,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX1FXHTW7PA8AZ9VGTHCMM,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,500,66ldt-1765631114970-de32ac847ab2,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,8,iad1,288,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX1FV6HX247B2T57SV5BDJ,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,500,625hh-1765631114897-04279b6796f1,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,7,iad1,288,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX1FNWWJDZJK7FQJFV73FW,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,500,qxddd-1765631113155-96f7636cc844,vercel-screenshot/1.0,info,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,,,,,"Fatal error loading app: Please install pg package manually Error: Please install pg package manually    at ConnectionManager._loadDialectModule (/var/task/backend/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:55:15)    at new ConnectionManager (/var/task/backend/node_modules/sequelize/lib/dialects/postgres/connection-manager.js:15:24)    at new PostgresDialect (/var/task/backend/node_modules/sequelize/lib/dialects/postgres/index.js:13:30)    at new Sequelize (/var/task/backend/node_modules/sequelize/lib/sequelize.js:194:20)    at Object.<anonymous> (/var/task/backend/dist/config/database.js:23:21)    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)    at A.l._compile (/opt/rust/bytecode.js:2:3182)    at Object..js (node:internal/modules/cjs/loader:1893:10)    at Module.load (node:internal/modules/cjs/loader:1480:32)    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,500,qxddd-1765631113155-96f7636cc844,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,1000,iad1,288,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX1E6114FBSHASCQ3NT84W,695LLKiiPmoM,1
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,,9q2zq-1765631113120-6e1e1f144d73,vercel-screenshot/1.0,info,production,main,,serverless,,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,,,,,"Fatal error loading app: Please install pg package manually Error: Please install pg package manually    at ConnectionManager._loadDialectModule (/var/task/backend/node_modules/sequelize/lib/dialects/abstract/connection-manager.js:55:15)    at new ConnectionManager (/var/task/backend/node_modules/sequelize/lib/dialects/postgres/connection-manager.js:15:24)    at new PostgresDialect (/var/task/backend/node_modules/sequelize/lib/dialects/postgres/index.js:13:30)    at new Sequelize (/var/task/backend/node_modules/sequelize/lib/sequelize.js:194:20)    at Object.<anonymous> (/var/task/backend/dist/config/database.js:23:21)    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)    at A.l._compile (/opt/rust/bytecode.js:2:3182)    at Object..js (node:internal/modules/cjs/loader:1893:10)    at Module.load (node:internal/modules/cjs/loader:1480:32)    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 13:05,1.76563E+12,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app/,GET,,,9q2zq-1765631113120-6e1e1f144d73,vercel-screenshot/1.0,,production,main,,serverless,/api/index.js,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,eishro-backend-7yystr1ba-bennoubas-projects.vercel.app,dpl_9qjsUSftaPS6RF91TeiojG3zM8fE,886,iad1,273,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBX1E6114FBSHASCSRJ11MQ,irpBfDeGYcad,1
+12/13/2025 12:56,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.ico,GET,,500,whmzl-1765630583229-620c246358f7,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,10,iad1,248,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWH8FC74JN7RNYE9AAMCXX,06482M8g60bC,1
+12/13/2025 12:56,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/api/ads/store/nawaem,GET,,500,whmzl-1765630583029-1016a4aad7f8,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,21,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWH89B7EX5AX0GGZAEA3WA,06482M8g60bC,1
+12/13/2025 12:56,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.ico,GET,,500,822mg-1765630575472-ed4cb63e0f86,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,12,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWH0X0N6GQSAWFHG5ETHVY,06482M8g60bC,1
+12/13/2025 12:56,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/api/ads/store/nawaem,GET,,500,822mg-1765630575172-e22fb3e458c6,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,32,iad1,251,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWH0QCF9W2V3P6EYWP3YBM,06482M8g60bC,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.ico,GET,,500,kkqq4-1765630496451-f3bca42ebd3e,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",info,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,,,,,"Fatal error loading app: ENOENT: no such file or directory, mkdir 'logs' Error: ENOENT: no such file or directory, mkdir 'logs'    at Object.mkdirSync (node:fs:1349:26)    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)    at A.l._compile (/opt/rust/bytecode.js:2:3182)    at Object..js (node:internal/modules/cjs/loader:1893:10)    at Module.load (node:internal/modules/cjs/loader:1480:32)    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)    at /opt/rust/nodejs.js:2:13529    at Module.dn (/opt/rust/nodejs.js:2:13907)    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499)",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.ico,GET,,500,kkqq4-1765630496451-f3bca42ebd3e,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,449,iad1,245,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWEKQJC338ZHEB00AAC680,06482M8g60bC,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,kkqq4-1765630494816-c1509b1a9694,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,21,iad1,254,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWEJCFV6D9XTZE65EWWJ7R,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.png,GET,,500,zkf2w-1765630469402-cf3bf2725f7a,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,24,iad1,254,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDSA5YYJ2X8EM0KAYBFQC,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.png,GET,,500,zkf2w-1765630467250-009655195fa1,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,6,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDQ6XM6P2PKH4TZ7QA6ZM,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.png,GET,,500,6xx9v-1765630466100-173d78a93774,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,6,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDP2Y0X714S9Z7WQS26FY,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.ico,GET,,,mhl56-1765630466002-3a7d9906e412,vercel-favicon/1.0,,production,,,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,7,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDNZSVAXDNYKAR221TRK1,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.ico,GET,,500,k8kqb-1765630463843-1a1cc63d9ad1,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,6,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDKWBKJE251QCPFN6C95W,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.ico,GET,,500,xk544-1765630462663-df52c7502bc9,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,5,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDJQEKBKYM176MCGTDBM9,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,xk544-1765630462480-dc230c32aa1e,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,6,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDJHPG366EJ3222P6T5CJ,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.ico,GET,,500,9f44s-1765630461837-28d617582310,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,7,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDJ3C4TN57WXF6NHZWDXJ,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/favicon.ico,GET,,500,bb7bp-1765630461621-db6459369c92,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,6,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDHPY1Q5SZJBQQWN54Y3D,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,q7dwx-1765630461543-7a2fa3a58941,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,6,iad1,252,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDHQGNCCNZ5SNHKGN58PY,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,cr7c9-1765630461485-4df8890dd4c3,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,7,iad1,253,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDHJT5Y6XMF33N6CWQCT9,8yJhdSdnKF7n,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,vwnsd-1765630461002-04514d6c4528,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,6,iad1,245,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDHD0B8KZBQ8FHCCG53YT,tD9g3rq8dgnj,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,8jkk2-1765630460929-61e946eaf224,vercel-favicon/1.0,info,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,,,,,"Fatal error loading app: ENOENT: no such file or directory, mkdir 'logs' Error: ENOENT: no such file or directory, mkdir 'logs'    at Object.mkdirSync (node:fs:1349:26)    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)    at A.l._compile (/opt/rust/bytecode.js:2:3182)    at Object..js (node:internal/modules/cjs/loader:1893:10)    at Module.load (node:internal/modules/cjs/loader:1480:32)    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)    at /opt/rust/nodejs.js:2:13529    at Module.dn (/opt/rust/nodejs.js:2:13907)    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499)",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,8jkk2-1765630460929-61e946eaf224,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,20,iad1,244,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDH1QSKXCQEWYME2P8RFY,tD9g3rq8dgnj,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,86mnk-1765630460238-661021fa0dfc,vercel-screenshot/1.0,info,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,,,,,"Fatal error loading app: ENOENT: no such file or directory, mkdir 'logs' Error: ENOENT: no such file or directory, mkdir 'logs'    at Object.mkdirSync (node:fs:1349:26)    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)    at A.l._compile (/opt/rust/bytecode.js:2:3182)    at Object..js (node:internal/modules/cjs/loader:1893:10)    at Module.load (node:internal/modules/cjs/loader:1480:32)    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)    at /opt/rust/nodejs.js:2:13529    at Module.dn (/opt/rust/nodejs.js:2:13907)    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499)",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,86mnk-1765630460238-661021fa0dfc,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,442,iad1,245,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDGF4HZQJ9PZT4E5ZFP8X,Vuk6tdVYIy7u,1
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,fwkzc-1765630460040-e37897087bd0,vercel-screenshot/1.0,info,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,,,,,"Fatal error loading app: ENOENT: no such file or directory, mkdir 'logs' Error: ENOENT: no such file or directory, mkdir 'logs'    at Object.mkdirSync (node:fs:1349:26)    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)    at A.l._compile (/opt/rust/bytecode.js:2:3182)    at Object..js (node:internal/modules/cjs/loader:1893:10)    at Module.load (node:internal/modules/cjs/loader:1480:32)    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)    at /opt/rust/nodejs.js:2:13529    at Module.dn (/opt/rust/nodejs.js:2:13907)    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499)",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:54,1.76563E+12,eishro-backend-689ilynh2-bennoubas-projects.vercel.app/,GET,,500,fwkzc-1765630460040-e37897087bd0,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,eishro-backend-689ilynh2-bennoubas-projects.vercel.app,dpl_CZZV3uB7Cu7HgJCME1ovSmvyr4cH,556,iad1,253,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBWDGCHZ9SHA2RMN5WTEZ39,8yJhdSdnKF7n,1
+12/13/2025 12:52,1.76563E+12,final-platform-gamma.vercel.app/auth/google/callback,GET,,500,kvpt5-1765630322315-7c6af9102ae2,Mozilla/5.0 (compatible),error,production,main,MISS,serverless,/auth/google/callback,final-platform-gamma.vercel.app,final-platform-gamma.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:52,1.76563E+12,final-platform-gamma.vercel.app/auth/google/callback,GET,,500,kvpt5-1765630322315-7c6af9102ae2,Mozilla/5.0 (compatible),,production,main,MISS,serverless,/api/index.js,final-platform-gamma.vercel.app,final-platform-gamma.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,368,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBW99PPXQZZPEHM6MVW0CN7,,-1
+12/13/2025 12:52,1.76563E+12,final-platform-gamma.vercel.app/,GET,,500,56c6v-1765630322315-b52cf82fcc08,Mozilla/5.0 (compatible),error,production,main,MISS,serverless,/,final-platform-gamma.vercel.app,final-platform-gamma.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:52,1.76563E+12,final-platform-gamma.vercel.app/,GET,,500,56c6v-1765630322315-b52cf82fcc08,Mozilla/5.0 (compatible),,production,main,MISS,serverless,/api/index.js,final-platform-gamma.vercel.app,final-platform-gamma.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,362,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBW99PNQN87JJWZNRF38YZK,,-1
+12/13/2025 12:46,1.76563E+12,final-platform-gamma.vercel.app/api/ads/store/nawaem,GET,,500,lb7ht-1765629999417-e160a354f300,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",error,production,main,MISS,serverless,/api/ads/store/nawaem,final-platform-gamma.vercel.app,final-platform-gamma.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:46,1.76563E+12,final-platform-gamma.vercel.app/api/ads/store/nawaem,GET,,500,lb7ht-1765629999417-e160a354f300,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,final-platform-gamma.vercel.app,final-platform-gamma.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,378,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVZEF6A1KTJQJJP5A0F70Z,,-1
+12/13/2025 12:46,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,bktgp-1765629968030-f23dfe6a2a0c,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",error,production,main,MISS,serverless,/favicon.ico,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:46,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,bktgp-1765629968030-f23dfe6a2a0c,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,385,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVYFTCD4HF6VZG05MTGR95,,-1
+12/13/2025 12:46,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,rg4jc-1765629966549-b95b54983bdd,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",error,production,main,MISS,serverless,/,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:46,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,rg4jc-1765629966549-b95b54983bdd,"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 OPR/124.0.0.0",,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,383,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVYEC1Q6C2YJKRQ59EJDN6,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.png,GET,,500,tfzdw-1765629916537-d3e92af363c1,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.png,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.png,GET,,500,tfzdw-1765629916537-d3e92af363c1,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,382,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWXD1KWXMRWSV9428E02A,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.png,GET,,500,k8kqb-1765629913943-454e30070da9,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.png,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.png,GET,,500,k8kqb-1765629913943-454e30070da9,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,403,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWTWKZ5KA5M2124C7H269,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.png,GET,,500,npd8b-1765629912449-912cca220c2e,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.png,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.png,GET,,500,npd8b-1765629912449-912cca220c2e,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,379,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWSDBH9QXQTBBGV4QWNAQ,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,86mnk-1765629911972-83eeb47ebd1f,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,86mnk-1765629911972-83eeb47ebd1f,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,382,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWRYB9C4BVTHAYY2HG8FJ,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,,4xjcd-1765629909405-ffb7f8dd7daf,vercel-favicon/1.0,error,production,main,,serverless,,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,,4xjcd-1765629909405-ffb7f8dd7daf,vercel-favicon/1.0,,production,main,,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,384,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWPE8SYZ731XTPNMX2F92,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,tfzdw-1765629907896-17ed09833d6a,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,tfzdw-1765629907896-17ed09833d6a,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,389,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWMZ01EG7AV32NV1XC3TD,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,lqh5j-1765629907301-92fa14b6015b,vercel-favicon/1.0,error,production,main,MISS,serverless,/,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,lqh5j-1765629907301-92fa14b6015b,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,403,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWMCN53379TW34SN9J47M,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,86mnk-1765629907012-0732acd23ec1,vercel-screenshot/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,86mnk-1765629907012-0732acd23ec1,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,380,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWM3C0PZ9DFVDG10PF741,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,66ldt-1765629906868-4b77e53a5188,vercel-screenshot/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/favicon.ico,GET,,500,66ldt-1765629906868-4b77e53a5188,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,367,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWKYYZGTDK3VJXQJNG6XD,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,q4t8w-1765629906363-e98754d30377,vercel-screenshot/1.0,error,production,main,MISS,serverless,/,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,q4t8w-1765629906363-e98754d30377,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,375,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWKF33GFHRED045BHT5G7,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,cf565-1765629906359-2454def08017,vercel-screenshot/1.0,error,production,main,MISS,serverless,/,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,cf565-1765629906359-2454def08017,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,375,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWKF5V7TTP6GP3M1DRKV9,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,qtgk9-1765629905707-a91644e7fabf,vercel-favicon/1.0,error,production,main,MISS,serverless,/,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,qtgk9-1765629905707-a91644e7fabf,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,403,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWJXN1NPP54JATRV5C805,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,xcrb9-1765629905606-fbb043195da1,vercel-favicon/1.0,error,production,main,MISS,serverless,/,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,xcrb9-1765629905606-fbb043195da1,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,400,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWJTMBT8MBN1NJHJ6C2QA,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,qwk49-1765629904615-822a5234583f,vercel-screenshot/1.0,error,production,main,MISS,serverless,/,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,qwk49-1765629904615-822a5234583f,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,393,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWHY135TSFCSJYDGCDAXV,,-1
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,vp6jj-1765629904563-f406d51d1722,vercel-screenshot/1.0,error,production,main,MISS,serverless,/,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:45,1.76563E+12,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app/,GET,,500,vp6jj-1765629904563-f406d51d1722,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,eishro-backend-njuhziv0d-bennoubas-projects.vercel.app,dpl_FpJg7HeeyQ8cvBbH7Nqdef9csJmj,370,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVWHY2BNEQVP009VEHH7E2,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,tsbq5-1765629777741-620855e8d5d2,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.png,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,tsbq5-1765629777741-620855e8d5d2,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,364,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVRNVQ5DGQ1H6HYR0Q5JT3,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,,9q2zq-1765629775222-bfc250654991,vercel-favicon/1.0,error,production,main,,serverless,,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,,9q2zq-1765629775222-bfc250654991,vercel-favicon/1.0,,production,main,,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,366,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVRKCYAD40M8YJ9ME391D2,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,tsbq5-1765629773677-d2f408e4de1a,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.png,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,tsbq5-1765629773677-d2f408e4de1a,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,365,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVRHWTEBR8QE1F9FAFDH6Z,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,gzx7d-1765629773215-3a5c00dc4481,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,gzx7d-1765629773215-3a5c00dc4481,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,365,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVRHE79K64T7WYS3KBKGQ5,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,mbqbl-1765629770685-877cdd161d76,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,mbqbl-1765629770685-877cdd161d76,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,363,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVREZ63DEE5CQ5DP5PQSX4,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,9n22p-1765629769604-596d490d08bb,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.png,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,9n22p-1765629769604-596d490d08bb,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,362,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVRDXCQKYENQ2VFMK8QZM0,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,tg8dj-1765629769157-87c89e83a785,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,tg8dj-1765629769157-87c89e83a785,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,366,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVRDFET9ZZ0JWMA2SM19RK,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,68wkp-1765629768598-e76475a92e01,vercel-favicon/1.0,error,production,main,MISS,serverless,/,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,68wkp-1765629768598-e76475a92e01,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,362,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVRCY3M5MC738BYC754HQ5,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,njdck-1765629767062-fc497daf3b48,vercel-favicon/1.0,error,production,main,MISS,serverless,/,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,njdck-1765629767062-fc497daf3b48,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,369,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVRBDYBAZ46Q7Z54P87D1F,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,g97gl-1765629767046-229b4b9ead02,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.png,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,g97gl-1765629767046-229b4b9ead02,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,386,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVRBDQMBFNJGX7CMT6D4G1,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,bb7bp-1765629765372-618c4decdde0,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.png,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.png,GET,,500,bb7bp-1765629765372-618c4decdde0,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,373,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVR9W3QD1H2BMN7YFB79C7,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,vwnsd-1765629764815-ba7babd31401,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,vwnsd-1765629764815-ba7babd31401,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,369,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVR9AM0GTT0K1PGVQC1RDE,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,fwnqq-1765629762286-6a308666cae1,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,fwnqq-1765629762286-6a308666cae1,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,370,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVR6RPRZBRKFR2ACCQSN90,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,4lqc8-1765629760697-5482b884258e,vercel-favicon/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,4lqc8-1765629760697-5482b884258e,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,394,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVR579K81W2DQ2X8HXMMRZ,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,tfzdw-1765629760111-32824cb2de93,vercel-favicon/1.0,error,production,main,MISS,serverless,/,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,tfzdw-1765629760111-32824cb2de93,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,371,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVR4MQXT1QFK1P7WH3SR5B,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,klvjs-1765629758613-fde8dec8d832,vercel-favicon/1.0,error,production,main,MISS,serverless,/,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,klvjs-1765629758613-fde8dec8d832,vercel-favicon/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,370,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVR361HHX4S4DEFVYGVEK9,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,qtgk9-1765629729391-87b9549af7c0,vercel-screenshot/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,qtgk9-1765629729391-87b9549af7c0,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,364,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVQ6QQPWRR5NCVA3B78VTD,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,pqsj5-1765629729383-433c85813b48,vercel-screenshot/1.0,error,production,main,MISS,serverless,/favicon.ico,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/favicon.ico,GET,,500,pqsj5-1765629729383-433c85813b48,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,381,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVQ6QR3WAVGWP228TJ0S9K,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,lc5xw-1765629728594-683b16545b03,vercel-screenshot/1.0,error,production,main,MISS,serverless,/,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,lc5xw-1765629728594-683b16545b03,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,371,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVQ5YZ641CG47F1R7CQ192,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,2pf8x-1765629728591-9a6372b7f1b8,vercel-screenshot/1.0,error,production,main,MISS,serverless,/,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,2pf8x-1765629728591-9a6372b7f1b8,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,355,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVQ5ZG18AW1QVJQXF30KAK,,-1
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,8xscq-1765629726773-dda084aa84ee,vercel-screenshot/1.0,error,production,main,MISS,serverless,/,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,,,,,"Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.
+Error: ENOENT: no such file or directory, mkdir 'logs'
+    at Object.mkdirSync (node:fs:1349:26)
+    at Object.<anonymous> (/var/task/backend/dist/utils/logger.js:12:18)
+    at Module.<anonymous> (/opt/rust/bytecode.js:2:1435)
+    at A.l._compile (/opt/rust/bytecode.js:2:3182)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1480:32)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1299:12)
+    at /opt/rust/nodejs.js:2:13529
+    at Module.dn (/opt/rust/nodejs.js:2:13907)
+    at Je.e.<computed>.ze._load (/opt/rust/nodejs.js:2:13499) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'mkdir',
+  path: 'logs'
+}
+Node.js process exited with exit status: 1. The logs above can help with debugging the issue.",prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,,,
+12/13/2025 12:42,1.76563E+12,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app/,GET,,500,8xscq-1765629726773-dda084aa84ee,vercel-screenshot/1.0,,production,main,MISS,serverless,/api/index.js,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,eishro-backend-i56pv0u8b-bennoubas-projects.vercel.app,dpl_FqAot1ehLsVWKCrBCtt7JwCaZ4hZ,378,iad1,-1,2048,,prj_zaVMBE9jdDgy3EE5m2qneV2TKy96,,,01KCBVQ49VMYCDQR0X9PEK5QZ4,,-1
