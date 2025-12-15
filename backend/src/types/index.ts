@@ -47,11 +47,15 @@ export interface JWTPayload {
   exp?: number;
 }
 
-export type AuthRequest = Request;
+export type AuthRequest = Request & {
+  user?: JWTPayload;
+};
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: JWTPayload;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: JWTPayload;
+    }
   }
 }
 
