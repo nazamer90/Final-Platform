@@ -102,150 +102,111 @@ const DEFAULT_SLIDERS: Record<string, Array<{ title: string; subtitle: string; b
       sortOrder: 1
     },
     {
-      title: 'عروض Pretty',
-      subtitle: 'تخفيضات كبيرة على المنتجات المختارة',
-      buttonText: 'اعرضي الآن',
-      imagePath: '/assets/pretty/sliders/slider12.webp',
-      sortOrder: 1
-    },
-    {
-      title: 'عروض Pretty',
-      subtitle: 'تخفيضات كبيرة على المنتجات المختارة',
-      buttonText: 'اعرضي الآن',
-      imagePath: '/assets/pretty/sliders/slider13.webp',
-      sortOrder: 1
-    },
-    {
-      title: 'عروض Pretty',
-      subtitle: 'تخفيضات كبيرة على المنتجات المختارة',
-      buttonText: 'اعرضي الآن',
+      title: 'مجموعة جديدة من Pretty',
+      subtitle: 'أحدث صيحات الموضة',
+      buttonText: 'تعرفي عليها',
       imagePath: '/assets/pretty/sliders/slider14.webp',
       sortOrder: 1
     },
     {
-      title: 'عروض Pretty',
-      subtitle: 'تخفيضات كبيرة على المنتجات المختارة',
-      buttonText: 'اعرضي الآن',
-      imagePath: '/assets/pretty/sliders/slider15.webp',
+      title: 'خصومات Pretty الحصرية',
+      subtitle: 'اختاري من أفضل الأزياء',
+      buttonText: 'استمتعي بالعروض',
+      imagePath: '/assets/pretty/sliders/slider12.webp',
+      sortOrder: 1
+    },
+    {
+      title: 'Pretty - عالم الأناقة',
+      subtitle: 'ملابس وإكسسوارات بجودة عالية',
+      buttonText: 'ابدأي التسوق',
+      imagePath: '/assets/pretty/sliders/slider13.webp',
       sortOrder: 1
     }
   ],
+
   'delta-store': [
     {
-      title: 'مجموعة Delta Store الجديدة',
-      subtitle: 'أحدث الأزياء والتصاميم العصرية',
-      buttonText: 'تسوق الآن',
-      imagePath: '/assets/delta-store/sliders/slider1.webp',
+      title: 'ديلتا ستور - أفضل الإلكترونيات',
+      subtitle: 'احصلي على أحدث المنتجات الإلكترونية',
+      buttonText: 'ابدأي الآن',
+      imagePath: '/assets/delta-store/sliders/slider1.jpg',
       sortOrder: 0
     },
     {
-      title: 'عروض Delta Store',
-      subtitle: 'خصومات على كل المنتجات',
-      buttonText: 'تسوق الآن',
-      imagePath: '/assets/delta-store/sliders/slider2.webp',
+      title: 'عروض ديلتا الحصرية',
+      subtitle: 'تخفيضات على أفضل الماركات',
+      buttonText: 'شاهد العروض',
+      imagePath: '/assets/delta-store/sliders/slider2.jpg',
       sortOrder: 1
     },
     {
-      title: 'عروض Delta Store',
-      subtitle: 'خصومات على كل المنتجات',
-      buttonText: 'تسوق الآن',
-      imagePath: '/assets/delta-store/sliders/slider3.webp',
+      title: 'تقنيات جديدة من ديلتا',
+      subtitle: 'استمتعي بأحدث الابتكارات',
+      buttonText: 'اكتشفي المزيد',
+      imagePath: '/assets/delta-store/sliders/slider3.jpg',
       sortOrder: 1
     },
     {
-      title: 'عروض Delta Store',
-      subtitle: 'خصومات على كل المنتجات',
-      buttonText: 'تسوق الآن',
-      imagePath: '/assets/delta-store/sliders/slider4.webp',
+      title: 'ديلتا - جودة وأمان',
+      subtitle: 'منتجات أصلية بضمان',
+      buttonText: 'ابدأ التسوق',
+      imagePath: '/assets/delta-store/sliders/slider4.jpg',
       sortOrder: 1
     },
     {
-      title: 'عروض Delta Store',
-      subtitle: 'خصومات على كل المنتجات',
+      title: 'أحدث الموديلات في ديلتا',
+      subtitle: 'اختر من أفضل الماركات العالمية',
       buttonText: 'تسوق الآن',
-      imagePath: '/assets/delta-store/sliders/slider5.webp',
-      sortOrder: 1
-    },
-    {
-      title: 'عروض Delta Store',
-      subtitle: 'خصومات على كل المنتجات',
-      buttonText: 'تسوق الآن',
-      imagePath: '/assets/delta-store/sliders/slider6.webp',
-      sortOrder: 1
-    },
-    {
-      title: 'عروض Delta Store',
-      subtitle: 'خصومات على كل المنتجات',
-      buttonText: 'تسوق الآن',
-      imagePath: '/assets/delta-store/sliders/slider7.webp',
+      imagePath: '/assets/delta-store/sliders/slider5.jpg',
       sortOrder: 1
     }
   ],
+
   'magna-beauty': [
     {
-      title: 'منتجات Magna Beauty',
-      subtitle: 'اعتني بجمالك مع أفضل المنتجات',
+      title: 'مغنا بيوتي - جمالك أولويتنا',
+      subtitle: 'منتجات عناية وتجميل فاخرة',
       buttonText: 'اكتشفي المنتجات',
-      imagePath: '/assets/magna-beauty/sliders/slide1.webp',
+      imagePath: '/assets/magna-beauty/sliders/slider1.jpg',
       sortOrder: 0
     },
     {
-      title: 'عروض Magna Beauty',
-      subtitle: 'منتجات التجميل بأسعار خاصة',
-      buttonText: 'شاهدي العروض',
-      imagePath: '/assets/magna-beauty/sliders/slide2.webp',
+      title: 'عروض مغنا الجمالية',
+      subtitle: 'عناية فاخرة بأسعار مميزة',
+      buttonText: 'تسوقي الآن',
+      imagePath: '/assets/magna-beauty/sliders/slider2.jpg',
       sortOrder: 1
     },
     {
-      title: 'عروض Magna Beauty',
-      subtitle: 'منتجات التجميل بأسعار خاصة',
-      buttonText: 'شاهدي العروض',
-      imagePath: '/assets/magna-beauty/sliders/slide3.webp',
+      title: 'منتجات طبيعية من مغنا',
+      subtitle: 'الجمال الطبيعي يبدأ من هنا',
+      buttonText: 'تعرفي عليها',
+      imagePath: '/assets/magna-beauty/sliders/slider3.jpg',
       sortOrder: 1
     },
     {
-      title: 'عروض Magna Beauty',
-      subtitle: 'منتجات التجميل بأسعار خاصة',
-      buttonText: 'شاهدي العروض',
-      imagePath: '/assets/magna-beauty/sliders/slide4.webp',
+      title: 'مغنا - رعاية شاملة',
+      subtitle: 'حلول جمالية متكاملة',
+      buttonText: 'استكشفي',
+      imagePath: '/assets/magna-beauty/sliders/slider4.jpg',
       sortOrder: 1
     },
     {
-      title: 'عروض Magna Beauty',
-      subtitle: 'منتجات التجميل بأسعار خاصة',
-      buttonText: 'شاهدي العروض',
-      imagePath: '/assets/magna-beauty/sliders/slide5.webp',
+      title: 'عناية بشرتك مع مغنا',
+      subtitle: 'منتجات آمنة وفعالة',
+      buttonText: 'ابدأ الآن',
+      imagePath: '/assets/magna-beauty/sliders/slider5.jpg',
       sortOrder: 1
     }
   ],
+
   indeesh: [
     {
-      title: 'مرحبا بك في متجر انديش',
-      subtitle: 'علامة رائدة في عالم المنظفات',
-      buttonText: 'تسوق الآن',
-      imagePath: '/assets/indeesh/sliders/1764003949431-7n5h5h-3.jpg',
+      title: 'عالم اندیش الفاخر',
+      subtitle: 'احدث الملابس الإسلامية',
+      buttonText: 'ابدأي التسوق',
+      imagePath: '/assets/indeesh/sliders/1764003949480-khgvls-1.jpg',
       sortOrder: 0
-    },
-    {
-      title: 'عروض انديش الخاصة',
-      subtitle: 'منتجات أصلية بأسعار مميزة',
-      buttonText: 'اكتشف العروض',
-      imagePath: '/assets/indeesh/sliders/1764003949444-z43zxk-9.jpg',
-      sortOrder: 1
-    },
-    {
-      title: 'عروض انديش الخاصة',
-      subtitle: 'منتجات أصلية بأسعار مميزة',
-      buttonText: 'اكتشف العروض',
-      imagePath: '/assets/indeesh/sliders/1764003949446-93ffbn-8.jpg',
-      sortOrder: 1
-    },
-    {
-      title: 'عروض انديش الخاصة',
-      subtitle: 'منتجات أصلية بأسعار مميزة',
-      buttonText: 'اكتشف العروض',
-      imagePath: '/assets/indeesh/sliders/1764003949455-gvxg6e-7.jpg',
-      sortOrder: 1
     },
     {
       title: 'عروض انديش الخاصة',
@@ -257,9 +218,43 @@ const DEFAULT_SLIDERS: Record<string, Array<{ title: string; subtitle: string; b
   ]
 };
 
+async function checkTableExists(dialect: string, tableName: string): Promise<boolean> {
+  try {
+    if (dialect === 'postgres') {
+      const result: any = await sequelize.query(`
+        SELECT to_regclass('public.${tableName}') as name;
+      `, { raw: true });
+      return (result?.[0]?.[0] as any)?.name !== null;
+    } else if (dialect === 'mysql') {
+      const result: any = await sequelize.query(`
+        SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '${tableName}';
+      `, { raw: true });
+      return (result?.[0] as any)?.length > 0;
+    } else if (dialect === 'sqlite') {
+      const result: any = await sequelize.query(`
+        SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';
+      `, { raw: true });
+      return (result?.[0] as any)?.length > 0;
+    }
+    return true;
+  } catch (error) {
+    logger.warn(`⚠️ Error checking if table ${tableName} exists:`, error);
+    return false;
+  }
+}
+
 export async function populateSliders() {
   try {
     logger.info('🔄 Starting slider population for existing stores...');
+
+    const dialect = ((sequelize as any).options).dialect || 'sqlite';
+    const tableExists = await checkTableExists(dialect, 'store_sliders');
+    
+    if (!tableExists) {
+      logger.warn('⚠️ Table store_sliders does not exist yet, skipping slider population');
+      return { success: true, skipped: true };
+    }
 
     const stores = await Store.findAll({
       attributes: ['id', 'slug', 'name']

@@ -124,6 +124,14 @@ async function addStoreAdColumnsSQLite(): Promise<void> {
 }
 
 async function addStoreAdColumnsPostgres(): Promise<void> {
+  const dialect = ((sequelize as any).options).dialect || 'postgres';
+  const tableExists = await checkTableExists(dialect, 'store_ads');
+  
+  if (!tableExists) {
+    logger.warn('⚠️ Table store_ads does not exist yet, skipping column additions');
+    return;
+  }
+
   const columnsToAdd = [
     { name: 'text_position', definition: "TEXT DEFAULT 'center'" },
     { name: 'text_color', definition: "VARCHAR(7) DEFAULT '#ffffff'" },
@@ -142,6 +150,32 @@ async function addStoreAdColumnsPostgres(): Promise<void> {
     } catch (error) {
       logger.warn(`⚠️ Failed to add column ${col.name}: ${error}`);
     }
+  }
+}
+
+async function checkTableExists(dialect: string, tableName: string): Promise<boolean> {
+  try {
+    if (dialect === 'postgres') {
+      const result: any = await sequelize.query(`
+        SELECT to_regclass('public.${tableName}') as name;
+      `, { raw: true });
+      return (result?.[0]?.[0] as any)?.name !== null;
+    } else if (dialect === 'mysql') {
+      const result: any = await sequelize.query(`
+        SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES 
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '${tableName}';
+      `, { raw: true });
+      return (result?.[0] as any)?.length > 0;
+    } else if (dialect === 'sqlite') {
+      const result: any = await sequelize.query(`
+        SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}';
+      `, { raw: true });
+      return (result?.[0] as any)?.length > 0;
+    }
+    return true;
+  } catch (error) {
+    logger.warn(`⚠️ Error checking if table ${tableName} exists:`, error);
+    return false;
   }
 }
 

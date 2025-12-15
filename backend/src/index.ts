@@ -30,23 +30,26 @@ const initializeDatabase = async (): Promise<void> => {
     }
 
     if (dbConnected) {
-      logger.info('🔄 Running database migrations...');
-      try {
-        await runMigrations();
-      } catch (error) {
-        logger.warn('⚠️ Database migration error (tables may already exist):', error);
-      }
-
       logger.info('📊 Synchronizing database schema...');
-      await syncDatabase(false).catch((error) => {
-        logger.warn('⚠️ Database sync failed, continuing without sync:', error.message);
-      });
+      try {
+        await syncDatabase(false);
+      } catch (error) {
+        logger.error('❌ Database sync failed, aborting initialization:', error);
+        return;
+      }
 
       logger.info('🌱 Seeding database with initial data...');
       try {
         await seedDatabase();
       } catch (error) {
         logger.warn('⚠️ Database seeding failed, continuing:', error);
+      }
+
+      logger.info('🔄 Running database migrations...');
+      try {
+        await runMigrations();
+      } catch (error) {
+        logger.warn('⚠️ Database migration error (tables may already exist):', error);
       }
 
       logger.info('📦 Fixing slider paths and populating default sliders for existing stores...');
