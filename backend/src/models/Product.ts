@@ -12,6 +12,7 @@ interface ProductAttributes {
   discountStart?: Date;
   discountEnd?: Date;
   category: string;
+  categoryId?: number;
   brand?: string;
   image: string;
   thumbnail?: string;
@@ -51,6 +52,7 @@ class Product extends Model<ProductAttributes, ProductCreationAttributes> implem
   declare discountStart?: Date;
   declare discountEnd?: Date;
   declare category: string;
+  declare categoryId?: number;
   declare brand?: string;
   declare image: string;
   declare thumbnail?: string;
@@ -126,6 +128,16 @@ Product.init(
     category: {
       type: DataTypes.STRING(100),
       allowNull: false,
+    },
+    categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      field: 'category_id',
+      references: {
+        model: 'categories',
+        key: 'id',
+      },
+      onDelete: 'SET NULL',
     },
     brand: {
       type: DataTypes.STRING(100),
@@ -233,11 +245,12 @@ Product.init(
     tableName: 'products',
     timestamps: true,
     underscored: false,
-    charset: 'utf8mb4',
-    collate: 'utf8mb4_unicode_ci',
     indexes: [
       {
         fields: ['category'],
+      },
+      {
+        fields: ['categoryId'],
       },
       {
         fields: ['storeId'],

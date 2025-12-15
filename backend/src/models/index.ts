@@ -92,11 +92,11 @@ const defineAssociations = (): void => {
   });
 
   Category.hasMany(Product, {
-    foreignKey: 'category',
+    foreignKey: 'categoryId',
     as: 'products',
   });
   Product.belongsTo(Category, {
-    foreignKey: 'category',
+    foreignKey: 'categoryId',
     as: 'productCategory',
   });
 

@@ -84,8 +84,6 @@ Category.init(
     tableName: 'categories',
     timestamps: true,
     underscored: false,
-    charset: 'utf8mb4',
-    collate: 'utf8mb4_unicode_ci',
     indexes: [
       {
         fields: ['storeId'],
