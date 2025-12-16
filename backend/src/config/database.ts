@@ -137,7 +137,7 @@ export const syncDatabase = async (force = false): Promise<void> => {
       await sequelize.query('SET CONSTRAINTS ALL DEFERRED');
     }
     
-    await sequelize.sync({ force: false, alter: false });
+    await sequelize.sync({ force: true, alter: false });
     
     logger.info('✅ Database synchronized successfully');
   } catch (error) {
