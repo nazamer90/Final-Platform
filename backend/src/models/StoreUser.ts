@@ -32,10 +32,12 @@ StoreUser.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    userId: {
-      type: DataTypes.STRING(36),
-      allowNull: false,
-    },
+       userId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        references: { model: 'users', key: 'id' },
+        onDelete: 'CASCADE',
+      },
     role: {
       type: DataTypes.ENUM('owner', 'manager', 'staff'),
       allowNull: false,
