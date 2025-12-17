@@ -1,15 +1,21 @@
 import sequelize from '@config/database';
 import logger from '@utils/logger';
 
-const isMySQL = ((sequelize as any).options).dialect === 'mysql';
+const dialect = (sequelize as any).getDialect
+  ? (sequelize as any).getDialect()
+  : ((sequelize as any).options?.dialect as string);
 
 const createTables = async (): Promise<void> => {
   try {
-    if (isMySQL) {
+    if (dialect === 'mysql') {
       await createTablesMySQL();
-    } else {
+    } else if (dialect === 'sqlite') {
       await createTablesSQLite();
+    } else {
+      logger.info(`ℹ️ Skipping legacy SQL table creation for dialect: ${dialect}`);
+      return;
     }
+
     logger.info('✅ All database tables created successfully');
   } catch (error) {
     logger.error('❌ Error creating database tables:', error);
