@@ -49,17 +49,16 @@ const initializeDatabase = async (): Promise<void> => {
          logger.info('ℹ️ Skipping database seeding');
           }
 
-          logger.info('🔄 Running database migrations...');
-          if (process.env.RUN_LEGACY_MIGRATIONS === 'true') {
-         try {
-        await runMigrations();
-         } catch (error) {
-        logger.warn('⚠️ Database migration error (tables may already    
-           exist):', error);
-         }
-          } else {
-         logger.info('ℹ️ Skipping legacy SQL migrations');
-          }
+                logger.info('🌱 Seeding database with initial data...');
+                if (process.env.SEED_DB === 'true') {
+             try {
+          await seedDatabase();
+             } catch (error) {
+          logger.warn('⚠️ Database seeding failed, continuing:', error);
+             }
+                } else {
+            logger.info('ℹ️ Skipping database seeding');
+               }
 
       logger.info('📦 Fixing slider paths and populating default sliders for existing stores...');
       try {
