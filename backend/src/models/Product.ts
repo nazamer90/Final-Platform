@@ -250,7 +250,7 @@ Product.init(
         fields: ['category'],
       },
       {
-        fields: ['categoryId'],
+        fields: ['category_id'],
       },
       {
         fields: ['storeId'],
