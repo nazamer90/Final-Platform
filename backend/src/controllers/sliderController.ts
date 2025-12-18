@@ -4,21 +4,30 @@ import StoreSlider from '@models/StoreSlider';
 import Store from '@models/Store';
 import logger from '@utils/logger';
 
+const findStoreByIdentifier = async (storeIdentifier: string): Promise<any> => {
+  try {
+    if (/^\d+$/.test(storeIdentifier)) {
+      const byId = await Store.findByPk(parseInt(storeIdentifier, 10));
+      if (byId) return byId;
+    }
+
+    let store = await Store.findOne({ where: { slug: storeIdentifier } });
+    if (store) return store;
+
+    store = await Store.findOne({ where: { merchantId: storeIdentifier } });
+    if (store) return store;
+
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 export const getStoreSliders = async (req: Request, res: Response): Promise<void> => {
   try {
     const { storeId } = req.params;
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await findStoreByIdentifier(String(storeId));
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -46,17 +55,7 @@ export const createStoreSlider = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await findStoreByIdentifier(String(storeId));
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -97,17 +96,7 @@ export const updateStoreSlider = async (req: Request, res: Response): Promise<vo
     const { storeId, sliderId } = req.params;
     const { title, subtitle, buttonText, imagePath, sortOrder, metadata } = req.body;
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await findStoreByIdentifier(String(storeId));
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -150,17 +139,7 @@ export const deleteStoreSlider = async (req: Request, res: Response): Promise<vo
   try {
     const { storeId, sliderId } = req.params;
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await findStoreByIdentifier(String(storeId));
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -195,17 +174,7 @@ export const bulkDeleteStoreSliders = async (req: Request, res: Response): Promi
       return;
     }
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await findStoreByIdentifier(String(storeId));
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -233,17 +202,7 @@ export const updateSlidersOrder = async (req: Request, res: Response): Promise<v
       return;
     }
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await findStoreByIdentifier(String(storeId));
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -312,17 +271,7 @@ export const uploadSliderImage = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await findStoreByIdentifier(String(storeId));
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
