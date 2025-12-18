@@ -269,7 +269,7 @@ export const uploadSliderImage = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    const imagePath = `/assets/${store.id}/sliders/${req.file.filename}`;
+    const imagePath = `/assets/${storeId}/sliders/${req.file.filename}`;
 
     logger.info(`Slider image uploaded for store ${storeId}: ${req.file.filename}`);
     res.status(201).json({

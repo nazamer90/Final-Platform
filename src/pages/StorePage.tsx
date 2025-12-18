@@ -96,19 +96,72 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
   }, []);
 
   const getTextPositionStyle = (position?: string) => {
-    const baseClasses = "absolute text-center";
+    const baseClasses = "absolute";
     const positionMap: Record<string, string> = {
       'top-left': 'top-2 left-2 text-left',
-      'top-center': 'top-2 left-1/2 -translate-x-1/2',
+      'top-center': 'top-2 left-1/2 -translate-x-1/2 text-center',
       'top-right': 'top-2 right-2 text-right',
       'center-left': 'top-1/2 -translate-y-1/2 left-2 text-left',
-      'center': 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+      'center': 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center',
       'center-right': 'top-1/2 -translate-y-1/2 right-2 text-right',
       'bottom-left': 'bottom-2 left-2 text-left',
-      'bottom-center': 'bottom-2 left-1/2 -translate-x-1/2',
+      'bottom-center': 'bottom-2 left-1/2 -translate-x-1/2 text-center',
       'bottom-right': 'bottom-2 right-2 text-right',
     };
     return `${baseClasses} ${positionMap[position || 'center']}`;
+  };
+
+  const getMainTextSizeClass = (size?: string): string => {
+    switch (size) {
+      case 'sm':
+        return 'text-xs md:text-sm';
+      case 'base':
+        return 'text-sm md:text-base';
+      case 'lg':
+        return 'text-base md:text-lg';
+      case 'xl':
+        return 'text-lg md:text-xl';
+      case '2xl':
+        return 'text-xl md:text-2xl';
+      default:
+        return 'text-sm md:text-base';
+    }
+  };
+
+  const getSubTextSizeClass = (size?: string): string => {
+    switch (size) {
+      case 'xs':
+        return 'text-xs';
+      case 'sm':
+        return 'text-sm';
+      case 'base':
+        return 'text-base';
+      default:
+        return 'text-sm';
+    }
+  };
+
+  const getFontClass = (font?: string): string => {
+    switch (font) {
+      case 'Cairo-Light':
+        return 'font-light';
+      case 'Cairo-ExtraLight':
+        return 'font-extralight';
+      case 'Cairo-Regular':
+        return 'font-normal';
+      case 'Cairo-Medium':
+        return 'font-medium';
+      case 'Cairo-SemiBold':
+        return 'font-semibold';
+      case 'Cairo-Bold':
+        return 'font-bold';
+      case 'Cairo-ExtraBold':
+        return 'font-extrabold';
+      case 'Cairo-Black':
+        return 'font-black';
+      default:
+        return 'font-semibold';
+    }
   };
 
   const getStoreConfig = (slug: string) => {
@@ -298,8 +351,8 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
                   <div key={ad.id} className="flex-shrink-0 bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer" onClick={() => ad.linkUrl && window.open(ad.linkUrl, '_blank')}>
                     <div className="relative w-64 h-24">
                       <img src={template?.image} alt={ad.title} className="w-full h-full object-cover" />
-                      <div className={`${getTextPositionStyle(ad.textPosition)} max-w-[95%]`} style={{ color: ad.textColor || '#ffffff', fontFamily: 'Cairo, sans-serif', fontWeight: 600 }}>
-                        <h4 className="text-sm font-semibold line-clamp-2">{ad.title}</h4>
+                      <div className={`${getTextPositionStyle(ad.textPosition)} max-w-[95%]`} style={{ color: ad.textColor || '#ffffff' }}>
+                        <h4 className={`${getFontClass(ad.textFont)} ${getMainTextSizeClass(ad.mainTextSize)} drop-shadow-lg leading-tight line-clamp-2`}>{ad.title}</h4>
                       </div>
                     </div>
                     <div className="p-2 bg-white">
@@ -349,8 +402,13 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
                           <Card key={ad.id} className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onClick={() => ad.linkUrl && window.open(ad.linkUrl, '_blank')}>
                             <div className="relative aspect-video bg-gray-100">
                               <img src={template?.image} alt={ad.title} className="w-full h-full object-cover" />
-                              <div className={`${getTextPositionStyle(ad.textPosition)} w-full px-3`} style={{ color: ad.textColor || '#ffffff', fontFamily: 'Cairo, sans-serif', fontWeight: 600 }}>
-                                <h3 className="font-semibold mb-1 text-sm line-clamp-2">{ad.title}</h3>
+                              <div className={`${getTextPositionStyle(ad.textPosition)} w-full px-3`} style={{ color: ad.textColor || '#ffffff' }}>
+                                <h3 className={`${getFontClass(ad.textFont)} ${getMainTextSizeClass(ad.mainTextSize)} drop-shadow-lg mb-1 leading-tight line-clamp-2`}>{ad.title}</h3>
+                                {ad.description && (
+                                  <p className={`${getFontClass(ad.textFont)} ${getSubTextSizeClass(ad.subTextSize)} drop-shadow-lg opacity-90 line-clamp-2 leading-snug`}>
+                                    {ad.description}
+                                  </p>
+                                )}
                               </div>
                             </div>
                             <CardContent className="p-3">
