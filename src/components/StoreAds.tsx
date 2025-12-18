@@ -28,26 +28,31 @@ interface StoreAdsProps {
 const getTextPositionClass = (position?: string): string => {
   switch (position) {
     case 'top-left':
-      return 'top-0 left-0 text-right pt-2 pr-4';
+      return 'top-4 left-4 text-left';
     case 'top-center':
-      return 'top-0 left-1/2 -translate-x-1/2 text-center pt-2 px-4';
+      return 'top-4 left-1/2 -translate-x-1/2 text-center';
     case 'top-right':
-      return 'top-0 right-0 text-left pt-2 pl-4';
+      return 'top-4 right-4 text-right';
     case 'center-left':
-      return 'top-1/2 -translate-y-1/2 left-0 text-right px-2 pr-4';
+      return 'top-1/2 left-4 -translate-y-1/2 text-left';
     case 'center':
-      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center px-4';
+      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center';
     case 'center-right':
-      return 'top-1/2 -translate-y-1/2 right-0 text-left px-2 pl-4';
+      return 'top-1/2 right-4 -translate-y-1/2 text-right';
     case 'bottom-left':
-      return 'bottom-0 left-0 text-right pb-2 pr-4';
+      return 'bottom-4 left-4 text-left';
     case 'bottom-center':
-      return 'bottom-0 left-1/2 -translate-x-1/2 text-center pb-2 px-4';
+      return 'bottom-4 left-1/2 -translate-x-1/2 text-center';
     case 'bottom-right':
-      return 'bottom-0 right-0 text-left pb-2 pl-4';
+      return 'bottom-4 right-4 text-right';
     default:
-      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center px-4';
+      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center';
   }
+};
+
+const getTemplateImage = (templateId?: string): string => {
+  if (!templateId) return '/AdsForms/adv1.jpg';
+  return `/AdsForms/${templateId}.jpg`;
 };
 
 const getMainTextSizeClass = (size?: string): string => {
@@ -190,40 +195,31 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
             const mainSizeClass = getMainTextSizeClass(ad.mainTextSize);
             const subSizeClass = getSubTextSizeClass(ad.subTextSize);
             const fontClass = getFontClass(ad.textFont);
-            
+            const backgroundSrc = ad.imageUrl || getTemplateImage(ad.templateId);
+
             return (
-            <div
-              key={adKey}
-              className="relative w-full h-40 md:h-48 lg:h-56 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer group"
-              onClick={() => handleAdClick(ad)}
-            >
-              {ad.imageUrl ? (
+              <div
+                key={adKey}
+                className="relative w-full h-40 md:h-48 lg:h-56 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer group"
+                onClick={() => handleAdClick(ad)}
+              >
                 <img
-                  src={ad.imageUrl}
+                  src={backgroundSrc}
                   alt={ad.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-200 to-purple-200">
-                  <div className="text-center text-white">
-                    <div className="text-sm md:text-base font-semibold mb-2">{ad.title}</div>
-                    <div className="text-xs md:text-sm opacity-90">{ad.description}</div>
-                  </div>
-                </div>
-              )}
 
-              {ad.imageUrl && (
-                <>
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-all" />
-                  <div className={`absolute ${positionClass} p-4`} style={{ color: textColor, maxWidth: '90%' }}>
-                    <h3 className={`${fontClass} ${mainSizeClass} md:text-xl mb-1 drop-shadow-lg`}>{ad.title}</h3>
-                    {ad.description && (
-                      <p className={`${fontClass} ${subSizeClass} md:text-base opacity-90 px-2 line-clamp-2 drop-shadow-lg`}>{ad.description}</p>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
+                <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-all" />
+                <div className={`absolute ${positionClass} p-4 max-w-[90%]`} style={{ color: textColor }}>
+                  <h3 className={`${fontClass} ${mainSizeClass} drop-shadow-lg mb-1 leading-tight`}>{ad.title}</h3>
+                  {ad.description && (
+                    <p className={`${fontClass} ${subSizeClass} opacity-90 line-clamp-2 drop-shadow-lg leading-snug`}>{ad.description}</p>
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>
@@ -233,40 +229,37 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
         <div className="space-y-4" data-placement="between-products">
           {betweenProductsAds.map((ad, index) => {
             const adKey = ad.id || `between-ad-${index}-${ad.title}`;
-            const textColor = ad.textColor || '#000000';
+            const textColor = ad.textColor || '#ffffff';
+            const positionClass = getTextPositionClass(ad.textPosition);
             const mainSizeClass = getMainTextSizeClass(ad.mainTextSize);
             const subSizeClass = getSubTextSizeClass(ad.subTextSize);
             const fontClass = getFontClass(ad.textFont);
-            
+            const backgroundSrc = ad.imageUrl || getTemplateImage(ad.templateId);
+
             return (
-            <div
-              key={adKey}
-              className="w-full bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => handleAdClick(ad)}
-            >
-              <div className="flex flex-col md:flex-row items-center p-4 md:p-6 gap-4">
-                {ad.imageUrl && (
-                  <div className="w-full md:w-32 h-32 md:h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
-                    <img
-                      src={ad.imageUrl}
-                      alt={ad.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform"
-                    />
-                  </div>
-                )}
-                <div className="flex-1 text-center md:text-right" style={{ color: textColor }}>
-                  <h4 className={`${fontClass} ${mainSizeClass} md:text-base mb-1`}>{ad.title}</h4>
+              <div
+                key={adKey}
+                className="relative overflow-hidden rounded-2xl border-none shadow-2xl group w-full cursor-pointer"
+                style={{ aspectRatio: '1920 / 450', minHeight: '220px' }}
+                onClick={() => handleAdClick(ad)}
+              >
+                <img
+                  src={backgroundSrc}
+                  alt={ad.title}
+                  className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className={`absolute ${positionClass} p-4 max-w-[90%]`} style={{ color: textColor }}>
+                  <h3 className={`${fontClass} ${mainSizeClass} drop-shadow-lg mb-1 leading-tight`}>{ad.title}</h3>
                   {ad.description && (
-                    <p className={`${fontClass} ${subSizeClass} md:text-sm line-clamp-2`} style={{ color: textColor, opacity: 0.8 }}>{ad.description}</p>
+                    <p className={`${fontClass} ${subSizeClass} drop-shadow-lg opacity-90 line-clamp-2 leading-snug`}>{ad.description}</p>
                   )}
                 </div>
-                <div className="flex-shrink-0">
-                  <button className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-medium hover:from-green-600 hover:to-emerald-600 transition">
-                    عرض
-                  </button>
-                </div>
               </div>
-            </div>
             );
           })}
         </div>
