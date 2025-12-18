@@ -733,6 +733,84 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                         return templates[templateId] || '/AdsForms/adv1.jpg';
                       };
 
+                      const getTextPositionClass = (position?: string): string => {
+                        switch (position) {
+                          case 'top-left':
+                            return 'top-4 left-4 text-left';
+                          case 'top-center':
+                            return 'top-4 left-1/2 -translate-x-1/2 text-center';
+                          case 'top-right':
+                            return 'top-4 right-4 text-right';
+                          case 'center-left':
+                            return 'top-1/2 left-4 -translate-y-1/2 text-left';
+                          case 'center':
+                            return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center';
+                          case 'center-right':
+                            return 'top-1/2 right-4 -translate-y-1/2 text-right';
+                          case 'bottom-left':
+                            return 'bottom-4 left-4 text-left';
+                          case 'bottom-center':
+                            return 'bottom-4 left-1/2 -translate-x-1/2 text-center';
+                          case 'bottom-right':
+                            return 'bottom-4 right-4 text-right';
+                          default:
+                            return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center';
+                        }
+                      };
+
+                      const getMainTextSizeClass = (size?: string): string => {
+                        switch (size) {
+                          case 'sm':
+                            return 'text-sm md:text-base';
+                          case 'base':
+                            return 'text-base md:text-lg';
+                          case 'lg':
+                            return 'text-lg md:text-xl';
+                          case 'xl':
+                            return 'text-xl md:text-2xl';
+                          case '2xl':
+                            return 'text-2xl md:text-3xl';
+                          default:
+                            return 'text-lg md:text-xl';
+                        }
+                      };
+
+                      const getSubTextSizeClass = (size?: string): string => {
+                        switch (size) {
+                          case 'xs':
+                            return 'text-xs md:text-sm';
+                          case 'sm':
+                            return 'text-sm md:text-base';
+                          case 'base':
+                            return 'text-base md:text-lg';
+                          default:
+                            return 'text-sm md:text-base';
+                        }
+                      };
+
+                      const getFontClass = (font?: string): string => {
+                        switch (font) {
+                          case 'Cairo-Light':
+                            return 'font-light';
+                          case 'Cairo-ExtraLight':
+                            return 'font-extralight';
+                          case 'Cairo-Regular':
+                            return 'font-normal';
+                          case 'Cairo-Medium':
+                            return 'font-medium';
+                          case 'Cairo-SemiBold':
+                            return 'font-semibold';
+                          case 'Cairo-Bold':
+                            return 'font-bold';
+                          case 'Cairo-ExtraBold':
+                            return 'font-extrabold';
+                          case 'Cairo-Black':
+                            return 'font-black';
+                          default:
+                            return 'font-semibold';
+                        }
+                      };
+
                       return (
                         <Card className="relative overflow-hidden rounded-2xl border-none shadow-2xl group w-full" style={{ aspectRatio: '1920 / 450', minHeight: '250px' }}>
                           <div className="relative w-full h-full">
@@ -754,11 +832,20 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                                   }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                                
-                                <div className="absolute inset-0 flex items-center justify-center p-4 text-white">
-                                  <div className="text-center">
-                                    <h3 className="text-lg md:text-xl font-bold drop-shadow-lg mb-1">{ad.title}</h3>
-                                    <p className="text-sm md:text-base text-white/90 drop-shadow-lg line-clamp-2">{ad.description}</p>
+
+                                <div className="absolute inset-0 p-4">
+                                  <div
+                                    className={`absolute ${getTextPositionClass(ad.textPosition)} max-w-[90%]`}
+                                    style={{ color: ad.textColor || '#ffffff' }}
+                                  >
+                                    <h3 className={`${getFontClass(ad.textFont)} ${getMainTextSizeClass(ad.mainTextSize)} drop-shadow-lg mb-1 leading-tight`}>
+                                      {ad.title}
+                                    </h3>
+                                    {ad.description && (
+                                      <p className={`${getFontClass(ad.textFont)} ${getSubTextSizeClass(ad.subTextSize)} drop-shadow-lg opacity-90 line-clamp-2 leading-snug`}>
+                                        {ad.description}
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
                               </div>
