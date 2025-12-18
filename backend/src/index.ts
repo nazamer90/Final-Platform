@@ -113,11 +113,7 @@ const startServer = (): void => {
       });
     });
 
-    if (process.env.SKIP_DB_INIT !== 'true') {
-      initializeDatabase();
-    } else {
-      logger.warn('⚠️ SKIP_DB_INIT is true, skipping database initialization');
-    }
+    initializeDatabase();
   } catch (error) {
     logger.error('❌ Failed to start server:', error);
     process.exit(1);
