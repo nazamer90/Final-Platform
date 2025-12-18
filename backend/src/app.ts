@@ -43,9 +43,19 @@ app.use(helmet({
   },
 }));
 
-const corsOptions = {
-  origin: '*',
-  credentials: false,
+const allowedOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.length === 0) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Session-Id'],
   optionsSuccessStatus: 200,
@@ -57,19 +67,17 @@ app.options('*', cors(corsOptions));
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
+    secret: process.env.SESSION_SECRET || '6f91bc1ecc37067446dcbd6af83eec73d2a97dceb167da3b8a0547c4d5a5864c',
     resave: false,
     saveUninitialized: true,
-    cookie: {
-      secure: isProduction,
-      httpOnly: true,
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000,
-    },
+     cookie: {
+     secure: true,
+     httpOnly: true,
+     sameSite:'none',
+     maxAge: 24 * 60 * 60 * 1000,
+   },
   })
 );
-
-
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -111,16 +119,6 @@ logger.info(`📁 Static assets configuration:`);
 logger.info(`   Base Path: ${basePath}`);
 logger.info(`   Public Path: ${publicPath}`);
 logger.info(`   Assets Path: ${assetsPath}`);
-
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS, POST, PUT, DELETE, PATCH');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
 
 app.use('/assets', express.static(assetsPath, { 
   maxAge: '1h',

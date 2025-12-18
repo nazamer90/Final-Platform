@@ -475,7 +475,7 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
               {/* اسم المستخدم */}
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-right">
@@ -483,6 +483,8 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
                 </Label>
                 <Input
                   id="username"
+                            name="username"
+                            autoComplete="off"
                   type={userType === 'admin' ? 'email' : 'text'}
                   placeholder={
                     userType === 'admin'
@@ -504,6 +506,8 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
                 <div className="relative">
                   <Input
                     id="password"
+                               name="password"
+                               autoComplete="new-password"
                     type={showPassword ? "text" : "password"}
                     placeholder="أدخل كلمة المرور"
                     value={credentials.password}
