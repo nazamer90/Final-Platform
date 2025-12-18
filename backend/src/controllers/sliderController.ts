@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import StoreSlider from '@models/StoreSlider';
 import Store from '@models/Store';
 import logger from '@utils/logger';
@@ -61,14 +62,26 @@ export const createStoreSlider = async (req: Request, res: Response): Promise<vo
       return;
     }
 
+    const isDataImage = typeof imagePath === 'string' && imagePath.startsWith('data:image/');
+    const sliderId = isDataImage ? crypto.randomUUID() : undefined;
+    const resolvedImagePath = isDataImage && sliderId ? `/api/sliders/image/${sliderId}` : imagePath;
+    const resolvedMetadata = (() => {
+      const base = (metadata && typeof metadata === 'object') ? metadata : {};
+      if (isDataImage) {
+        return { ...base, imageData: imagePath };
+      }
+      return Object.keys(base).length ? base : null;
+    })();
+
     const slider = await StoreSlider.create({
+      ...(sliderId ? { id: sliderId } : {}),
       storeId: store.id,
       title: title.slice(0, 255),
       subtitle: subtitle ? subtitle.slice(0, 512) : undefined,
       buttonText: buttonText ? buttonText.slice(0, 128) : undefined,
-      imagePath: imagePath,
+      imagePath: resolvedImagePath,
       sortOrder: sortOrder || 0,
-      metadata: metadata || null,
+      metadata: resolvedMetadata,
     });
 
     logger.info(`Slider created for store ${storeId}: ${slider.id}`);
@@ -109,13 +122,20 @@ export const updateStoreSlider = async (req: Request, res: Response): Promise<vo
       return;
     }
 
+    const isDataImage = typeof imagePath === 'string' && imagePath.startsWith('data:image/');
+    const nextMetadataBase = (metadata !== undefined && metadata && typeof metadata === 'object')
+      ? metadata
+      : ((slider.metadata && typeof slider.metadata === 'object') ? slider.metadata : {});
+    const nextMetadata = isDataImage ? { ...nextMetadataBase, imageData: imagePath } : nextMetadataBase;
+    const nextImagePath = isDataImage ? `/api/sliders/image/${slider.id}` : imagePath;
+
     await slider.update({
       ...(title && { title: title.slice(0, 255) }),
       ...(subtitle !== undefined && { subtitle: subtitle ? subtitle.slice(0, 512) : null }),
       ...(buttonText !== undefined && { buttonText: buttonText ? buttonText.slice(0, 128) : null }),
-      ...(imagePath && { imagePath: imagePath }),
+      ...(imagePath && { imagePath: nextImagePath }),
       ...(sortOrder !== undefined && { sortOrder }),
-      ...(metadata !== undefined && { metadata }),
+      ...(metadata !== undefined || isDataImage ? { metadata: Object.keys(nextMetadata).length ? nextMetadata : null } : {}),
     });
 
     logger.info(`Slider updated: ${sliderId}`);
@@ -241,6 +261,45 @@ export const updateSlidersOrder = async (req: Request, res: Response): Promise<v
   } catch (error) {
     logger.error('Error updating sliders order:', error);
     res.status(500).json({ success: false, error: 'Failed to update sliders order' });
+  }
+};
+
+export const getSliderImage = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { sliderId } = req.params as any;
+
+    const slider = await StoreSlider.findByPk(sliderId);
+    if (!slider) {
+      res.status(404).send('Not found');
+      return;
+    }
+
+    const meta: any = slider.metadata || {};
+    const imageData: any = meta?.imageData;
+
+    if (typeof imageData !== 'string' || !imageData.startsWith('data:image/')) {
+      res.status(404).send('Not found');
+      return;
+    }
+
+    const commaIndex = imageData.indexOf(',');
+    if (commaIndex === -1) {
+      res.status(400).send('Invalid image');
+      return;
+    }
+
+    const header = imageData.slice(0, commaIndex);
+    const base64 = imageData.slice(commaIndex + 1);
+    const mimeMatch = header.match(/^data:([^;]+);base64$/);
+    const contentType = mimeMatch?.[1] || 'image/png';
+
+    const buffer = Buffer.from(base64, 'base64');
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.status(200).send(buffer);
+  } catch (error) {
+    logger.error('Error serving slider image:', error);
+    res.status(500).send('Error');
   }
 };
 

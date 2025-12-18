@@ -60,8 +60,26 @@ const SimplifiedSliderManager: React.FC<SimplifiedSliderManagerProps> = ({
   const [selectedForDeletion, setSelectedForDeletion] = useState<Set<string>>(new Set());
   const [showDeleteMode, setShowDeleteMode] = useState(false);
   const [loading, setLoading] = useState(false);
-const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+
+  const shouldUseInlineImageUpload = () => {
+    try {
+      const host = window.location.hostname;
+      return host !== 'localhost' && host !== '127.0.0.1';
+    } catch {
+      return true;
+    }
+  };
+
+  const fileToDataUrl = (file: File) => {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  };
   const [storeData, setStoreData] = useState<any>(null);
 
   useEffect(() => {
@@ -207,51 +225,71 @@ const fileInputRef = useRef<HTMLInputElement>(null);
     setCurrentSlideIndex((prev) => (prev - 1 + sliders.length) % sliders.length);
   };
 
-const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, forEdit: boolean = false) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, forEdit: boolean = false) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  if (!file.type.startsWith('image/')) {
-    showNotification('يرجى اختيار ملف صورة صحيح', 'error');
-    return;
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    showNotification('حجم الصورة يجب أن يكون أقل من 5 ميجابايت', 'error');
-    return;
-  }
-
-  try {
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    const uploadResponse = await fetch(`${apiUrl}/sliders/store/${storeId}/upload`, {
-      method: 'POST',
-      body: formData
-    });
-    
-    if (uploadResponse.ok) {
-      const uploadResult = await uploadResponse.json();
-      const imagePath = uploadResult.data?.imagePath || `/assets/${storeId}/sliders/${uploadResult.data?.filename}`;
-      
-      if (forEdit) {
-        setEditForm({ ...editForm, imageUrl: imagePath });
-      } else {
-        setCreateForm({ ...createForm, imageUrl: imagePath });
-      }
-      showNotification('تم تحميل الصورة بنجاح', 'success');
-    } else {
-      showNotification('فشل تحميل الصورة', 'error');
+    if (!file.type.startsWith('image/')) {
+      showNotification('يرجى اختيار ملف صورة صحيح', 'error');
+      return;
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-    showNotification(`خطأ في تحميل الصورة: ${errorMessage}`, 'error');
-  } finally {
-    setLoading(false);
-  }
-};
+
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification('حجم الصورة يجب أن يكون أقل من 5 ميجابايت', 'error');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      if (shouldUseInlineImageUpload()) {
+        const dataUrl = await fileToDataUrl(file);
+        if (!dataUrl || !dataUrl.startsWith('data:image/')) {
+          showNotification('فشل تحميل الصورة', 'error');
+          return;
+        }
+
+        if (forEdit) {
+          setEditForm({ ...editForm, imageUrl: dataUrl });
+        } else {
+          setCreateForm({ ...createForm, imageUrl: dataUrl });
+        }
+
+        showNotification('تم تحميل الصورة بنجاح', 'success');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const uploadResponse = await fetch(`${apiUrl}/sliders/store/${storeId}/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        const imagePath = uploadResult.data?.imagePath || `/assets/${storeId}/sliders/${uploadResult.data?.filename}`;
+
+        if (forEdit) {
+          setEditForm({ ...editForm, imageUrl: imagePath });
+        } else {
+          setCreateForm({ ...createForm, imageUrl: imagePath });
+        }
+
+        showNotification('تم تحميل الصورة بنجاح', 'success');
+      } else {
+        const errText = await uploadResponse.text().catch(() => '');
+        showNotification(`فشل تحميل الصورة${errText ? `: ${errText}` : ''}`, 'error');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
+      showNotification(`خطأ في تحميل الصورة: ${errorMessage}`, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openEditDialog = (slider: SliderData) => {
     stopAutoPlay();

@@ -10,6 +10,7 @@ import {
   bulkDeleteStoreSliders,
   updateSlidersOrder,
   uploadSliderImage,
+  getSliderImage,
 } from '@controllers/sliderController';
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -43,6 +44,7 @@ const upload = multer({
 
 const router = Router();
 
+router.get('/image/:sliderId', getSliderImage);
 router.get('/store/:storeId', getStoreSliders);
 router.post('/store/:storeId', createStoreSlider);
 router.put('/store/:storeId/:sliderId', updateStoreSlider);
