@@ -790,6 +790,27 @@ const resolveMerchantId = (merchant?: any): string | null => {
   return null;
 };
 
+const canonicalStoreSlug = (value?: string | null): string | null => {
+  if (!value) {
+    return null;
+  }
+  const normalized = value.toString().trim().toLowerCase().replace(/\s+/g, '-');
+  if (!normalized) {
+    return null;
+  }
+  const alias: Record<string, string> = {
+    sherine: 'sheirine',
+    sheirin: 'sheirine',
+    delta: 'delta-store',
+    details: 'delta-store',
+    detail: 'delta-store',
+    megna: 'magna-beauty',
+    magna: 'magna-beauty',
+    magna_beauty: 'magna-beauty',
+  };
+  return alias[normalized] || normalized;
+};
+
 const DASHBOARD_SECTION_ACCESS: Partial<Record<DashboardSection, string | string[]>> = {
   overview: 'overview-root',
   'orders-manual': 'orders-manual',
@@ -1148,13 +1169,15 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
       reasons.push(`from merchantId: ${slug}`);
     }
 
-    if (slug) {
-      console.log('[EnhancedMerchantDashboard] merchantStoreSlug determined:', slug, reasons);
+    const canonical = slug ? canonicalStoreSlug(slug) : null;
+
+    if (canonical) {
+      console.log('[EnhancedMerchantDashboard] merchantStoreSlug determined:', canonical, { raw: slug, reasons });
     } else {
       console.warn('[EnhancedMerchantDashboard] merchantStoreSlug could not be determined');
     }
 
-    return slug;
+    return canonical;
   }, [currentMerchant, merchantProfile, merchantId]);
 
   useEffect(() => {

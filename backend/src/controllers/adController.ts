@@ -1,36 +1,56 @@
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import StoreAd from '@models/StoreAd';
 import Store from '@models/Store';
 import logger from '@utils/logger';
 
-const findStoreByIdOrSlug = async (storeIdentifier: string): Promise<any> => {
-  const numericId = parseInt(storeIdentifier, 10);
-  
-  if (!isNaN(numericId)) {
+const findStoreByIdentifier = async (storeIdentifier: string): Promise<any> => {
+  const raw = (storeIdentifier ?? '').toString().trim();
+  if (!raw) {
+    return null;
+  }
+
+  if (/^\d+$/.test(raw)) {
+    const numericId = Number(raw);
     const store = await Store.findByPk(numericId);
     if (store) {
-      logger.info(`[findStoreByIdOrSlug] Found store by ID: ${numericId}`);
+      logger.info(`[findStoreByIdentifier] Found store by ID: ${numericId}`);
       return store;
     }
   }
-  
-  let store = await Store.findOne({
-    where: { slug: storeIdentifier }
-  });
+
+  let store = await Store.findOne({ where: { slug: raw } });
   if (store) {
-    logger.info(`[findStoreByIdOrSlug] Found store by slug: ${storeIdentifier} (ID: ${store.id})`);
+    logger.info(`[findStoreByIdentifier] Found store by slug: ${raw} (ID: ${store.id})`);
     return store;
   }
-  
+
+  store = await Store.findOne({ where: { merchantId: raw } });
+  if (store) {
+    logger.info(`[findStoreByIdentifier] Found store by merchantId: ${raw} (ID: ${store.id})`);
+    return store;
+  }
+
+  store = await Store.findOne({ where: { name: raw } });
+  if (store) {
+    logger.info(`[findStoreByIdentifier] Found store by name: ${raw} (ID: ${store.id})`);
+    return store;
+  }
+
   store = await Store.findOne({
-    where: { name: storeIdentifier }
+    where: {
+      slug: {
+        [Op.or]: [{ [Op.like]: `${raw}-%` }, { [Op.like]: `%-${raw}` }],
+      },
+    },
+    order: [['id', 'ASC']],
   });
   if (store) {
-    logger.info(`[findStoreByIdOrSlug] Found store by name: ${storeIdentifier} (ID: ${store.id})`);
+    logger.info(`[findStoreByIdentifier] Found store by slug pattern: ${raw} (ID: ${store.id}, slug: ${store.slug})`);
     return store;
   }
-  
-  logger.warn(`[findStoreByIdOrSlug] Store not found for identifier: ${storeIdentifier}`);
+
+  logger.warn(`[findStoreByIdentifier] Store not found for identifier: ${raw}`);
   return null;
 };
 
@@ -38,7 +58,7 @@ export const getStoreAds = async (req: Request, res: Response): Promise<void> =>
   try {
     const { storeId } = req.params;
 
-    const store = await findStoreByIdOrSlug(storeId);
+    const store = await findStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -49,7 +69,7 @@ export const getStoreAds = async (req: Request, res: Response): Promise<void> =>
       order: [['createdAt', 'DESC']],
     });
 
-    const plainAds = ads.map(ad => ad.toJSON());
+    const plainAds = ads.map((ad) => ad.toJSON());
     res.json({ success: true, data: plainAds });
   } catch (error) {
     logger.error('Error fetching store ads:', error);
@@ -60,17 +80,32 @@ export const getStoreAds = async (req: Request, res: Response): Promise<void> =>
 export const createStoreAd = async (req: Request, res: Response): Promise<void> => {
   try {
     const { storeId } = req.params;
-    const { templateId, title, description, placement, imageUrl, linkUrl, textPosition, textColor, textFont, mainTextSize, subTextSize } = req.body;
+    const {
+      templateId,
+      title,
+      description,
+      placement,
+      imageUrl,
+      linkUrl,
+      textPosition,
+      textColor,
+      textFont,
+      mainTextSize,
+      subTextSize,
+    } = req.body;
 
     logger.info(`[createStoreAd] Creating ad for store: ${storeId}, template: ${templateId}`);
 
     if (!templateId || !title || !description || !placement) {
       logger.warn(`[createStoreAd] Missing required fields`);
-      res.status(400).json({ success: false, error: 'Missing required fields: templateId, title, description, placement' });
+      res.status(400).json({
+        success: false,
+        error: 'Missing required fields: templateId, title, description, placement',
+      });
       return;
     }
 
-    const store = await findStoreByIdOrSlug(storeId);
+    const store = await findStoreByIdentifier(storeId);
     if (!store) {
       logger.warn(`[createStoreAd] Store not found: ${storeId}`);
       res.status(404).json({ success: false, error: 'Store not found' });
@@ -106,9 +141,20 @@ export const createStoreAd = async (req: Request, res: Response): Promise<void> 
 export const updateStoreAd = async (req: Request, res: Response): Promise<void> => {
   try {
     const { storeId, adId } = req.params;
-    const { templateId, title, description, placement, isActive, textPosition, textColor, textFont, mainTextSize, subTextSize } = req.body;
+    const {
+      templateId,
+      title,
+      description,
+      placement,
+      isActive,
+      textPosition,
+      textColor,
+      textFont,
+      mainTextSize,
+      subTextSize,
+    } = req.body;
 
-    const store = await findStoreByIdOrSlug(storeId);
+    const store = await findStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -153,7 +199,7 @@ export const deleteStoreAd = async (req: Request, res: Response): Promise<void> 
 
     logger.info(`[deleteStoreAd] Deleting ad ${adId} from store ${storeId}`);
 
-    const store = await findStoreByIdOrSlug(storeId);
+    const store = await findStoreByIdentifier(storeId);
     if (!store) {
       logger.warn(`[deleteStoreAd] Store not found: ${storeId}`);
       res.status(404).json({ success: false, error: 'Store not found' });
@@ -198,7 +244,7 @@ export const bulkDeleteStoreAds = async (req: Request, res: Response): Promise<v
       return;
     }
 
-    const store = await findStoreByIdOrSlug(storeId);
+    const store = await findStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;

@@ -15,7 +15,7 @@ export const register = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { email, password, firstName, lastName, phone, role = UserRole.CUSTOMER, storeName, storeCategory, storeDescription } = req.body;
+    const { email, password, firstName, lastName, phone, role = UserRole.CUSTOMER, storeName, storeCategory, storeDescription, storeSlug: requestedStoreSlug, subdomain } = req.body as any;
 
     if (!validateEmail(email)) {
       sendError(res, 'Invalid email format', 400, 'INVALID_EMAIL');
@@ -40,10 +40,15 @@ export const register = async (
     const userId = generateUUID();
     let storeSlug: string | undefined;
 
-    if (role === UserRole.MERCHANT && storeName) {
-      storeSlug = slugify(storeName);
-      const existingSlug = await User.findOne({ where: { storeSlug } });
-      if (existingSlug) {
+    if (role === UserRole.MERCHANT) {
+      const rawRequested = (requestedStoreSlug || subdomain || storeName || '').toString().trim();
+      const normalizedRequested = rawRequested ? slugify(rawRequested) : '';
+      const normalizedFromName = storeName ? slugify(storeName) : '';
+      storeSlug = normalizedRequested || normalizedFromName || `store-${Date.now()}`;
+
+      const existingUserSlug = await User.findOne({ where: { storeSlug } });
+      const existingStoreSlug = await Store.findOne({ where: { slug: storeSlug } });
+      if (existingUserSlug || existingStoreSlug) {
         storeSlug = `${storeSlug}-${Date.now()}`;
       }
     }
