@@ -1,23 +1,57 @@
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import StoreSlider from '@models/StoreSlider';
 import Store from '@models/Store';
 import logger from '@utils/logger';
+
+const resolveStoreByIdentifier = async (storeIdentifier: string): Promise<any | null> => {
+  const raw = (storeIdentifier ?? '').toString().trim();
+  if (!raw) {
+    return null;
+  }
+
+  if (/^\d+$/.test(raw)) {
+    const store = await Store.findByPk(Number(raw));
+    if (store) {
+      return store;
+    }
+  }
+
+  let store = await Store.findOne({ where: { slug: raw } });
+  if (store) {
+    return store;
+  }
+
+  store = await Store.findOne({ where: { merchantId: raw } });
+  if (store) {
+    return store;
+  }
+
+  store = await Store.findOne({ where: { name: raw } });
+  if (store) {
+    return store;
+  }
+
+  store = await Store.findOne({
+    where: {
+      slug: {
+        [Op.or]: [{ [Op.like]: `${raw}-%` }, { [Op.like]: `%-${raw}` }],
+      },
+    },
+    order: [['id', 'ASC']],
+  });
+  if (store) {
+    return store;
+  }
+
+  return null;
+};
 
 export const getStoreSliders = async (req: Request, res: Response): Promise<void> => {
   try {
     const { storeId } = req.params;
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await resolveStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -28,7 +62,7 @@ export const getStoreSliders = async (req: Request, res: Response): Promise<void
       order: [['sortOrder', 'ASC']],
     });
 
-    res.json({ success: true, data: sliders.map(s => s.toJSON()) });
+    res.json({ success: true, data: sliders.map((s) => s.toJSON()) });
   } catch (error) {
     logger.error('Error fetching store sliders:', error);
     res.status(500).json({ success: false, error: 'Failed to fetch sliders' });
@@ -45,17 +79,7 @@ export const createStoreSlider = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await resolveStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -66,7 +90,7 @@ export const createStoreSlider = async (req: Request, res: Response): Promise<vo
       title: title.slice(0, 255),
       subtitle: subtitle ? subtitle.slice(0, 512) : undefined,
       buttonText: buttonText ? buttonText.slice(0, 128) : undefined,
-      imagePath: imagePath,
+      imagePath,
       sortOrder: sortOrder || 0,
       metadata: metadata || null,
     });
@@ -84,17 +108,7 @@ export const updateStoreSlider = async (req: Request, res: Response): Promise<vo
     const { storeId, sliderId } = req.params;
     const { title, subtitle, buttonText, imagePath, sortOrder, metadata } = req.body;
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await resolveStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -113,7 +127,7 @@ export const updateStoreSlider = async (req: Request, res: Response): Promise<vo
       ...(title && { title: title.slice(0, 255) }),
       ...(subtitle !== undefined && { subtitle: subtitle ? subtitle.slice(0, 512) : null }),
       ...(buttonText !== undefined && { buttonText: buttonText ? buttonText.slice(0, 128) : null }),
-      ...(imagePath && { imagePath: imagePath }),
+      ...(imagePath && { imagePath }),
       ...(sortOrder !== undefined && { sortOrder }),
       ...(metadata !== undefined && { metadata }),
     });
@@ -130,17 +144,7 @@ export const deleteStoreSlider = async (req: Request, res: Response): Promise<vo
   try {
     const { storeId, sliderId } = req.params;
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await resolveStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -175,17 +179,7 @@ export const bulkDeleteStoreSliders = async (req: Request, res: Response): Promi
       return;
     }
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await resolveStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -213,27 +207,14 @@ export const updateSlidersOrder = async (req: Request, res: Response): Promise<v
       return;
     }
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await resolveStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
     }
 
     for (const slider of sliders) {
-      await StoreSlider.update(
-        { sortOrder: slider.sortOrder },
-        { where: { id: slider.id, storeId: store.id } }
-      );
+      await StoreSlider.update({ sortOrder: slider.sortOrder }, { where: { id: slider.id, storeId: store.id } });
     }
 
     logger.info(`Sliders order updated for store ${storeId}`);
@@ -253,17 +234,7 @@ export const uploadSliderImage = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    let store = await Store.findByPk(storeId);
-    if (!store) {
-      store = await Store.findOne({
-        where: { slug: storeId }
-      });
-    }
-    if (!store) {
-      store = await Store.findOne({
-        where: { merchantId: storeId }
-      });
-    }
+    const store = await resolveStoreByIdentifier(storeId);
     if (!store) {
       res.status(404).json({ success: false, error: 'Store not found' });
       return;
@@ -276,14 +247,13 @@ export const uploadSliderImage = async (req: Request, res: Response): Promise<vo
       success: true,
       data: {
         filename: req.file.filename,
-        imagePath: imagePath,
+        imagePath,
         size: req.file.size,
-        mimetype: req.file.mimetype
-      }
+        mimetype: req.file.mimetype,
+      },
     });
   } catch (error) {
     logger.error('Error uploading slider image:', error);
     res.status(500).json({ success: false, error: 'Failed to upload image' });
   }
 };
-
