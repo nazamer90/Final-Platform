@@ -8,6 +8,8 @@ import { sendSuccess, sendCreated, sendError, sendUnauthorized } from '@utils/re
 import { generateUUID, slugify, validateEmail } from '@utils/helpers';
 import logger from '@utils/logger';
 import storeAutoPopulateService from '@services/storeAutoPopulateService';
+import StoreSlider from '@models/StoreSlider';
+import StoreAd from '@models/StoreAd';
 
 export const register = async (
   req: AuthRequest,
@@ -83,7 +85,49 @@ export const register = async (
         // Auto-populate store with categories and products
         await storeAutoPopulateService.populateStore(store.id);
 
-        logger.info(`Store created and populated for merchant: ${email}`);
+        // Seed minimal defaults so merchant dashboard works for every new store
+        const existingSliderCount = await StoreSlider.count({ where: { storeId: store.id } });
+        if (existingSliderCount === 0) {
+          await StoreSlider.bulkCreate([
+            {
+              storeId: store.id,
+              title: `مرحباً بك في متجر ${store.name}`,
+              subtitle: 'اكتشف أحدث المنتجات والعروض',
+              buttonText: 'تسوق الآن',
+              imagePath: '/assets/default-slider.png',
+              sortOrder: 0,
+              metadata: { isActive: true },
+            },
+            {
+              storeId: store.id,
+              title: `عروض خاصة من ${store.name}`,
+              subtitle: 'لا تفوت الفرصة',
+              buttonText: 'شاهد العروض',
+              imagePath: '/assets/default-slider.png',
+              sortOrder: 1,
+              metadata: { isActive: true },
+            },
+          ] as any);
+        }
+
+        const existingAdCount = await StoreAd.count({ where: { storeId: store.id } });
+        if (existingAdCount === 0) {
+          await StoreAd.create({
+            storeId: store.id,
+            templateId: 'banner_default',
+            title: `مرحبا بك في متجر ${store.name}`,
+            description: 'استمتع بأفضل العروض والمنتجات الحصرية',
+            placement: 'banner',
+            textPosition: 'center',
+            textColor: '#ffffff',
+            textFont: 'Cairo-SemiBold',
+            mainTextSize: 'lg',
+            subTextSize: 'base',
+            isActive: true,
+          } as any);
+        }
+
+        logger.info(`Store created, populated, and seeded for merchant: ${email}`);
       } catch (storeError) {
         logger.error('Error creating/populating store:', storeError);
         // Don't fail registration if store creation fails
