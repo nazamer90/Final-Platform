@@ -928,6 +928,13 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
   const [warehouseModalOpen, setWarehouseModalOpen] = useState(false);
   const [discountModalOpen, setDiscountModalOpen] = useState(false);
   const [selectedProductForDiscount, setSelectedProductForDiscount] = useState<any>(null);
+  const [discountPercentInput, setDiscountPercentInput] = useState('');
+  const [discountTypeValue, setDiscountTypeValue] = useState('season_end');
+  const [discountPeriodDays, setDiscountPeriodDays] = useState('30');
+  const [editProductModalOpen, setEditProductModalOpen] = useState(false);
+  const [selectedProductForEdit, setSelectedProductForEdit] = useState<any>(null);
+  const [productEditDraft, setProductEditDraft] = useState<any>(null);
+  const [productEditNewImageUrl, setProductEditNewImageUrl] = useState('');
   const [inventorySnapshot, setInventorySnapshot] = useState<StoreInventorySnapshot>({ products: [], categories: [], lastFetchedAt: null });
   const [inventoryLoading, setInventoryLoading] = useState(false);
   const [inventoryError, setInventoryError] = useState('');
@@ -1180,6 +1187,15 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
     return canonical;
   }, [currentMerchant, merchantProfile, merchantId]);
 
+  const productsStorageKey = useMemo(() => {
+    const slug = merchantStoreSlug?.trim();
+    if (slug) {
+      return `store_products_${slug}`;
+    }
+    const fallback = currentMerchant?.subdomain || merchantId || 'default';
+    return `store_products_${fallback}`;
+  }, [merchantStoreSlug, currentMerchant, merchantId]);
+
   useEffect(() => {
     let cancelled = false;
     const slug = merchantStoreSlug ? merchantStoreSlug.trim() : null;
@@ -1295,6 +1311,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
         }
         const payload = await response.json();
         const sourceProducts = Array.isArray(payload?.products) ? payload.products : [];
+        const sourceCategories = Array.isArray(payload?.categories) ? payload.categories : [];
         const normalizedProducts: StoreInventoryProduct[] = sourceProducts.map((product: any) => {
           const images = Array.isArray(product?.images)
             ? product.images
@@ -1312,7 +1329,12 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
             inStock: typeof product?.inStock === 'boolean' ? product.inStock : product?.isAvailable !== false
           } satisfies StoreInventoryProduct;
         });
-        const categorySummaries = buildCategorySummaries(normalizedProducts, payload?.categories, slug);
+        try {
+          localStorage.setItem(`store_products_${slug}`, JSON.stringify(normalizedProducts));
+          localStorage.setItem(`store_categories_${slug}`, JSON.stringify(sourceCategories));
+        } catch {
+        }
+        const categorySummaries = buildCategorySummaries(normalizedProducts, sourceCategories, slug);
         setInventorySnapshot({
           products: normalizedProducts,
           categories: categorySummaries,
@@ -4987,7 +5009,32 @@ useEffect(() => {
                               </div>
 
                               <div className="flex gap-2">
-                                <Button size="sm" variant="outline" className="flex-1">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1"
+                                  onClick={() => {
+                                    setSelectedProductForEdit(product);
+                                    setProductEditDraft({
+                                      name: product?.name || '',
+                                      description: product?.description || '',
+                                      price: product?.price ?? '',
+                                      originalPrice: product?.originalPrice ?? '',
+                                      category: product?.category || '',
+                                      quantity: typeof product?.quantity === 'number' ? product.quantity : (product as any)?.stock ?? '',
+                                      inStock: product?.inStock !== false,
+                                      badge: product?.badge || '',
+                                      tags: Array.isArray(product?.tags) ? product.tags : [],
+                                      images: Array.isArray(product?.images)
+                                        ? product.images
+                                        : product?.image
+                                          ? [product.image]
+                                          : []
+                                    });
+                                    setProductEditNewImageUrl('');
+                                    setEditProductModalOpen(true);
+                                  }}
+                                >
                                   <Edit className="h-3 w-3 mr-1" />
                                   تعديل
                                 </Button>
@@ -4997,6 +5044,9 @@ useEffect(() => {
                                   className="flex-1"
                                   onClick={() => {
                                     setSelectedProductForDiscount(product);
+                                    setDiscountPercentInput(discountPercent ? String(discountPercent) : '');
+                                    setDiscountTypeValue('season_end');
+                                    setDiscountPeriodDays('30');
                                     setDiscountModalOpen(true);
                                   }}
                                 >
@@ -5908,8 +5958,14 @@ useEffect(() => {
                               };
 
                               // Save to localStorage
-                              const storeKey = `store_products_${currentMerchant?.subdomain || 'default'}`;
-                              const existingProducts = JSON.parse(localStorage.getItem(storeKey) || '[]');
+                              const storeKey = productsStorageKey;
+                              let existingProducts: any[] = [];
+                              try {
+                                const parsed = JSON.parse(localStorage.getItem(storeKey) || '[]');
+                                existingProducts = Array.isArray(parsed) ? parsed : [];
+                              } catch {
+                                existingProducts = [];
+                              }
                               existingProducts.push(newProduct);
                               localStorage.setItem(storeKey, JSON.stringify(existingProducts));
 
@@ -14830,6 +14886,279 @@ useEffect(() => {
         </DialogContent>
       </Dialog>
 
+      {/* Edit Product Modal */}
+      <Dialog
+        open={editProductModalOpen}
+        onOpenChange={(open) => {
+          setEditProductModalOpen(open);
+          if (!open) {
+            setSelectedProductForEdit(null);
+            setProductEditDraft(null);
+            setProductEditNewImageUrl('');
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="h-5 w-5 text-blue-600" />
+              تعديل المنتج
+            </DialogTitle>
+            <DialogDescription>
+              تعديل بيانات المنتج ثم حفظها لتظهر في واجهة المتجر
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-product-name">اسم المنتج</Label>
+                <Input
+                  id="edit-product-name"
+                  value={productEditDraft?.name ?? ''}
+                  onChange={(e) => setProductEditDraft((prev: any) => ({ ...(prev || {}), name: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-product-category">التصنيف</Label>
+                <Input
+                  id="edit-product-category"
+                  value={productEditDraft?.category ?? ''}
+                  onChange={(e) => setProductEditDraft((prev: any) => ({ ...(prev || {}), category: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-product-price">السعر</Label>
+                <Input
+                  id="edit-product-price"
+                  type="number"
+                  value={productEditDraft?.price ?? ''}
+                  onChange={(e) => setProductEditDraft((prev: any) => ({ ...(prev || {}), price: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-product-original-price">السعر قبل الخصم</Label>
+                <Input
+                  id="edit-product-original-price"
+                  type="number"
+                  value={productEditDraft?.originalPrice ?? ''}
+                  onChange={(e) => setProductEditDraft((prev: any) => ({ ...(prev || {}), originalPrice: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-product-quantity">المخزون</Label>
+                <Input
+                  id="edit-product-quantity"
+                  type="number"
+                  value={productEditDraft?.quantity ?? ''}
+                  onChange={(e) => setProductEditDraft((prev: any) => ({ ...(prev || {}), quantity: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-product-badge">البطاقة</Label>
+                <Input
+                  id="edit-product-badge"
+                  placeholder="مثال: تخفيضات / مميزة / جديد"
+                  value={productEditDraft?.badge ?? ''}
+                  onChange={(e) => setProductEditDraft((prev: any) => ({ ...(prev || {}), badge: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-product-description">وصف المنتج</Label>
+              <Textarea
+                id="edit-product-description"
+                rows={3}
+                value={productEditDraft?.description ?? ''}
+                onChange={(e) => setProductEditDraft((prev: any) => ({ ...(prev || {}), description: e.target.value }))}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="edit-product-instock"
+                checked={Boolean(productEditDraft?.inStock)}
+                onCheckedChange={(checked) =>
+                  setProductEditDraft((prev: any) => ({ ...(prev || {}), inStock: Boolean(checked) }))
+                }
+              />
+              <Label htmlFor="edit-product-instock">متوفر</Label>
+            </div>
+            <div className="grid gap-2">
+              <Label>صور المنتج</Label>
+              {Array.isArray(productEditDraft?.images) && productEditDraft.images.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {productEditDraft.images.map((url: string, idx: number) => (
+                    <div key={`${url}-${idx}`} className="relative group rounded-lg overflow-hidden border bg-gray-50">
+                      <img
+                        src={url}
+                        alt={`product-${idx}`}
+                        className="w-full h-24 object-cover"
+                        onError={(e) => handleImageError(e as any, merchantStoreSlug || undefined)}
+                      />
+                      <button
+                        type="button"
+                        title="حذف الصورة"
+                        onClick={() =>
+                          setProductEditDraft((prev: any) => ({
+                            ...(prev || {}),
+                            images: (Array.isArray(prev?.images) ? prev.images : []).filter((_: any, i: number) => i !== idx)
+                          }))
+                        }
+                        className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  placeholder="رابط صورة (اختياري)"
+                  value={productEditNewImageUrl}
+                  onChange={(e) => setProductEditNewImageUrl(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const url = productEditNewImageUrl.trim();
+                    if (!url) return;
+                    setProductEditDraft((prev: any) => ({
+                      ...(prev || {}),
+                      images: [...(Array.isArray(prev?.images) ? prev.images : []), url]
+                    }));
+                    setProductEditNewImageUrl('');
+                  }}
+                >
+                  إضافة
+                </Button>
+              </div>
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    if (files.length === 0) return;
+                    Promise.all(
+                      files.map(
+                        (file) =>
+                          new Promise<string>((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(String(reader.result || ''));
+                            reader.readAsDataURL(file);
+                          })
+                      )
+                    ).then((urls) => {
+                      const valid = urls.filter((u) => typeof u === 'string' && u.length > 0);
+                      if (valid.length === 0) return;
+                      setProductEditDraft((prev: any) => ({
+                        ...(prev || {}),
+                        images: [...(Array.isArray(prev?.images) ? prev.images : []), ...valid]
+                      }));
+                    });
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditProductModalOpen(false);
+              }}
+            >
+              إلغاء
+            </Button>
+            <Button
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => {
+                if (!selectedProductForEdit) return;
+                if (!confirm('هل تريد حذف المنتج؟')) return;
+                const key = productsStorageKey;
+                let existingProducts: any[] = [];
+                try {
+                  const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+                  existingProducts = Array.isArray(parsed) ? parsed : [];
+                } catch {
+                  existingProducts = [];
+                }
+                const next = existingProducts.filter((p: any) => String(p?.id) !== String(selectedProductForEdit?.id));
+                try {
+                  localStorage.setItem(key, JSON.stringify(next));
+                } catch {
+                }
+                setEditProductModalOpen(false);
+                setSelectedProductForEdit(null);
+                setProductEditDraft(null);
+                setProductEditNewImageUrl('');
+                setProductRefreshTrigger((prev) => prev + 1);
+                fetchStoreInventory();
+              }}
+            >
+              حذف
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={() => {
+                if (!selectedProductForEdit) return;
+                const key = productsStorageKey;
+                let existingProducts: any[] = [];
+                try {
+                  const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+                  existingProducts = Array.isArray(parsed) ? parsed : [];
+                } catch {
+                  existingProducts = [];
+                }
+
+                const draft = productEditDraft || {};
+                const draftPrice = draft.price === '' || draft.price === undefined ? undefined : Number(draft.price);
+                const draftOriginalPrice =
+                  draft.originalPrice === '' || draft.originalPrice === undefined ? undefined : Number(draft.originalPrice);
+                const draftQuantity = draft.quantity === '' || draft.quantity === undefined ? undefined : Number(draft.quantity);
+
+                const next = existingProducts.map((p: any) => {
+                  if (String(p?.id) !== String(selectedProductForEdit?.id)) return p;
+
+                  const badge = typeof draft.badge === 'string' ? draft.badge.trim() : '';
+                  const tags = Array.isArray(p?.tags) ? [...p.tags] : [];
+                  if (badge && !tags.includes(badge)) {
+                    tags.push(badge);
+                  }
+
+                  return {
+                    ...p,
+                    ...draft,
+                    price: typeof draftPrice === 'number' && !Number.isNaN(draftPrice) ? draftPrice : p.price,
+                    originalPrice:
+                      typeof draftOriginalPrice === 'number' && !Number.isNaN(draftOriginalPrice) ? draftOriginalPrice : p.originalPrice,
+                    quantity: typeof draftQuantity === 'number' && !Number.isNaN(draftQuantity) ? draftQuantity : p.quantity,
+                    tags,
+                    images: Array.isArray(draft.images) && draft.images.length > 0 ? draft.images : p.images
+                  };
+                });
+
+                try {
+                  localStorage.setItem(key, JSON.stringify(next));
+                } catch {
+                }
+
+                setEditProductModalOpen(false);
+                setSelectedProductForEdit(null);
+                setProductEditDraft(null);
+                setProductEditNewImageUrl('');
+                setProductRefreshTrigger((prev) => prev + 1);
+                fetchStoreInventory();
+              }}
+            >
+              حفظ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Discount Modal */}
       <Dialog open={discountModalOpen} onOpenChange={setDiscountModalOpen}>
         <DialogContent className="sm:max-w-[500px]">
@@ -14845,7 +15174,7 @@ useEffect(() => {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="discount-type">نوع الخصم</Label>
-              <Select defaultValue="season_end">
+              <Select value={discountTypeValue} onValueChange={setDiscountTypeValue}>
                 <SelectTrigger>
                   <SelectValue placeholder="اختر نوع الخصم" />
                 </SelectTrigger>
@@ -14869,12 +15198,14 @@ useEffect(() => {
                 min="0"
                 max="100"
                 placeholder="مثال: 25"
+                value={discountPercentInput}
+                onChange={(e) => setDiscountPercentInput(e.target.value)}
               />
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="discount-period">فترة الخصم (أيام)</Label>
-              <Select defaultValue="30">
+              <Select value={discountPeriodDays} onValueChange={setDiscountPeriodDays}>
                 <SelectTrigger>
                   <SelectValue placeholder="اختر الفترة" />
                 </SelectTrigger>
@@ -14891,9 +15222,19 @@ useEffect(() => {
             <div className="p-4 bg-blue-50 rounded-lg">
               <h4 className="font-medium text-blue-800 mb-2">معاينة الخصم</h4>
               <div className="text-sm text-blue-600">
-                <div>السعر الأصلي: {selectedProductForDiscount?.price || 0} د.ل</div>
-                <div>السعر بعد الخصم: {Math.round((selectedProductForDiscount?.price || 0) * 0.75)} د.ل</div>
-                <div>توفير: {Math.round((selectedProductForDiscount?.price || 0) * 0.25)} د.ل</div>
+                {(() => {
+                  const base = Number(selectedProductForDiscount?.originalPrice ?? selectedProductForDiscount?.price ?? 0) || 0;
+                  const pct = Math.max(0, Math.min(100, Number(discountPercentInput) || 0));
+                  const discounted = Math.round(base * (1 - pct / 100) * 100) / 100;
+                  const saving = Math.round((base - discounted) * 100) / 100;
+                  return (
+                    <>
+                      <div>السعر الأصلي: {base} د.ل</div>
+                      <div>السعر بعد الخصم: {discounted} د.ل</div>
+                      <div>توفير: {saving} د.ل</div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -14901,7 +15242,53 @@ useEffect(() => {
             <Button variant="outline" onClick={() => setDiscountModalOpen(false)}>
               إلغاء
             </Button>
-            <Button className="bg-orange-600 hover:bg-orange-700">
+            <Button
+              className="bg-orange-600 hover:bg-orange-700"
+              onClick={() => {
+                if (!selectedProductForDiscount) return;
+                const base = Number(selectedProductForDiscount?.originalPrice ?? selectedProductForDiscount?.price ?? 0) || 0;
+                const pct = Math.max(0, Math.min(100, Number(discountPercentInput) || 0));
+                const discounted = Math.round(base * (1 - pct / 100) * 100) / 100;
+
+                const key = productsStorageKey;
+                let existingProducts: any[] = [];
+                try {
+                  const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+                  existingProducts = Array.isArray(parsed) ? parsed : [];
+                } catch {
+                  existingProducts = [];
+                }
+
+                const next = existingProducts.map((p: any) => {
+                  if (String(p?.id) !== String(selectedProductForDiscount?.id)) return p;
+                  const tags = Array.isArray(p?.tags) ? [...p.tags] : [];
+                  if (!tags.includes('تخفيضات')) {
+                    tags.push('تخفيضات');
+                  }
+                  return {
+                    ...p,
+                    originalPrice: base,
+                    price: discounted,
+                    discountPercent: pct,
+                    badge: 'تخفيضات',
+                    tags
+                  };
+                });
+
+                try {
+                  localStorage.setItem(key, JSON.stringify(next));
+                } catch {
+                }
+
+                setDiscountModalOpen(false);
+                setSelectedProductForDiscount(null);
+                setDiscountPercentInput('');
+                setDiscountTypeValue('season_end');
+                setDiscountPeriodDays('30');
+                setProductRefreshTrigger((prev) => prev + 1);
+                fetchStoreInventory();
+              }}
+            >
               تطبيق الخصم
             </Button>
           </DialogFooter>
