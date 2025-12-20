@@ -6,6 +6,8 @@ import logger from '@utils/logger';
 import { populateSliders } from '@migrations/populateSliders';
 import { fixSliderPaths } from '@migrations/fixSliderPaths';
 import { addStoreAdColumns } from '@migrations/addStoreAdColumns';
+import { backfillMerchantStores } from '@migrations/backfillMerchantStores';
+import { populateDefaultAds } from '@migrations/populateDefaultAds';
 import runMigrations from '@database/migrate';
 import seedDatabase from '@database/seed';
 
@@ -60,6 +62,13 @@ const initializeDatabase = async (): Promise<void> => {
             logger.info('ℹ️ Skipping database seeding');
                }
 
+      logger.info('📦 Backfilling missing stores for merchant users...');
+      try {
+        await backfillMerchantStores();
+      } catch (error) {
+        logger.warn('⚠️ Store backfill failed, continuing:', error);
+      }
+
       logger.info('📦 Fixing slider paths and populating default sliders for existing stores...');
       try {
         await fixSliderPaths();
@@ -73,6 +82,13 @@ const initializeDatabase = async (): Promise<void> => {
         await addStoreAdColumns();
       } catch (error) {
         logger.warn('⚠️ Store ads columns migration failed, continuing:', error);
+      }
+
+      logger.info('📦 Populating default ads for stores without ads...');
+      try {
+        await populateDefaultAds();
+      } catch (error) {
+        logger.warn('⚠️ Default ads population failed, continuing:', error);
       }
     }
   } catch (error) {
