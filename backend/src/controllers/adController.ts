@@ -25,10 +25,12 @@ const findStoreByIdentifier = async (storeIdentifier: string): Promise<any> => {
     return store;
   }
 
-  store = await Store.findOne({ where: { merchantId: raw } });
-  if (store) {
-    logger.info(`[findStoreByIdentifier] Found store by merchantId: ${raw} (ID: ${store.id})`);
-    return store;
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(raw)) {
+    store = await Store.findOne({ where: { merchantId: raw } });
+    if (store) {
+      logger.info(`[findStoreByIdentifier] Found store by merchantId: ${raw} (ID: ${store.id})`);
+      return store;
+    }
   }
 
   store = await Store.findOne({ where: { name: raw } });

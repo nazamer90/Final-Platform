@@ -4,7 +4,7 @@ import StoreSlider from '@models/StoreSlider';
 import logger from '@utils/logger';
 
 const DEFAULT_SLIDERS: Record<string, Array<{ title: string; subtitle: string; buttonText: string; imagePath: string; sortOrder: number }>> = {
-  sherine: [
+  sheirine: [
     {
       title: 'مجوهرات شيرين الفاخرة',
       subtitle: 'تألقي بأجمل المجوهرات والإكسسوارات',
@@ -273,11 +273,26 @@ export async function populateSliders() {
         continue;
       }
 
-      const defaultSliders = DEFAULT_SLIDERS[storeSlug];
+      let defaultSliders = DEFAULT_SLIDERS[storeSlug];
 
       if (!defaultSliders) {
-        logger.warn(`⚠️ No default sliders defined for store '${storeSlug}'`);
-        continue;
+        defaultSliders = [
+          {
+            title: `مرحباً بك في متجر ${store.name}`,
+            subtitle: 'اكتشف العروض والمنتجات الجديدة',
+            buttonText: 'تسوق الآن',
+            imagePath: `/assets/${storeSlug}/sliders/default-slider-1.svg`,
+            sortOrder: 0
+          },
+          {
+            title: `عروض حصرية من ${store.name}`,
+            subtitle: 'لا تفوت الفرصة',
+            buttonText: 'شاهد العروض',
+            imagePath: `/assets/${storeSlug}/sliders/default-slider-2.svg`,
+            sortOrder: 1
+          }
+        ];
+        logger.warn(`⚠️ No default sliders defined for store '${storeSlug}', using generic defaults`);
       }
 
       try {
