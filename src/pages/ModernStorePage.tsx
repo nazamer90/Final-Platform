@@ -194,11 +194,33 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
     }
   }
 
+  const isDiscountedProduct = (product: any): boolean => {
+    const tags = Array.isArray(product?.tags) ? product.tags : [];
+    const badge = typeof product?.badge === 'string' ? product.badge : '';
+    const price = Number(product?.price ?? 0) || 0;
+    const originalPrice = Number(product?.originalPrice ?? 0) || 0;
+    const discountPercent = Number(product?.discountPercent ?? product?.discountPercentage ?? 0) || 0;
+
+    if (tags.includes('تخفيضات') || badge === 'تخفيضات') {
+      return true;
+    }
+    if (discountPercent > 0) {
+      return true;
+    }
+    return originalPrice > 0 && price > 0 && originalPrice > price;
+  };
+
+  const isNewProduct = (product: any): boolean => {
+    const tags = Array.isArray(product?.tags) ? product.tags : [];
+    const badge = typeof product?.badge === 'string' ? product.badge : '';
+    return tags.includes('جديد') || badge === 'جديد';
+  };
+
   let displayProducts = storeProducts;
   if (currentView === 'discounts') {
-    displayProducts = storeProducts.filter(p => p.tags.includes('تخفيضات'));
+    displayProducts = storeProducts.filter(isDiscountedProduct);
   } else if (currentView === 'new') {
-    displayProducts = storeProducts.filter(p => p.tags.includes('جديد'));
+    displayProducts = storeProducts.filter(isNewProduct);
   }
 
   const [sliderImages, setSliderImages] = useState<any[]>([]);
