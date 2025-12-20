@@ -8,6 +8,7 @@ import { fixSliderPaths } from '@migrations/fixSliderPaths';
 import { addStoreAdColumns } from '@migrations/addStoreAdColumns';
 import { backfillMerchantStores } from '@migrations/backfillMerchantStores';
 import { populateDefaultAds } from '@migrations/populateDefaultAds';
+import { bootstrapKnownStores } from '@migrations/bootstrapKnownStores';
 import runMigrations from '@database/migrate';
 import seedDatabase from '@database/seed';
 
@@ -61,6 +62,13 @@ const initializeDatabase = async (): Promise<void> => {
                 } else {
             logger.info('ℹ️ Skipping database seeding');
                }
+
+      logger.info('📦 Bootstrapping known stores missing in database...');
+      try {
+        await bootstrapKnownStores();
+      } catch (error) {
+        logger.warn('⚠️ Known stores bootstrap failed, continuing:', error);
+      }
 
       logger.info('📦 Backfilling missing stores for merchant users...');
       try {
