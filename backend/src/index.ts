@@ -9,6 +9,7 @@ import { addStoreAdColumns } from '@migrations/addStoreAdColumns';
 import { backfillMerchantStores } from '@migrations/backfillMerchantStores';
 import { populateDefaultAds } from '@migrations/populateDefaultAds';
 import { bootstrapKnownStores } from '@migrations/bootstrapKnownStores';
+import { ensureIndeeshSliders } from '@migrations/ensureIndeeshSliders';
 import runMigrations from '@database/migrate';
 import seedDatabase from '@database/seed';
 
@@ -90,6 +91,13 @@ const initializeDatabase = async (): Promise<void> => {
         await addStoreAdColumns();
       } catch (error) {
         logger.warn('⚠️ Store ads columns migration failed, continuing:', error);
+      }
+
+      logger.info('📦 Ensuring indeesh has 5 valid sliders...');
+      try {
+        await ensureIndeeshSliders();
+      } catch (error) {
+        logger.warn('⚠️ Indeesh slider repair failed, continuing:', error);
       }
 
       logger.info('📦 Populating default ads for stores without ads...');
