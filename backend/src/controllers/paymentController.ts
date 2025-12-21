@@ -27,7 +27,16 @@ export const generateMoamalatHash = async (
       return;
     }
 
-    const formattedAmount = formatAmountForMoamalat(amount);
+    const order = await Order.findByPk(orderId);
+    if (!order) {
+      sendNotFound(res, 'Order not found');
+      return;
+    }
+
+    const amountNumber = Number(order.finalTotal);
+    const safeAmount = Number.isFinite(amountNumber) && amountNumber > 0 ? amountNumber : Number(amount);
+
+    const formattedAmount = formatAmountForMoamalat(safeAmount);
     const dateTime = formatDateTimeForMoamalat(new Date());
     const merchantReference = generateMerchantReference(orderId);
 
@@ -46,11 +55,39 @@ export const generateMoamalatHash = async (
 
     const { secureHash } = moamalatHashUtil(hashRequest);
 
+    const existingPayment = await Payment.findOne({ where: { orderId } });
+    if (existingPayment) {
+      await existingPayment.update({
+        amount: safeAmount,
+        currency,
+        gateway: PaymentGateway.MOAMALAT,
+        status: PaymentStatus.PENDING,
+        secureHash,
+        merchantReference,
+      });
+    } else {
+      await Payment.create({
+        orderId,
+        amount: safeAmount,
+        currency,
+        gateway: PaymentGateway.MOAMALAT,
+        status: PaymentStatus.PENDING,
+        secureHash,
+        merchantReference,
+      });
+    }
+
+    await order.update({
+      paymentStatus: PaymentStatus.PENDING,
+      paymentType: PaymentGateway.MOAMALAT,
+      paymentMethod: order.paymentMethod,
+    });
+
     logger.info(`Moamalat hash generated for order: ${orderId}, reference: ${merchantReference}`);
 
     sendSuccess(res, {
       orderId,
-      amount,
+      amount: safeAmount,
       currency,
       merchantReference,
       secureHash,
@@ -222,6 +259,44 @@ export const refundPayment = async (
     });
   } catch (error) {
     logger.error('Refund payment error:', error);
+    next(error);
+  }
+};
+
+export const verifyMoamalatPayment = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const merchantReference = String(req.query.paymentRef || req.query.merchantReference || '').trim();
+
+    if (!merchantReference) {
+      sendBadRequest(res, 'Missing merchantReference');
+      return;
+    }
+
+    const payment = await Payment.findOne({ where: { merchantReference } });
+    if (!payment) {
+      sendNotFound(res, 'Payment not found');
+      return;
+    }
+
+    const order = await Order.findByPk(payment.orderId);
+
+    sendSuccess(res, {
+      merchantReference,
+      orderId: payment.orderId,
+      paymentStatus: payment.status,
+      orderStatus: order?.orderStatus,
+      orderPaymentStatus: order?.paymentStatus,
+      transactionId: order?.transactionId,
+      systemReference: payment.systemReference,
+      networkReference: payment.networkReference,
+      completedAt: payment.completedAt,
+    });
+  } catch (error) {
+    logger.error('Verify Moamalat payment error:', error);
     next(error);
   }
 };

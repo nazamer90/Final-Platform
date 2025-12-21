@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ishro-merchant</string>
+    <string name="title_activity_main">ishro-merchant</string>
+    <string name="package_name">ly.ishro.merchant</string>
+    <string name="custom_url_scheme">ly.ishro.merchant</string>
+</resources>

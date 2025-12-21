@@ -32,6 +32,8 @@ router.post(
 
 router.post('/webhook/moamalat', paymentController.handleMoamalatWebhook);
 
+router.get('/moamalat/verify', paymentController.verifyMoamalatPayment);
+
 router.get('/moamalat/test', paymentController.testMoamalatConfig);
 
 export default router;

@@ -51,6 +51,15 @@ const allowedOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || '
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
+
+    const isMobileWebViewOrigin =
+      origin.startsWith('capacitor://') ||
+      origin.startsWith('ionic://') ||
+      origin.startsWith('http://localhost') ||
+      origin.startsWith('https://localhost');
+
+    if (isMobileWebViewOrigin) return callback(null, true);
+
     if (allowedOrigins.length === 0) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     return callback(new Error(`CORS blocked for origin: ${origin}`));
@@ -105,6 +114,39 @@ app.get('/health', (req: Request, res: Response): void => {
     environment: config.environment,
     skipDbInit: process.env.SKIP_DB_INIT === 'true'
   });
+});
+
+app.get('/payments/moamalat/return', (req: Request, res: Response): void => {
+  const paymentRef =
+    String(req.query.paymentRef || req.query.MerchantReference || req.query.merchantReference || '').trim();
+
+  const status = String(req.query.status || req.query.Status || req.query.ResponseCode || '').trim();
+
+  const deepLinkBase = `ishro-customer://payment-return?paymentRef=${encodeURIComponent(paymentRef)}`;
+  const deepLink = status ? `${deepLinkBase}&status=${encodeURIComponent(status)}` : deepLinkBase;
+
+  const html = `<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ishro</title>
+</head>
+<body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 16px;">
+  <div style="font-size: 16px; font-weight: 700;">جاري الرجوع للتطبيق...</div>
+  <div style="margin-top: 8px; color: #555;">إذا لم يتم فتح التطبيق تلقائياً، اضغط على الزر أدناه.</div>
+  <a href="${deepLink}" style="display:inline-block; margin-top: 14px; padding: 12px 14px; background:#111827; color:#fff; text-decoration:none; border-radius:10px;">فتح تطبيق ishro</a>
+  <script>
+    window.location.href = ${JSON.stringify(deepLink)};
+    setTimeout(function () {
+      window.location.href = ${JSON.stringify(deepLink)};
+    }, 600);
+  </script>
+</body>
+</html>`;
+
+  res.status(200).setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 let basePath = process.cwd();

@@ -1,0 +1,15 @@
+{
+  "name": "ishro-mobile",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:customer": "npm --workspace apps/customer run dev",
+    "dev:merchant": "npm --workspace apps/merchant run dev",
+    "build:customer": "npm --workspace apps/customer run build",
+    "build:merchant": "npm --workspace apps/merchant run build",
+    "lint:customer": "npm --workspace apps/customer run lint",
+    "lint:merchant": "npm --workspace apps/merchant run lint"
+  }
+}
