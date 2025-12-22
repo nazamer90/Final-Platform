@@ -450,7 +450,9 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
 
     try {
 
-      const checkResponse = await fetch('/api/stores/check-exists', {
+      const apiBase = (import.meta.env.VITE_API_URL || '/api').replace(/\/+$/, '');
+
+      const checkResponse = await fetch(`${apiBase}/stores/check-exists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -713,7 +715,7 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
       let apiResponse: any = null;
 
       try {
-        createResponse = await fetch('/api/stores/create-with-images', {
+        createResponse = await fetch(`${apiBase}/stores/create-with-images`, {
           method: 'POST',
           body: apiFormData
           // Don't set Content-Type header - let the browser set it with boundary
