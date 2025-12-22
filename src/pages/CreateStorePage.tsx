@@ -385,32 +385,43 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
 
   const checkBackendHealthLocal = async () => {
     try {
-      // Try both direct and relative paths
-      const backendUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+      const apiBase = import.meta.env.VITE_API_URL || '/api';
+      const backendBase = apiBase.startsWith('http')
+        ? apiBase.replace(/\/api\/?$/, '')
+        : '';
+
       const urls = [
-        `${backendUrl}/health`,
-        '/health'
+        apiBase.startsWith('http') ? `${apiBase}/health` : '/api/health',
+        backendBase ? `${backendBase}/health` : '/health'
       ];
-      
+
       for (const url of urls) {
         try {
-          const res = await fetch(url, { 
+          const res = await fetch(url, {
             cache: 'no-store',
             method: 'GET'
           });
-          if (res.ok) {
-            const data = await res.json().catch(() => ({}));
 
+          if (!res.ok) continue;
+
+          const text = await res.text();
+          let data: any = null;
+          try {
+            data = text ? JSON.parse(text) : null;
+          } catch {
+            data = null;
+          }
+
+          if (data && (data.status === 'ok' || data.status === 'OK' || data.success === true)) {
             return { isHealthy: true, message: data?.status || 'ok' };
           }
-        } catch (e) {
+        } catch {
           // Silently ignore fetch errors
         }
       }
-      
+
       return { isHealthy: false, message: 'Backend not responding on any endpoint' };
     } catch (e: any) {
-
       return { isHealthy: false, message: e?.message || 'network error' };
     }
   };
@@ -450,8 +461,15 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
         })
       });
 
-      const checkData = await checkResponse.json();
-      if (checkData.data?.exists) {
+      const checkText = await checkResponse.text();
+      let checkData: any = null;
+      try {
+        checkData = checkText ? JSON.parse(checkText) : null;
+      } catch {
+        checkData = null;
+      }
+
+      if (checkResponse.ok && checkData?.data?.exists) {
         const existingItems: string[] = [];
         if (checkData.data?.store) {
           existingItems.push(`متجر "${formData.nameAr}"`);
@@ -701,10 +719,23 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
           // Don't set Content-Type header - let the browser set it with boundary
         });
 
-        apiResponse = await createResponse.json().catch((e: any) => ({
-          success: false,
-          error: `Failed to parse response: ${e.message}`
-        }));
+        const createText = await createResponse.text();
+        try {
+          apiResponse = createText ? JSON.parse(createText) : null;
+        } catch {
+          apiResponse = {
+            success: false,
+            error: `Non-JSON response from API (HTTP ${createResponse.status})`,
+            raw: (createText || '').slice(0, 200)
+          };
+        }
+
+        if (!apiResponse) {
+          apiResponse = {
+            success: false,
+            error: `Empty response from API (HTTP ${createResponse.status})`
+          };
+        }
 
 
 

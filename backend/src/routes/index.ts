@@ -14,6 +14,13 @@ import inventoryRoutes from './inventoryRoutes';
 
 const router = Router();
 
+router.get(`${API_PREFIX}/health`, (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString()
+  });
+});
+
 router.use(`${API_PREFIX}/auth`, authRoutes);
 router.use(`${API_PREFIX}/products`, productRoutes);
 router.use(`${API_PREFIX}/orders`, orderRoutes);
