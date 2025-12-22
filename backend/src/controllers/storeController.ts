@@ -518,6 +518,9 @@ export const createStoreWithImages = async (
         images = [allUploadedImages[imageIndex % allUploadedImages.length]];
         imageIndex++;
         logger.info(`  📦 Product ${idx} (${product.name}): ✅ 1 image assigned (from upload pool)`);
+      } else if (Array.isArray(product.images) && product.images.length > 0) {
+        images = product.images;
+        logger.info(`  📦 Product ${idx} (${product.name}): ✅ ${images.length} image(s) kept (pre-provided URL(s))`);
       } else {
         images = [getDefaultProductImage(storeSlug)];
         logger.info(`  📦 Product ${idx} (${product.name}): ⚠️  Using default image`);
@@ -579,9 +582,10 @@ export const createStoreWithImages = async (
       };
     });
 
+    const providedLogoUrl = (req.body?.storeLogoUrl || req.body?.logoUrl || req.body?.logo || '').toString().trim();
     const logoUrl = logoFile 
       ? `/assets/${storeSlug}/logo/${logoFile.filename}` 
-      : `/assets/default-store.png`;
+      : (providedLogoUrl || `/assets/default-store.png`);
     logger.info(`  🏷️ Logo: ${logoUrl}`);
 
     logger.info(`📝 Generating store files for: ${storeName}`);

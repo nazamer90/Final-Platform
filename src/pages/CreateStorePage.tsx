@@ -554,15 +554,148 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
 
       const storeId = Date.now();
 
+      const azureProductImages: Record<number, string[]> = {};
+      const azureSliderImages: Record<number, string> = {};
+      let azureLogoUrl = '';
+      let azureUploadSucceeded = false;
+
+      const sanitizeFilename = (name: string) => {
+        const base = (name || 'file').toString();
+        const dot = base.lastIndexOf('.');
+        const ext = dot >= 0 ? base.slice(dot).toLowerCase() : '';
+        const stem = (dot >= 0 ? base.slice(0, dot) : base)
+          .toLowerCase()
+          .replace(/[^a-z0-9_-]+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+        return `${stem || 'file'}${ext}`;
+      };
+
+      const uid = () => {
+        try {
+          return crypto.randomUUID();
+        } catch {
+          return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        }
+      };
+
+      const uploadPlan: Array<
+        | { kind: 'logo'; file: File; blobName: string }
+        | { kind: 'product'; productIdx: number; file: File; blobName: string }
+        | { kind: 'slider'; sliderIdx: number; file: File; blobName: string }
+      > = [];
+
+      if (formData.storeLogo) {
+        uploadPlan.push({
+          kind: 'logo',
+          file: formData.storeLogo,
+          blobName: `stores/${formData.subdomain}/logo/${uid()}-${sanitizeFilename(formData.storeLogo.name)}`
+        });
+      }
+
+      (formData.products || []).forEach((p: any, productIdx: number) => {
+        (p.imageFiles || []).forEach((file: File) => {
+          uploadPlan.push({
+            kind: 'product',
+            productIdx,
+            file,
+            blobName: `stores/${formData.subdomain}/products/${productIdx}/${uid()}-${sanitizeFilename(file.name)}`
+          });
+        });
+      });
+
+      (formData.sliderImages || []).forEach((s: any, sliderIdx: number) => {
+        const file = s?.imageFile as File | undefined;
+        if (!file) return;
+        uploadPlan.push({
+          kind: 'slider',
+          sliderIdx,
+          file,
+          blobName: `stores/${formData.subdomain}/sliders/${sliderIdx}/${uid()}-${sanitizeFilename(file.name)}`
+        });
+      });
+
+      if (uploadPlan.length > 0) {
+        try {
+          const sasResponse = await fetch(`${apiBase}/storage/sas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              files: uploadPlan.map((p) => ({
+                blobName: p.blobName,
+                contentType: (p.file as any)?.type || undefined
+              }))
+            })
+          });
+
+          const sasText = await sasResponse.text();
+          let sasJson: any = null;
+          try {
+            sasJson = sasText ? JSON.parse(sasText) : null;
+          } catch {
+            sasJson = null;
+          }
+
+          if (!sasResponse.ok || !sasJson?.success || !Array.isArray(sasJson?.data?.files)) {
+            throw new Error(sasJson?.error || `SAS request failed (HTTP ${sasResponse.status})`);
+          }
+
+          const sasFiles: Array<{ blobName: string; publicUrl: string; uploadUrl: string }> = sasJson.data.files;
+          const sasByBlobName = new Map<string, { publicUrl: string; uploadUrl: string }>();
+          sasFiles.forEach((f) => {
+            if (f?.blobName && f?.publicUrl && f?.uploadUrl) {
+              sasByBlobName.set(f.blobName, { publicUrl: f.publicUrl, uploadUrl: f.uploadUrl });
+            }
+          });
+
+          for (const item of uploadPlan) {
+            const sas = sasByBlobName.get(item.blobName);
+            if (!sas) {
+              throw new Error(`Missing SAS for blob: ${item.blobName}`);
+            }
+
+            const putRes = await fetch(sas.uploadUrl, {
+              method: 'PUT',
+              headers: {
+                'x-ms-blob-type': 'BlockBlob',
+                ...(item.file.type ? { 'Content-Type': item.file.type } : {})
+              },
+              body: item.file
+            });
+
+            if (!putRes.ok) {
+              const t = await putRes.text().catch(() => '');
+              throw new Error(`Azure upload failed (HTTP ${putRes.status}): ${(t || '').slice(0, 200)}`);
+            }
+
+            if (item.kind === 'logo') {
+              azureLogoUrl = sas.publicUrl;
+            } else if (item.kind === 'product') {
+              if (!azureProductImages[item.productIdx]) azureProductImages[item.productIdx] = [];
+              azureProductImages[item.productIdx].push(sas.publicUrl);
+            } else if (item.kind === 'slider') {
+              azureSliderImages[item.sliderIdx] = sas.publicUrl;
+            }
+          }
+
+          azureUploadSucceeded = true;
+        } catch {
+          azureUploadSucceeded = false;
+          azureLogoUrl = '';
+        }
+      }
+
       
       let productsWithIds = (formData.products || []).map((product, idx) => {
         const { imageFiles, ...productData } = product;
 
-        const finalImages = (imageFiles || []).length > 0 ? 
-          (imageFiles || []).map((file, fileIdx) => {
-            return `/assets/${formData.subdomain}/products/${file.name}`;
-          }) : 
-          [`/default-product.png`];
+        const uploadedImages = azureProductImages[idx];
+        const finalImages =
+          uploadedImages && uploadedImages.length > 0
+            ? uploadedImages
+            : (imageFiles || []).length > 0
+              ? (imageFiles || []).map((file) => `/assets/${formData.subdomain}/products/${file.name}`)
+              : [`/default-product.png`];
 
         const isInStock = (product.quantity || 0) > 0;
 
@@ -578,9 +711,12 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
       let sliderImagesWithIds = (formData.sliderImages || []).map((slider, idx) => {
         const { imageFile, ...sliderData } = slider;
 
-        const imagePath = imageFile ?
-          `/assets/${formData.subdomain}/sliders/${imageFile.name}` :
-          `/default-slider.png`;
+        const uploadedSliderImage = azureSliderImages[idx];
+        const imagePath = uploadedSliderImage
+          ? uploadedSliderImage
+          : imageFile
+            ? `/assets/${formData.subdomain}/sliders/${imageFile.name}`
+            : `/default-slider.png`;
 
         return {
           ...sliderData,
@@ -614,7 +750,7 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
         description: formData.description,
         icon: '🏪',
         color: 'from-purple-400 to-pink-600',
-        logo: useLocalFallback ? `/default-store.png` : (formData.storeLogo ? `/assets/${formData.subdomain}/logo/store-logo.webp` : `/default-store.png`),
+        logo: useLocalFallback ? `/default-store.png` : (azureLogoUrl || (formData.storeLogo ? `/assets/${formData.subdomain}/logo/store-logo.webp` : `/default-store.png`)),
         categories: formData.categories.map(catId =>
           storeCategories.find(c => c.id === catId)?.name || catId
         ),
@@ -684,31 +820,33 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
       apiFormData.append('commercialRegister', formData.commercialRegister?.name || '');
       apiFormData.append('practiceLicense', formData.practiceLicense?.name || '');
 
-      // Add logo
-      if (formData.storeLogo) {
+      if (azureUploadSucceeded && azureLogoUrl) {
+        apiFormData.append('storeLogoUrl', azureLogoUrl);
+      } else if (formData.storeLogo) {
         apiFormData.append('storeLogo', formData.storeLogo);
       }
 
       // Add product images with index-based field names to prevent mixing
       // Each product's images go to productImage_0, productImage_1, etc.
-      let fileIdx = 0;
-      productsImageCounts.forEach((count, productIdx) => {
-        for (let i = 0; i < count; i++) {
-          if (fileIdx < flatProductFiles.length) {
-            const file = flatProductFiles[fileIdx];
-            if (file) {
-              const fieldName = `productImage_${productIdx}`;
-              apiFormData.append(fieldName, file);
-              fileIdx++;
+      if (!azureUploadSucceeded) {
+        let fileIdx = 0;
+        productsImageCounts.forEach((count, productIdx) => {
+          for (let i = 0; i < count; i++) {
+            if (fileIdx < flatProductFiles.length) {
+              const file = flatProductFiles[fileIdx];
+              if (file) {
+                const fieldName = `productImage_${productIdx}`;
+                apiFormData.append(fieldName, file);
+                fileIdx++;
+              }
             }
           }
-        }
-      });
+        });
 
-      // Add slider images with sequential field names
-      sliderFiles.forEach((file, idx) => {
-        apiFormData.append(`sliderImage_${idx}`, file);
-      });
+        sliderFiles.forEach((file, idx) => {
+          apiFormData.append(`sliderImage_${idx}`, file);
+        });
+      }
 
      // Use relative path to benefit from Vite proxy
       let createResponse: Response | null = null;
