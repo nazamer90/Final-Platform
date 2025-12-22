@@ -11,8 +11,7 @@
     "dev": "concurrently -n FRONTEND,BACKEND -c green,blue \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "vite",
     "dev:backend": "cd backend && npm run dev",
-    "postinstall": "npm --prefix backend install --include=dev --no-audit --no-fund",
-    "build": "npm --prefix backend run build && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "maintenance": "node scripts/maintenance.js"
