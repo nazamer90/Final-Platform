@@ -442,6 +442,21 @@ export const createStoreWithImages = async (
       }
     }
 
+    const normalizePublicUrl = (value: any): string => {
+      const v = (value ?? '').toString().trim();
+      if (!v) return '';
+      if (!/^https?:\/\//i.test(v)) return v;
+      try {
+        const u = new URL(v);
+        u.search = '';
+        u.hash = '';
+        return u.toString();
+      } catch {
+        const q = v.indexOf('?');
+        return q >= 0 ? v.slice(0, q) : v;
+      }
+    };
+
     let parsedProducts: ProductData[] = [];
     let parsedSliders: SliderImage[] = [];
     let productsImageCounts: number[] = [];
@@ -454,6 +469,20 @@ export const createStoreWithImages = async (
       parsedProducts = JSON.parse(productsJson || '[]');
       parsedSliders = JSON.parse(sliderImagesJson || '[]');
       productsImageCounts = JSON.parse(productsImageCountsJson || '[]');
+
+      if (Array.isArray(parsedProducts)) {
+        parsedProducts = parsedProducts.map((p: any) => ({
+          ...p,
+          images: Array.isArray(p?.images) ? p.images.map(normalizePublicUrl).filter(Boolean) : p?.images
+        }));
+      }
+
+      if (Array.isArray(parsedSliders)) {
+        parsedSliders = parsedSliders.map((s: any) => ({
+          ...s,
+          image: normalizePublicUrl(s?.image)
+        }));
+      }
     } catch (parseError) {
       logger.error('Error parsing JSON:', parseError);
       sendError(res, 'Invalid JSON format for products or sliders', 400);
@@ -582,7 +611,8 @@ export const createStoreWithImages = async (
       };
     });
 
-    const providedLogoUrl = (req.body?.storeLogoUrl || req.body?.logoUrl || req.body?.logo || '').toString().trim();
+    const providedLogoUrlRaw = (req.body?.storeLogoUrl || req.body?.logoUrl || req.body?.logo || '').toString().trim();
+    const providedLogoUrl = normalizePublicUrl(providedLogoUrlRaw);
     const logoUrl = logoFile 
       ? `/assets/${storeSlug}/logo/${logoFile.filename}` 
       : (providedLogoUrl || `/assets/default-store.png`);

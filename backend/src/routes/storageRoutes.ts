@@ -81,7 +81,7 @@ router.post('/sas', async (req, res) => {
         {
           containerName,
           blobName: f.blobName,
-          permissions: BlobSASPermissions.parse('cw'),
+          permissions: BlobSASPermissions.parse('rcw'),
           protocol: SASProtocol.Https,
           startsOn,
           expiresOn,
