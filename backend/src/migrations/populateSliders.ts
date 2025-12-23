@@ -281,14 +281,14 @@ export async function populateSliders() {
             title: `مرحباً بك في متجر ${store.name}`,
             subtitle: 'اكتشف العروض والمنتجات الجديدة',
             buttonText: 'تسوق الآن',
-            imagePath: `/assets/${storeSlug}/sliders/default-slider-1.svg`,
+            imagePath: `/assets/default-slider.png`,
             sortOrder: 0
           },
           {
             title: `عروض حصرية من ${store.name}`,
             subtitle: 'لا تفوت الفرصة',
             buttonText: 'شاهد العروض',
-            imagePath: `/assets/${storeSlug}/sliders/default-slider-2.svg`,
+            imagePath: `/assets/default-slider.png`,
             sortOrder: 1
           }
         ];
