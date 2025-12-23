@@ -877,6 +877,14 @@ export const cleanupStoreAndUsers = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const expectedSecret = (process.env.STORE_CLEANUP_SECRET || '').trim();
+    const providedSecret = (req.headers['x-cleanup-secret'] || '').toString().trim();
+
+    if (!expectedSecret || providedSecret !== expectedSecret) {
+      sendError(res, 'Forbidden', 403, 'FORBIDDEN');
+      return;
+    }
+
     const { storeId, userIds } = req.body;
 
     if (!storeId || !Array.isArray(userIds) || userIds.length === 0) {
@@ -913,6 +921,14 @@ export const cleanupStoreBySlug = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    const expectedSecret = (process.env.STORE_CLEANUP_SECRET || '').trim();
+    const providedSecret = (req.headers['x-cleanup-secret'] || '').toString().trim();
+
+    if (!expectedSecret || providedSecret !== expectedSecret) {
+      sendError(res, 'Forbidden', 403, 'FORBIDDEN');
+      return;
+    }
+
     const storeSlug = (req.body?.storeSlug || '').toString().trim().toLowerCase();
     const deleteAzureAssets = req.body?.deleteAzureAssets !== false;
 
