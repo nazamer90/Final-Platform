@@ -11,6 +11,9 @@ import User from '@models/User';
 import StoreSlider from '@models/StoreSlider';
 import StoreAd from '@models/StoreAd';
 import UnavailableNotification from '@models/UnavailableNotification';
+import Product from '@models/Product';
+import ProductImage from '@models/ProductImage';
+import { BlobServiceClient, StorageSharedKeyCredential } from '@azure/storage-blob';
 import { moveUploadedFiles, cleanupTempUploads } from '@middleware/storeImageUpload';
 import fs from 'fs';
 import { promises as fsPromises } from 'fs';
@@ -900,6 +903,151 @@ export const cleanupStoreAndUsers = async (
     });
   } catch (error) {
     logger.error('Error during cleanup:', error);
+    next(error);
+  }
+};
+
+export const cleanupStoreBySlug = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const storeSlug = (req.body?.storeSlug || '').toString().trim().toLowerCase();
+    const deleteAzureAssets = req.body?.deleteAzureAssets !== false;
+
+    if (!storeSlug) {
+      sendError(res, 'storeSlug is required', 400);
+      return;
+    }
+
+    const store = await Store.findOne({ where: { slug: storeSlug } });
+    const storeId = store?.id;
+    const merchantId = (store as any)?.merchantId as string | undefined;
+
+    const merchantUsers = await User.findAll({
+      where: {
+        [Op.or]: [
+          { storeSlug },
+          ...(merchantId ? ([{ id: merchantId }] as any[]) : [])
+        ]
+      }
+    });
+
+    if (!store && (!merchantUsers || merchantUsers.length === 0)) {
+      sendError(res, `Store '${storeSlug}' not found`, 404);
+      return;
+    }
+
+    const deleted: any = {
+      store: 0,
+      users: 0,
+      sliders: 0,
+      ads: 0,
+      unavailableNotifications: 0,
+      products: 0,
+      productImages: 0,
+      azureBlobs: 0,
+      filesystem: false
+    };
+
+    await sequelize.transaction(async (transaction) => {
+      if (storeId) {
+        deleted.sliders = await StoreSlider.destroy({ where: { storeId }, transaction });
+        deleted.ads = await StoreAd.destroy({ where: { storeId }, transaction });
+        deleted.unavailableNotifications = await UnavailableNotification.destroy({
+          where: {
+            [Op.or]: [{ storeId }, { storeSlug }]
+          },
+          transaction
+        });
+
+        const productRows = await Product.findAll({
+          where: { storeId },
+          attributes: ['id'],
+          transaction,
+          raw: true
+        });
+
+        const productIds = (productRows as any[]).map((p) => p.id).filter(Boolean);
+
+        if (productIds.length > 0) {
+          deleted.productImages = await ProductImage.destroy({
+            where: { productId: { [Op.in]: productIds } },
+            transaction
+          });
+        }
+
+        deleted.products = await Product.destroy({ where: { storeId }, transaction });
+        deleted.store = await Store.destroy({ where: { id: storeId }, transaction });
+      } else {
+        deleted.unavailableNotifications = await UnavailableNotification.destroy({
+          where: { storeSlug },
+          transaction
+        });
+      }
+
+      deleted.users = await User.destroy({
+        where: {
+          [Op.or]: [
+            { storeSlug },
+            ...(merchantId ? ([{ id: merchantId }] as any[]) : [])
+          ]
+        },
+        transaction
+      });
+    });
+
+    try {
+      let basePath = process.cwd();
+      if (basePath.endsWith('backend')) {
+        basePath = path.join(basePath, '..');
+      }
+      const storeAssetsDir = path.join(basePath, 'backend', 'public', 'assets', storeSlug);
+      await fsPromises.rm(storeAssetsDir, { recursive: true, force: true });
+      deleted.filesystem = true;
+    } catch {
+      deleted.filesystem = false;
+    }
+
+    if (deleteAzureAssets) {
+      try {
+        const accountName = (process.env.AZURE_STORAGE_ACCOUNT_NAME || '').trim();
+        const accountKey = (process.env.AZURE_STORAGE_ACCOUNT_KEY || '').trim();
+        const containerName = (process.env.AZURE_STORAGE_CONTAINER || '').trim();
+        const baseUrlRaw = (process.env.AZURE_BLOB_BASE_URL || '').trim();
+
+        if (accountName && accountKey && containerName && baseUrlRaw) {
+          const baseUrl = new URL(baseUrlRaw);
+          const blobServiceUrl = `${baseUrl.protocol}//${baseUrl.host}`;
+          const credential = new StorageSharedKeyCredential(accountName, accountKey);
+          const serviceClient = new BlobServiceClient(blobServiceUrl, credential);
+          const containerClient = serviceClient.getContainerClient(containerName);
+
+          const prefix = `stores/${storeSlug}/`;
+          for await (const blob of containerClient.listBlobsFlat({ prefix })) {
+            try {
+              await containerClient.deleteBlob(blob.name);
+              deleted.azureBlobs++;
+            } catch {
+              // ignore single blob delete failures
+            }
+          }
+        }
+      } catch {
+        // ignore azure cleanup failures
+      }
+    }
+
+    sendSuccess(res, {
+      message: 'Cleanup completed',
+      storeSlug,
+      storeId,
+      merchantId,
+      deleted
+    });
+  } catch (error) {
+    logger.error('Error during cleanup-by-slug:', error);
     next(error);
   }
 };
