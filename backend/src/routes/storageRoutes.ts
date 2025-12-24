@@ -73,19 +73,22 @@ router.post('/sas', async (req, res) => {
 
     const startsOn = new Date(Date.now() - 5 * 60 * 1000);
     const expiresOn = new Date(Date.now() + expiresInSeconds * 1000);
+    const sasVersion = (process.env.AZURE_SAS_VERSION || '').trim() || '2019-12-12';
+    const includeContentType = (process.env.AZURE_SAS_INCLUDE_CONTENT_TYPE || '').trim() === '1';
 
     const out = files.map((f) => {
       const publicUrl = `${baseUrl}/${encodeBlobPath(f.blobName)}`;
 
       const sas = generateBlobSASQueryParameters(
         {
+          version: sasVersion,
           containerName,
           blobName: f.blobName,
           permissions: BlobSASPermissions.parse('rcw'),
           protocol: SASProtocol.Https,
           startsOn,
           expiresOn,
-          ...(f.contentType ? { contentType: f.contentType } : {})
+          ...(includeContentType && f.contentType ? { contentType: f.contentType } : {})
         },
         credential
       ).toString();
