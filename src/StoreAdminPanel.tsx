@@ -26,7 +26,7 @@ const canonicalSlug = (v: any) => {
   return alias[n] || n;
 };
 
-const fallbackLogo = '/default-store.png';
+const fallbackLogo = '/assets/default-store.png';
 
 async function fetchPermanentIndex(): Promise<AnyStore[]> {
   try {
@@ -107,10 +107,10 @@ function fixLocalStore(slug: string) {
     data.storeData.logo = data.storeData.logo || fallbackLogo;
     data.storeData.products = (data.storeData.products || []).map((p: any) => ({
       ...p,
-      images: Array.isArray(p.images) && p.images.length ? p.images : ['/default-product.png'],
+      images: Array.isArray(p.images) && p.images.length ? p.images : ['/assets/default-product.png'],
     }));
     data.storeData.sliderImages = (data.storeData.sliderImages || []).map((s: any) => ({
-      ...s, image: s.image || '/default-slider.png',
+      ...s, image: s.image || '/assets/default-slider.png',
     }));
     localStorage.setItem(key, JSON.stringify(data));
     localStorage.setItem(`store_products_${slug}`, JSON.stringify(data.storeData.products));

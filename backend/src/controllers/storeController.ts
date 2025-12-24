@@ -586,14 +586,14 @@ export const createStoreWithImages = async (
     const defaultSliderImages = [
       {
         id: 'banner1',
-        image: `/assets/${storeSlug}/sliders/default-slider-1.svg`,
+        image: '/assets/default-slider.png',
         title: `اكتشف تشكيلة ${storeName} الحصرية`,
         subtitle: 'جودة عالية وأسعار منافسة',
         buttonText: 'تسوق الآن'
       },
       {
         id: 'banner2',
-        image: `/assets/${storeSlug}/sliders/default-slider-2.svg`,
+        image: '/assets/default-slider.png',
         title: `عروض حصرية من ${storeName}`,
         subtitle: 'لا تفوت الفرصة',
         buttonText: 'تسوق الآن'

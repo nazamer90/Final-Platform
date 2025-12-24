@@ -695,7 +695,7 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
             ? uploadedImages
             : (imageFiles || []).length > 0
               ? (imageFiles || []).map((file) => `/assets/${formData.subdomain}/products/${file.name}`)
-              : [`/default-product.png`];
+              : [`/assets/default-product.png`];
 
         const isInStock = (product.quantity || 0) > 0;
 
@@ -716,7 +716,7 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
           ? uploadedSliderImage
           : imageFile
             ? `/assets/${formData.subdomain}/sliders/${imageFile.name}`
-            : `/default-slider.png`;
+            : `/assets/default-slider.png`;
 
         return {
           ...sliderData,
@@ -750,7 +750,7 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
         description: formData.description,
         icon: '🏪',
         color: 'from-purple-400 to-pink-600',
-        logo: useLocalFallback ? `/default-store.png` : (azureLogoUrl || (formData.storeLogo ? `/assets/${formData.subdomain}/logo/store-logo.webp` : `/default-store.png`)),
+        logo: useLocalFallback ? `/assets/default-store.png` : (azureLogoUrl || (formData.storeLogo ? `/assets/${formData.subdomain}/logo/store-logo.webp` : `/assets/default-store.png`)),
         categories: formData.categories.map(catId =>
           storeCategories.find(c => c.id === catId)?.name || catId
         ),
@@ -901,7 +901,7 @@ const CreateStorePage: React.FC<CreateStorePageProps> = ({
         // استخدم Placeholders للصور عند غياب الخادم
         productsWithIds = productsWithIds.map((p) => ({
           ...p,
-          images: (p.images || []).length ? p.images.map(() => '/default-product.png') : ['/default-product.png']
+          images: (p.images || []).length ? p.images.map(() => '/assets/default-product.png') : ['/assets/default-product.png']
         }));
         sliderImagesWithIds = sliderImagesWithIds.map((s) => ({ ...s, image: '/assets/default-slider.png' }));
         

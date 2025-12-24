@@ -251,7 +251,7 @@ const StoresCarousel: React.FC<StoresCarouselProps> = ({ onStoreClick }) => {
     ...allStores.filter((s) => !pinFirst.includes(canonicalSlug(s.slug))),
   ];
 
-  const fallbackLogo = '/default-store.png';
+  const fallbackLogo = '/assets/default-store.png';
 
   const stats = [
     { value: '150+', label: 'متجر نشط' },
