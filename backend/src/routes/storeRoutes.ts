@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createStoreWithFiles, createStoreWithImages, validateStoreData, checkStoreExists, cleanupStoreAndUsers, cleanupStoreBySlug, createUnavailableNotification, listUnavailableByStore, uploadSliderImage } from '@controllers/storeController';
+import { createStoreWithFiles, createStoreWithImages, validateStoreData, checkStoreExists, cleanupStoreAndUsers, cleanupStoreBySlug, createUnavailableNotification, listUnavailableByStore, uploadSliderImage, getStoreBySlug } from '@controllers/storeController';
 import { uploadBothImages, storeImageUpload } from '@middleware/storeImageUpload';
 import logger from '@utils/logger';
 import { sendSuccess } from '@utils/response';
@@ -68,6 +68,8 @@ router.get('/list', async (req, res, next) => {
     next(error);
   }
 });
+
+router.get('/:slug', getStoreBySlug);
 
 router.post('/unavailable/notify', createUnavailableNotification);
 router.get('/unavailable/by-store/:slug', listUnavailableByStore);

@@ -43,8 +43,11 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
   const [selectedCategory, setSelectedCategory] = useState('الكل');
   const [storeAds, setStoreAds] = useState<any[]>([]);
   const [liveProducts, setLiveProducts] = useState<any[]>([]);
+  const [serverStoreData, setServerStoreData] = useState<any>(null);
+  const [loadingStoreData, setLoadingStoreData] = useState(true);
 
-  const store = storesData.find(s => s.slug === storeSlug);
+  const localStore = storesData.find(s => s.slug === storeSlug);
+  const store = serverStoreData?.store || localStore;
 
   const fetchAds = async () => {
     try {
@@ -71,11 +74,39 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
         setLiveProducts(products);
       }
     } catch (error) {
-      // Failed to fetch products
+    }
+  };
+
+  const fetchStoreData = async () => {
+    try {
+      setLoadingStoreData(true);
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      const response = await fetch(`${apiUrl}/stores/${storeSlug}`);
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setServerStoreData(result.data);
+          
+          if (result.data.products && result.data.products.length > 0) {
+            setLiveProducts(result.data.products);
+          }
+          
+          console.log(`✅ Loaded store data from server:`, {
+            products: result.data.products?.length || 0,
+            sliders: result.data.sliders?.length || 0
+          });
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to fetch store data from server, using local data:', error);
+    } finally {
+      setLoadingStoreData(false);
     }
   };
 
   useEffect(() => {
+    fetchStoreData();
     fetchAds();
     fetchProducts();
   }, [storeSlug]);

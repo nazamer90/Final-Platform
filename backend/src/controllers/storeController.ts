@@ -1235,3 +1235,127 @@ export const uploadSliderImage = async (req: Request, res: Response): Promise<vo
     res.status(500).json({ success: false, error: 'Failed to upload image' });
   }
 };
+
+export const getStoreBySlug = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { slug } = req.params;
+    
+    if (!slug) {
+      sendError(res, 'Store slug is required', 400);
+      return;
+    }
+    
+    logger.info(`📍 Fetching store data for slug: ${slug}`);
+    
+    const store = await Store.findOne({
+      where: { slug },
+      raw: true
+    });
+    
+    if (!store) {
+      sendError(res, `Store "${slug}" not found`, 404);
+      return;
+    }
+    
+    const storeId = (store as any).id;
+    
+    const products = await Product.findAll({
+      where: { storeId },
+      attributes: [
+        'id',
+        'name',
+        'description',
+        'price',
+        'originalPrice',
+        'category',
+        'inStock',
+        'stockQuantity',
+        'rating',
+        'reviews',
+        'tags',
+        'colors',
+        'sizes',
+        'availableSizes',
+        'createdAt',
+        'updatedAt'
+      ],
+      raw: true
+    });
+    
+    const productIds = products.map((p: any) => p.id);
+    let productImages: any[] = [];
+    
+    if (productIds.length > 0) {
+      productImages = await ProductImage.findAll({
+        where: {
+          productId: {
+            [Op.in]: productIds
+          }
+        },
+        attributes: ['id', 'productId', 'imagePath', 'altText', 'sortOrder'],
+        raw: true
+      });
+    }
+    
+    const productsWithImages = products.map((product: any) => {
+      const images = productImages
+        .filter((img: any) => img.productId === product.id)
+        .sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        .map((img: any) => img.imagePath);
+      
+      return {
+        ...product,
+        images
+      };
+    });
+    
+    const sliders = await StoreSlider.findAll({
+      where: { storeId },
+      attributes: ['id', 'title', 'subtitle', 'buttonText', 'imagePath', 'linkUrl', 'sortOrder'],
+      order: [['sortOrder', 'ASC']],
+      raw: true
+    });
+    
+    const storeData = {
+      store: {
+        id: (store as any).id,
+        name: (store as any).name,
+        slug: (store as any).slug,
+        category: (store as any).category,
+        description: (store as any).description,
+        logo: (store as any).logo,
+        banner: (store as any).banner,
+        isActive: (store as any).isActive,
+        rating: (store as any).rating,
+        createdAt: (store as any).createdAt,
+        updatedAt: (store as any).updatedAt
+      },
+      products: productsWithImages,
+      sliders: sliders.map((slider: any) => ({
+        id: slider.id,
+        image: slider.imagePath,
+        title: slider.title || '',
+        subtitle: slider.subtitle || '',
+        buttonText: slider.buttonText || 'View More',
+        linkUrl: slider.linkUrl || '#',
+        sortOrder: slider.sortOrder || 0
+      })),
+      stats: {
+        productsCount: products.length,
+        slidersCount: sliders.length
+      }
+    };
+    
+    logger.info(`✅ Retrieved store data: ${products.length} products, ${sliders.length} sliders`);
+    
+    sendSuccess(res, storeData, 200, 'Store data retrieved successfully');
+    
+  } catch (error) {
+    logger.error('Error fetching store by slug:', error);
+    next(error);
+  }
+};
