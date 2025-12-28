@@ -126,77 +126,84 @@ const DEFAULT_SLIDERS: Record<string, Array<{ title: string; subtitle: string; b
 
   'delta-store': [
     {
-      title: 'ديلتا ستور - أفضل الإلكترونيات',
-      subtitle: 'احصلي على أحدث المنتجات الإلكترونية',
-      buttonText: 'ابدأي الآن',
-      imagePath: '/assets/delta-store/sliders/slider1.jpg',
+      title: 'مجموعة الأوشحة الفاخرة',
+      subtitle: 'أناقة لا تضاهى',
+      buttonText: 'تسوقي الآن',
+      imagePath: '/assets/delta-store/sliders/slider1.webp',
       sortOrder: 0
     },
     {
-      title: 'عروض ديلتا الحصرية',
-      subtitle: 'تخفيضات على أفضل الماركات',
-      buttonText: 'شاهد العروض',
-      imagePath: '/assets/delta-store/sliders/slider2.jpg',
-      sortOrder: 1
-    },
-    {
-      title: 'تقنيات جديدة من ديلتا',
-      subtitle: 'استمتعي بأحدث الابتكارات',
+      title: 'حجاب أنيق وعصري',
+      subtitle: 'لكل المناسبات',
       buttonText: 'اكتشفي المزيد',
-      imagePath: '/assets/delta-store/sliders/slider3.jpg',
+      imagePath: '/assets/delta-store/sliders/slider2.webp',
       sortOrder: 1
     },
     {
-      title: 'ديلتا - جودة وأمان',
-      subtitle: 'منتجات أصلية بضمان',
-      buttonText: 'ابدأ التسوق',
-      imagePath: '/assets/delta-store/sliders/slider4.jpg',
-      sortOrder: 1
+      title: 'إكسسوارات حجاب مميزة',
+      subtitle: 'لمسة جمالية',
+      buttonText: 'شاهدي التشكيلة',
+      imagePath: '/assets/delta-store/sliders/slider3.webp',
+      sortOrder: 2
     },
     {
-      title: 'أحدث الموديلات في ديلتا',
-      subtitle: 'اختر من أفضل الماركات العالمية',
-      buttonText: 'تسوق الآن',
-      imagePath: '/assets/delta-store/sliders/slider5.jpg',
-      sortOrder: 1
+      title: 'ملابس نسائية أنيقة',
+      subtitle: 'أحدث الصيحات',
+      buttonText: 'تسوقي الآن',
+      imagePath: '/assets/delta-store/sliders/slider4.webp',
+      sortOrder: 3
+    },
+    {
+      title: 'تشكيلة صيفية مميزة',
+      subtitle: 'خامة مريحة',
+      buttonText: 'ابدئي التسوق',
+      imagePath: '/assets/delta-store/sliders/slider5.webp',
+      sortOrder: 4
+    },
+    {
+      title: 'أحدث صيحات الموضة',
+      subtitle: 'تألقي معنا',
+      buttonText: 'اكتشفي المجموعة',
+      imagePath: '/assets/delta-store/sliders/slider6.webp',
+      sortOrder: 5
     }
   ],
 
   'magna-beauty': [
     {
-      title: 'مغنا بيوتي - جمالك أولويتنا',
-      subtitle: 'منتجات عناية وتجميل فاخرة',
-      buttonText: 'اكتشفي المنتجات',
-      imagePath: '/assets/magna-beauty/sliders/slider1.jpg',
+      title: 'مكياج عصري أنيق',
+      subtitle: 'جمالك يستحق',
+      buttonText: 'تسوقي الآن',
+      imagePath: '/assets/magna-beauty/sliders/slide1.webp',
       sortOrder: 0
     },
     {
-      title: 'عروض مغنا الجمالية',
-      subtitle: 'عناية فاخرة بأسعار مميزة',
-      buttonText: 'تسوقي الآن',
-      imagePath: '/assets/magna-beauty/sliders/slider2.jpg',
+      title: 'رموش أنيقة وعصرية',
+      subtitle: 'نظرة ساحرة',
+      buttonText: 'اكتشفي المزيد',
+      imagePath: '/assets/magna-beauty/sliders/slide2.webp',
       sortOrder: 1
     },
     {
-      title: 'منتجات طبيعية من مغنا',
-      subtitle: 'الجمال الطبيعي يبدأ من هنا',
-      buttonText: 'تعرفي عليها',
-      imagePath: '/assets/magna-beauty/sliders/slider3.jpg',
-      sortOrder: 1
+      title: 'إكسسوارات مميزة',
+      subtitle: 'تكمل أناقتك',
+      buttonText: 'شاهدي التشكيلة',
+      imagePath: '/assets/magna-beauty/sliders/slide3.webp',
+      sortOrder: 2
     },
     {
-      title: 'مغنا - رعاية شاملة',
-      subtitle: 'حلول جمالية متكاملة',
+      title: 'عناية فائقة بالبشرة',
+      subtitle: 'إشراقة دائمة',
       buttonText: 'استكشفي',
-      imagePath: '/assets/magna-beauty/sliders/slider4.jpg',
-      sortOrder: 1
+      imagePath: '/assets/magna-beauty/sliders/slide4.webp',
+      sortOrder: 3
     },
     {
-      title: 'عناية بشرتك مع مغنا',
-      subtitle: 'منتجات آمنة وفعالة',
-      buttonText: 'ابدأ الآن',
-      imagePath: '/assets/magna-beauty/sliders/slider5.jpg',
-      sortOrder: 1
+      title: 'تشكيلة عصرية مميزة',
+      subtitle: 'لإطلالة خلابة',
+      buttonText: 'ابدئي التسوق',
+      imagePath: '/assets/magna-beauty/sliders/slide5.webp',
+      sortOrder: 4
     }
   ],
 

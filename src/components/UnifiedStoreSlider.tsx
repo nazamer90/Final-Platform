@@ -103,15 +103,35 @@ const UnifiedStoreSlider: React.FC<UnifiedStoreSliderProps> = ({
       if (response.ok) {
         const result = await response.json();
         if (result.data && Array.isArray(result.data) && result.data.length > 0) {
-          const loadedSliders = result.data.map((slider: any) => ({
-            id: slider.id,
-            title: slider.title,
-            subtitle: slider.subtitle,
-            buttonText: slider.buttonText,
-            imagePath: slider.imagePath,
-            image: slider.imagePath,
-            sortOrder: slider.sortOrder,
-          }));
+          const loadedSliders = result.data.map((slider: any) => {
+            // Fix image URL logic - clean up old localhost URLs and backend references
+            let imagePath = slider.imagePath || slider.image;
+            
+            if (imagePath) {
+              // Remove localhost URLs
+              if (imagePath.includes('localhost:5000')) {
+                imagePath = imagePath.replace(/^https?:\/\/localhost:5000/, '');
+              }
+              // Remove backend domain if it points to assets (assets are served from frontend)
+              if (imagePath.includes('eishro-backend.onrender.com') || imagePath.includes('.onrender.com')) {
+                imagePath = imagePath.replace(/^https?:\/\/[^/]+\.onrender\.com/, '');
+              }
+              // Ensure path starts with /assets if it's a relative path without domain
+              if (!imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+                imagePath = '/' + imagePath;
+              }
+            }
+
+            return {
+              id: slider.id,
+              title: slider.title,
+              subtitle: slider.subtitle,
+              buttonText: slider.buttonText,
+              imagePath: imagePath,
+              image: imagePath,
+              sortOrder: slider.sortOrder,
+            };
+          });
           
           loadedSliders.sort((a: Slider, b: Slider) => (a.sortOrder || 0) - (b.sortOrder || 0));
           setSliders(loadedSliders);
