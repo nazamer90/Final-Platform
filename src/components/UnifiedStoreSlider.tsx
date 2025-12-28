@@ -102,19 +102,21 @@ const UnifiedStoreSlider: React.FC<UnifiedStoreSliderProps> = ({
   
       if (response.ok) {
         const result = await response.json();
-        const loadedSliders = result.data.map((slider: any) => ({
-          id: slider.id,
-          title: slider.title,
-          subtitle: slider.subtitle,
-          buttonText: slider.buttonText,
-          imagePath: slider.imagePath,
-          image: slider.imagePath,
-          sortOrder: slider.sortOrder,
-        }));
-        
-        loadedSliders.sort((a: Slider, b: Slider) => (a.sortOrder || 0) - (b.sortOrder || 0));
-        setSliders(loadedSliders);
-        localStorage.setItem(storageKey, JSON.stringify(loadedSliders));
+        if (result.data && Array.isArray(result.data) && result.data.length > 0) {
+          const loadedSliders = result.data.map((slider: any) => ({
+            id: slider.id,
+            title: slider.title,
+            subtitle: slider.subtitle,
+            buttonText: slider.buttonText,
+            imagePath: slider.imagePath,
+            image: slider.imagePath,
+            sortOrder: slider.sortOrder,
+          }));
+          
+          loadedSliders.sort((a: Slider, b: Slider) => (a.sortOrder || 0) - (b.sortOrder || 0));
+          setSliders(loadedSliders);
+          localStorage.setItem(storageKey, JSON.stringify(loadedSliders));
+        }
       }
     } catch (error) {
       // Silent error handling - use cached data
