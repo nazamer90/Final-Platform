@@ -34,7 +34,7 @@ export class RedisCache {
   }
 
   private setupEventHandlers(): void {
-    this.client.on('error', (err) => {
+    this.client.on('error', (err: Error) => {
       logger.error('Redis error:', err);
       this.isConnected = false;
     });
@@ -59,7 +59,7 @@ export class RedisCache {
       if (!this.isConnected) return null;
 
       return new Promise((resolve, reject) => {
-        this.client.get(key, (err, data) => {
+        this.client.get(key, (err: Error | null, data: string | null) => {
           if (err) {
             logger.error(`Redis GET error for key ${key}:`, err);
             reject(err);
@@ -93,7 +93,7 @@ export class RedisCache {
       const serialized = JSON.stringify(value);
 
       return new Promise((resolve, reject) => {
-        this.client.setex(key, ttl, serialized, (err) => {
+        this.client.setex(key, ttl, serialized, (err: Error | null) => {
           if (err) {
             logger.error(`Redis SET error for key ${key}:`, err);
             reject(err);
@@ -112,13 +112,13 @@ export class RedisCache {
       if (!this.isConnected) return keys.map(() => null);
 
       return new Promise((resolve, reject) => {
-        this.client.mget(...keys, (err, data) => {
+        this.client.mget(...keys, (err: Error | null, data: (string | null)[]) => {
           if (err) {
             logger.error('Redis MGET error:', err);
             reject(err);
           } else {
             resolve(
-              (data || []).map((item) => {
+              (data || []).map((item: string | null) => {
                 if (!item) return null;
                 try {
                   return JSON.parse(item) as T;
@@ -156,7 +156,7 @@ export class RedisCache {
       if (!this.isConnected) return false;
 
       return new Promise((resolve, reject) => {
-        this.client.del(key, (err, reply) => {
+        this.client.del(key, (err: Error | null, reply: number) => {
           if (err) {
             logger.error(`Redis DEL error for key ${key}:`, err);
             reject(err);
@@ -176,7 +176,7 @@ export class RedisCache {
       if (!this.isConnected) return 0;
 
       return new Promise((resolve, reject) => {
-        this.client.del(...keys, (err, reply) => {
+        this.client.del(...keys, (err: Error | null, reply: number) => {
           if (err) {
             logger.error('Redis MDEL error:', err);
             reject(err);
@@ -196,12 +196,12 @@ export class RedisCache {
       if (!this.isConnected) return 0;
 
       return new Promise((resolve, reject) => {
-        this.client.keys(pattern, (err, keys) => {
+        this.client.keys(pattern, (err: Error | null, keys: string[]) => {
           if (err) {
             logger.error(`Redis KEYS error for pattern ${pattern}:`, err);
             reject(err);
           } else if (keys && keys.length > 0) {
-            this.client.del(...keys, (delErr, reply) => {
+            this.client.del(...keys, (delErr: Error | null, reply: number) => {
               if (delErr) {
                 reject(delErr);
               } else {
@@ -224,7 +224,7 @@ export class RedisCache {
       if (!this.isConnected) return false;
 
       return new Promise((resolve, reject) => {
-        this.client.exists(key, (err, reply) => {
+        this.client.exists(key, (err: Error | null, reply: number) => {
           if (err) {
             logger.error(`Redis EXISTS error for key ${key}:`, err);
             reject(err);
@@ -244,7 +244,7 @@ export class RedisCache {
       if (!this.isConnected) return 0;
 
       return new Promise((resolve, reject) => {
-        this.client.incr(key, (err, reply) => {
+        this.client.incr(key, (err: Error | null, reply: number) => {
           if (err) {
             logger.error(`Redis INCR error for key ${key}:`, err);
             reject(err);
@@ -264,7 +264,7 @@ export class RedisCache {
       if (!this.isConnected) return 0;
 
       return new Promise((resolve, reject) => {
-        this.client.decr(key, (err, reply) => {
+        this.client.decr(key, (err: Error | null, reply: number) => {
           if (err) {
             logger.error(`Redis DECR error for key ${key}:`, err);
             reject(err);
@@ -284,7 +284,7 @@ export class RedisCache {
       if (!this.isConnected) return false;
 
       return new Promise((resolve, reject) => {
-        this.client.expire(key, seconds, (err, reply) => {
+        this.client.expire(key, seconds, (err: Error | null, reply: number) => {
           if (err) {
             logger.error(`Redis EXPIRE error for key ${key}:`, err);
             reject(err);
@@ -304,7 +304,7 @@ export class RedisCache {
       if (!this.isConnected) return -1;
 
       return new Promise((resolve, reject) => {
-        this.client.ttl(key, (err, reply) => {
+        this.client.ttl(key, (err: Error | null, reply: number) => {
           if (err) {
             logger.error(`Redis TTL error for key ${key}:`, err);
             reject(err);
@@ -324,7 +324,7 @@ export class RedisCache {
       if (!this.isConnected) return;
 
       return new Promise((resolve, reject) => {
-        this.client.flushdb((err) => {
+        this.client.flushdb((err: Error | null) => {
           if (err) {
             logger.error('Redis FLUSHDB error:', err);
             reject(err);
@@ -344,7 +344,7 @@ export class RedisCache {
       if (!this.isConnected) return {};
 
       return new Promise((resolve, reject) => {
-        this.client.info('stats', (err, info) => {
+        this.client.info('stats', (err: Error | null, info: string) => {
           if (err) {
             logger.error('Redis INFO error:', err);
             reject(err);
@@ -365,7 +365,7 @@ export class RedisCache {
 
   close(): void {
     if (this.client) {
-      this.client.quit((err) => {
+      this.client.quit((err: Error | null) => {
         if (err) {
           logger.error('Error closing Redis connection:', err);
         } else {

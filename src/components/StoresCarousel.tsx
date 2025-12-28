@@ -48,9 +48,33 @@ function getLocalDynamicStores() {
     };
 
     try {
-      const eshroStores = JSON.parse(localStorage.getItem('eshro_stores') || '[]');
-      if (Array.isArray(eshroStores)) {
-        for (const store of eshroStores) {
+      const rawStored = localStorage.getItem('eshro_stores');
+      const eshroStores = JSON.parse(rawStored || '[]');
+      
+      // Cleanup Logic: Remove hamoda stores from localStorage if found
+      let hasCleanup = false;
+      const filteredStores = eshroStores.filter((store: any) => {
+        const slug = canonicalSlug(store.subdomain || store.id?.toString());
+        if (slug === 'center-hamoda' || slug === 'hamoda-center') {
+            hasCleanup = true;
+            return false;
+        }
+        return true;
+      });
+
+      if (hasCleanup) {
+          localStorage.setItem('eshro_stores', JSON.stringify(filteredStores));
+          // Remove specific store files as well
+          localStorage.removeItem('eshro_store_files_center-hamoda');
+          localStorage.removeItem('store_products_center-hamoda');
+          localStorage.removeItem('store_sliders_center-hamoda');
+          localStorage.removeItem('eshro_store_files_hamoda-center');
+          localStorage.removeItem('store_products_hamoda-center');
+          localStorage.removeItem('store_sliders_hamoda-center');
+      }
+
+      if (Array.isArray(filteredStores)) {
+        for (const store of filteredStores) {
           if (store.setupComplete === true) {
             const rawSlug = store.subdomain || store.id?.toString();
             const slug = canonicalSlug(rawSlug);

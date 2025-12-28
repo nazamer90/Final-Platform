@@ -93,11 +93,11 @@ class DependencyManagementService {
       const audit = JSON.parse(output);
       const vulnerabilities = audit.vulnerabilities || {};
 
-      let maxSeverity = 'low' as const;
+      let maxSeverity: 'critical' | 'high' | 'moderate' | 'low' = 'low';
       const severityLevels = { critical: 4, high: 3, moderate: 2, low: 1 };
 
       for (const [, vuln] of Object.entries(vulnerabilities)) {
-        const severity = (vuln as any).severity;
+        const severity = (vuln as any).severity as keyof typeof severityLevels;
         if (severityLevels[severity] > severityLevels[maxSeverity]) {
           maxSeverity = severity;
         }

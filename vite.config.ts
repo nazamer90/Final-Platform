@@ -25,7 +25,6 @@ function copyDirSync(src: string, dest: string) {
 
 const syncAssetsPlugin: Plugin = {
   name: "sync-assets",
-  apply: "serve",
   configResolved() {
     syncAssetsOnStartup();
   }

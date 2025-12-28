@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createStoreWithFiles, createStoreWithImages, validateStoreData, checkStoreExists, cleanupStoreAndUsers, createUnavailableNotification, listUnavailableByStore, uploadSliderImage } from '@controllers/storeController';
+import { createStoreWithFiles, createStoreWithImages, validateStoreData, checkStoreExists, cleanupStoreAndUsers, createUnavailableNotification, listUnavailableByStore, uploadSliderImage, getStorePublicData } from '@controllers/storeController';
 import { uploadBothImages, storeImageUpload } from '@middleware/storeImageUpload';
 import logger from '@utils/logger';
 import { sendSuccess } from '@utils/response';
@@ -7,6 +7,7 @@ import Store from '@models/Store';
 
 const router = Router();
 
+router.get('/public/:slug', getStorePublicData);
 router.post('/create-with-files', createStoreWithFiles);
 
 router.post('/create-with-images', (req, res, next) => {

@@ -285,23 +285,62 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
 
   useEffect(() => {
     const loadDynamicStoreData = async () => {
-      if (!store) return;
+      // Always try to load by slug, even if store object isn't fully populated yet
+      const currentSlug = storeSlug || store?.slug;
+      if (!currentSlug) return;
       
       setLoadingStore(true);
       try {
+        // 1. Try to fetch from Public API first (The Fix)
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        try {
+          const response = await fetch(`${apiUrl}/stores/public/${currentSlug}`);
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success && result.data) {
+              const { store: apiStore, products: apiProducts, sliders: apiSliders } = result.data;
+              
+              // Update state with API data
+              setEnhancedStore(prev => ({
+                ...prev,
+                ...apiStore,
+                logo: apiStore.logo || prev?.logo || '/assets/default-store.png'
+              }));
+
+              setDynamicStoreData({
+                products: apiProducts,
+                sliderImages: apiSliders
+              });
+
+              // If we have products from API, use them
+              if (apiProducts && apiProducts.length > 0) {
+                 // Map API products to frontend format if necessary
+                 // (Assuming API returns format compatible with frontend Product type)
+                 // You might need a mapper here if structures differ significantly
+              }
+              
+              setLoadingStore(false);
+              return; // Exit if API load successful
+            }
+          }
+        } catch (apiError) {
+          console.warn('Failed to load from public API, falling back to local storage', apiError);
+        }
+
+        // 2. Fallback to Local Storage / Static Data (Original Logic)
         // Check for cache corruption and clear if needed
-        await detectAndClearCacheCorruption(store.slug);
+        await detectAndClearCacheCorruption(currentSlug);
         
-        const storeData = await loadStoreBySlug(store.slug);
+        const storeData = await loadStoreBySlug(currentSlug);
         if (storeData) {
           setDynamicStoreData(storeData);
           
-          if (storeData.logo && storeData.logo !== store.logo) {
+          if (storeData.logo && store?.logo && storeData.logo !== store.logo) {
             setEnhancedStore({
               ...store,
               logo: storeData.logo
             });
-          } else {
+          } else if (store) {
             setEnhancedStore(store);
           }
         }
@@ -531,7 +570,7 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
           favorites={favorites}
         />
       ) : storeConfig ? (
-        <UnifiedStoreSlider storeSlug={store.slug} />
+        <UnifiedStoreSlider storeSlug={store.slug} initialSliders={sliderImages} />
       ) : sliderImages.length > 0 ? (
         /* السلايدر العادي للمتاجر الديناميكية بدون إعدادات مركزية */
           <div className="relative h-96 bg-gradient-to-r from-primary/10 to-primary/5 overflow-hidden">

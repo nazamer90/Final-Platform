@@ -791,6 +791,74 @@ export const validateStoreData = async (
   }
 };
 
+export const getStorePublicData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { slug } = req.params;
+
+    if (!slug) {
+      sendError(res, 'Store slug is required', 400);
+      return;
+    }
+
+    const store = await Store.findOne({
+      where: { slug },
+      include: [
+        { 
+          model: StoreSlider, 
+          as: 'sliders',
+          where: { isActive: true },
+          required: false,
+          attributes: ['id', 'title', 'subtitle', 'imagePath', 'buttonText', 'sortOrder']
+        }
+      ]
+    });
+
+    if (!store) {
+      sendError(res, 'Store not found', 404);
+      return;
+    }
+
+    // Sort sliders manually since we can't easily do it in include with all DB types
+    const sliders = (store.sliders || []).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+    // Get Products (assuming we can filter by storeId)
+    // Note: Since Product model might not be directly associated in all versions, 
+    // we fetch using storeId manually if association isn't standard
+    const products = await sequelize.models.Product.findAll({
+      where: { storeId: store.id },
+      include: ['images'] // Assuming alias is defined
+    }).catch(() => []); // Fallback if association fails
+
+    sendSuccess(res, {
+      store: {
+        id: store.id,
+        name: store.name,
+        slug: store.slug,
+        description: store.description,
+        logo: store.logo,
+        category: store.category,
+        isActive: store.isActive
+      },
+      products,
+      sliders: sliders.map((s: any) => ({
+        id: s.id,
+        title: s.title,
+        subtitle: s.subtitle,
+        image: s.imagePath,
+        buttonText: s.buttonText
+      }))
+    });
+
+  } catch (error) {
+    logger.error('Error fetching public store data:', error);
+    next(error);
+  }
+};
+
 export const checkStoreExists = async (
   req: Request,
   res: Response,

@@ -206,15 +206,8 @@ export const createAdvancedRateLimiter = (options: {
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator: options.keyGenerator || ((req: Request) => req.ip || 'unknown'),
-    skip: (req: Request) => {
-      if (options.skipSuccessfulRequests && req.statusCode >= 200 && req.statusCode < 300) {
-        return true;
-      }
-      if (options.skipFailedRequests && (req.statusCode >= 400 || req.statusCode >= 500)) {
-        return true;
-      }
-      return false;
-    },
+    skipSuccessfulRequests: options.skipSuccessfulRequests,
+    skipFailedRequests: options.skipFailedRequests,
   });
 };
 

@@ -20,6 +20,7 @@ interface Slider {
 interface UnifiedStoreSliderProps {
   storeSlug: string;
   height?: SliderHeightConfig;
+  initialSliders?: Slider[];
 }
 
 const DEFAULT_SLIDER_HEIGHT = {
@@ -29,7 +30,8 @@ const DEFAULT_SLIDER_HEIGHT = {
 
 const UnifiedStoreSlider: React.FC<UnifiedStoreSliderProps> = ({ 
   storeSlug, 
-  height 
+  height,
+  initialSliders
 }) => {
   const staticConfig = getStoreConfig(storeSlug);
   const [sliders, setSliders] = useState<Slider[]>([]);
@@ -44,7 +46,11 @@ const UnifiedStoreSlider: React.FC<UnifiedStoreSliderProps> = ({
   });
 
   useEffect(() => {
-    loadSliders();
+    if (initialSliders && initialSliders.length > 0) {
+      setSliders(initialSliders);
+    } else {
+      loadSliders();
+    }
 
     const handleSliderUpdate = (event: CustomEvent) => {
       loadSliders();
@@ -55,7 +61,7 @@ const UnifiedStoreSlider: React.FC<UnifiedStoreSliderProps> = ({
     return () => {
       window.removeEventListener('storeSlidersUpdated', handleSliderUpdate as EventListener);
     };
-  }, [storeSlug]);
+  }, [storeSlug, initialSliders]);
 
   const loadSliders = async () => {
     const storageKey = `eshro_store_sliders_${storeSlug}`;
