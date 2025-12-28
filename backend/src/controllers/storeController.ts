@@ -823,7 +823,7 @@ export const getStorePublicData = async (
     }
 
     // Sort sliders manually since we can't easily do it in include with all DB types
-    const sliders = (store.sliders || []).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
+    const sliders = ((store as any).sliders || []).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
     // Get Products (assuming we can filter by storeId)
     // Note: Since Product model might not be directly associated in all versions, 

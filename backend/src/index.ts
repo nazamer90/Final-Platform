@@ -5,6 +5,7 @@ import config from '@config/environment';
 import logger from '@utils/logger';
 import { populateSliders } from '@migrations/populateSliders';
 import { fixSliderPaths } from '@migrations/fixSliderPaths';
+import { fixDeltaMagnaSliders } from '@migrations/fixDeltaMagnaSliders';
 import { addStoreAdColumns } from '@migrations/addStoreAdColumns';
 import runMigrations from '@database/migrate';
 import seedDatabase from '@database/seed';
@@ -64,6 +65,7 @@ const initializeDatabase = async (): Promise<void> => {
       try {
         await fixSliderPaths();
         await populateSliders();
+        await fixDeltaMagnaSliders();
       } catch (error) {
         logger.warn('⚠️ Slider migration failed, continuing:', error);
       }
