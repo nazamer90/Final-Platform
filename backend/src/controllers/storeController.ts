@@ -11,7 +11,7 @@ import User from '@models/User';
 import StoreSlider from '@models/StoreSlider';
 import StoreAd from '@models/StoreAd';
 import UnavailableNotification from '@models/UnavailableNotification';
-import { cleanupTempUploads } from '@middleware/storeImageUpload';
+import { cleanupTempUploads, moveUploadedFiles } from '@middleware/storeImageUpload';
 import {
   fetchPublicStoreJsonFromSupabase,
   getSupabasePublicUrlForObject,
@@ -347,7 +347,18 @@ export const createStoreWithImages = async (
     if (files && Object.keys(files).length > 0) {
       logger.info(`📥 Received ${Object.keys(files).length} file fields for store creation`);
       logger.info(`   Files available: ${Object.keys(files).join(', ')}`);
-      logger.info(useSupabaseStorage ? '☁️ Supabase Storage enabled: uploading assets to Supabase' : '📁 Supabase Storage disabled: will use local /assets paths');
+      logger.info(useSupabaseStorage ? '☁️ Supabase Storage enabled: uploading assets to Supabase' : '📁 Supabase Storage disabled: will persist assets locally under /assets');
+
+      if (!useSupabaseStorage) {
+        try {
+          files = await moveUploadedFiles(storeSlug, files);
+          logger.info(`✅ Files moved successfully to /assets/${storeSlug}/`);
+        } catch (moveError) {
+          logger.error('❌ Failed to move uploaded files:', moveError);
+          sendError(res, 'Failed to process uploaded files', 500);
+          return;
+        }
+      }
     } else {
       logger.info(`ℹ️ No files provided, will use default images`);
     }
