@@ -22,9 +22,8 @@ const getBackendUrl = () => {
 };
 
 const getImageUrl = (assetPath: string) => {
-  const backendUrl = getBackendUrl();
   return {
-    primary: `${backendUrl}${assetPath}`,
+    primary: assetPath,
     fallback: assetPath,
   };
 };

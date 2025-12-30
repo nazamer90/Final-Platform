@@ -171,7 +171,7 @@ const MoamalatRealLightbox: React.FC<MoamalatRealLightboxProps> = ({
 
   const generateSecureHash = async (params: any) => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
       const response = await fetch(`${apiUrl}/moamalat/hash`, {
         method: 'POST',
         headers: {

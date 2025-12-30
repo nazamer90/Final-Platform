@@ -48,7 +48,7 @@ import { enhancedSampleProducts } from "@/data/productCategories";
 import { allStoreProducts } from "@/data/allStoreProducts";
 import { loadStoreBySlug, getStoreProducts } from "@/utils/storeLoader";
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 const canonicalStoreSlug = (value: unknown): string => {
   const normalized = (value ?? '').toString().trim().toLowerCase().replace(/\s+/g, '-');
