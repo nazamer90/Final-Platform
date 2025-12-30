@@ -15,6 +15,7 @@ import { cleanupTempUploads, moveUploadedFiles } from '@middleware/storeImageUpl
 import {
   fetchPublicStoreJsonFromSupabase,
   getSupabasePublicUrlForObject,
+  isSupabasePublicReadEnabled,
   isSupabaseStorageEnabled,
   uploadFileToSupabaseStorage,
   uploadJsonToSupabaseStorage
@@ -342,7 +343,7 @@ export const createStoreWithImages = async (
       return;
     }
 
-    const useSupabaseStorage = isSupabaseStorageEnabled();
+    let useSupabaseStorage = isSupabaseStorageEnabled();
 
     if (files && Object.keys(files).length > 0) {
       logger.info(`📥 Received ${Object.keys(files).length} file fields for store creation`);
@@ -530,43 +531,58 @@ export const createStoreWithImages = async (
     }
 
     if (useSupabaseStorage) {
-      logger.info(`☁️ Uploading store assets to Supabase bucket...`);
+      try {
+        logger.info(`☁️ Uploading store assets to Supabase bucket...`);
 
-      if (logoFile) {
-        const logoObjectPath = `stores/${storeSlug}/logo/${logoFile.filename}`;
-        const uploaded = await uploadFileToSupabaseStorage({
-          objectPath: logoObjectPath,
-          localFilePath: logoFile.path,
-          contentType: logoFile.mimetype,
-        });
-        (logoFile as any).publicUrl = uploaded?.publicUrl || getSupabasePublicUrlForObject(logoObjectPath);
-      }
-
-      for (const file of sliderFiles) {
-        const sliderObjectPath = `stores/${storeSlug}/sliders/${file.filename}`;
-        const uploaded = await uploadFileToSupabaseStorage({
-          objectPath: sliderObjectPath,
-          localFilePath: file.path,
-          contentType: file.mimetype,
-        });
-        (file as any).publicUrl = uploaded?.publicUrl || getSupabasePublicUrlForObject(sliderObjectPath);
-      }
-
-      for (const [idxRaw, filesForIdx] of Object.entries(productFilesMap)) {
-        const idx = parseInt(idxRaw, 10);
-        const productId = (parsedProducts[idx] as any)?.id || (parsedProducts[idx] as any)?.productId || idx + 1;
-        for (const file of filesForIdx) {
-          const productObjectPath = `stores/${storeSlug}/products/${productId}/${file.filename}`;
+        if (logoFile) {
+          const logoObjectPath = `stores/${storeSlug}/logo/${logoFile.filename}`;
           const uploaded = await uploadFileToSupabaseStorage({
-            objectPath: productObjectPath,
+            objectPath: logoObjectPath,
+            localFilePath: logoFile.path,
+            contentType: logoFile.mimetype,
+          });
+          (logoFile as any).publicUrl = uploaded?.publicUrl || getSupabasePublicUrlForObject(logoObjectPath);
+        }
+
+        for (const file of sliderFiles) {
+          const sliderObjectPath = `stores/${storeSlug}/sliders/${file.filename}`;
+          const uploaded = await uploadFileToSupabaseStorage({
+            objectPath: sliderObjectPath,
             localFilePath: file.path,
             contentType: file.mimetype,
           });
-          (file as any).publicUrl = uploaded?.publicUrl || getSupabasePublicUrlForObject(productObjectPath);
+          (file as any).publicUrl = uploaded?.publicUrl || getSupabasePublicUrlForObject(sliderObjectPath);
+        }
+
+        for (const [idxRaw, filesForIdx] of Object.entries(productFilesMap)) {
+          const idx = parseInt(idxRaw, 10);
+          const productId = (parsedProducts[idx] as any)?.id || (parsedProducts[idx] as any)?.productId || idx + 1;
+          for (const file of filesForIdx) {
+            const productObjectPath = `stores/${storeSlug}/products/${productId}/${file.filename}`;
+            const uploaded = await uploadFileToSupabaseStorage({
+              objectPath: productObjectPath,
+              localFilePath: file.path,
+              contentType: file.mimetype,
+            });
+            (file as any).publicUrl = uploaded?.publicUrl || getSupabasePublicUrlForObject(productObjectPath);
+          }
+        }
+
+        logger.info(`✅ Supabase uploads completed`);
+      } catch (error) {
+        logger.error(`❌ Supabase upload failed, falling back to local assets: ${(error as any)?.message || String(error)}`);
+        useSupabaseStorage = false;
+        if (files && Object.keys(files).length > 0) {
+          try {
+            files = await moveUploadedFiles(storeSlug, files);
+            logger.info(`✅ Files moved successfully to /assets/${storeSlug}/ (fallback)`);
+          } catch (moveError) {
+            logger.error('❌ Failed to move uploaded files during fallback:', moveError);
+            sendError(res, 'Failed to process uploaded files', 500);
+            return;
+          }
         }
       }
-
-      logger.info(`✅ Supabase uploads completed`);
     }
 
     const allUploadedImages: string[] = [];
@@ -938,7 +954,7 @@ const readStoreJson = async (storeSlug: string): Promise<StoreJsonPayload | null
     }
   }
 
-  if (isSupabaseStorageEnabled()) {
+  if (isSupabasePublicReadEnabled()) {
     const supabaseJson = await fetchPublicStoreJsonFromSupabase(storeSlug);
     if (supabaseJson) {
       return supabaseJson as StoreJsonPayload;
@@ -1009,9 +1025,8 @@ export const getStorePublicData = async (
         {
           model: StoreSlider,
           as: 'sliders',
-          where: { isActive: true },
           required: false,
-          attributes: ['id', 'title', 'subtitle', 'imagePath', 'buttonText', 'sortOrder']
+          attributes: ['id', 'title', 'subtitle', 'imagePath', 'buttonText', 'sortOrder', 'metadata']
         }
       ]
     });
@@ -1021,7 +1036,14 @@ export const getStorePublicData = async (
       return;
     }
 
-    const sliders = ((store as any).sliders || []).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
+    const sliders = ((store as any).sliders || [])
+      .filter((s: any) => {
+        const m = s?.metadata;
+        if (!m || typeof m !== 'object') return true;
+        if (typeof m.isActive === 'boolean') return m.isActive;
+        return true;
+      })
+      .sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
     const products = await sequelize.models.Product.findAll({
       where: { storeId: store.id },
