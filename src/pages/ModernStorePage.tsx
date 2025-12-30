@@ -292,7 +292,7 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
       setLoadingStore(true);
       try {
         // 1. Try to fetch from Public API first (The Fix)
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const apiUrl = '/api';
         try {
           const response = await fetch(`${apiUrl}/stores/public/${currentSlug}`);
           if (response.ok) {
@@ -414,7 +414,7 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
   const fetchAds = async () => {
     try {
       if (storeSlug) {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const apiUrl = '/api';
         const fetchUrl = `${apiUrl}/ads/store/${storeSlug}`;
         const response = await fetch(fetchUrl);
         if (response.ok) {

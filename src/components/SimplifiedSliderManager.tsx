@@ -96,7 +96,7 @@ const fileInputRef = useRef<HTMLInputElement>(null);
 
     try {
       setLoading(true);
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
       const response = await fetch(`${apiUrl}/sliders/store/${storeId}`);
       if (response.ok) {
         const result = await response.json();
@@ -160,7 +160,7 @@ const fileInputRef = useRef<HTMLInputElement>(null);
         metadata: { discount: createForm.discount || '0' }
       };
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
       const response = await fetch(`${apiUrl}/sliders/store/${storeId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -226,7 +226,7 @@ const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, for
     const formData = new FormData();
     formData.append('image', file);
     
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
     const uploadResponse = await fetch(`${apiUrl}/sliders/store/${storeId}/upload`, {
       method: 'POST',
       body: formData
@@ -295,7 +295,7 @@ const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, for
         metadata: { discount: editForm.discount }
       };
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
       const response = await fetch(`${apiUrl}/sliders/store/${storeId}/${selectedSlider.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -352,7 +352,7 @@ const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, for
 
     try {
       setLoading(true);
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
       const response = await fetch(`${apiUrl}/sliders/store/${storeId}/bulk-delete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
