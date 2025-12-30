@@ -250,10 +250,10 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
       }
 
       const knownStores = ['nawaem', 'sheirine', 'pretty', 'delta-store', 'magna-beauty', 'indeesh'];
-      if (!knownStores.includes(storeSlug)) {
+      if (!knownStores.includes(storeSlug) || Boolean(getStoreConfig(storeSlug))) {
         return [];
       }
-      
+
       return storeProducts.slice(0, 5);
     };
 
@@ -565,7 +565,7 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
           favorites={favorites}
         />
       ) : storeConfig ? (
-        <UnifiedStoreSlider storeSlug={store.slug} initialSliders={sliderImages} />
+        <UnifiedStoreSlider storeSlug={store.slug} />
       ) : sliderImages.length > 0 ? (
         /* السلايدر العادي للمتاجر الديناميكية بدون إعدادات مركزية */
           <div className="relative h-96 bg-gradient-to-r from-primary/10 to-primary/5 overflow-hidden">
