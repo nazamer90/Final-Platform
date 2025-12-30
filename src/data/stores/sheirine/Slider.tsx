@@ -45,26 +45,26 @@ const SheirineSlider: React.FC<SheirineSliderProps> = ({
   const defaultBanners = [
     {
       id: 'banner1',
-      image: getImageUrl('/assets/sherine/sliders/slider1.webp').primary,
-      fallbackImage: getImageUrl('/assets/sherine/sliders/slider1.webp').fallback,
+      image: getImageUrl('/assets/sheirine/slider1.jpg').primary,
+      fallbackImage: getImageUrl('/assets/sheirine/slider1.jpg').fallback,
       title: 'مجموعة ملابس الفاخرة في شيرين'
     },
     {
       id: 'banner2',
-      image: getImageUrl('/assets/sherine/sliders/slider2.jpg').primary,
-      fallbackImage: getImageUrl('/assets/sherine/sliders/slider3.webp').fallback,
+      image: getImageUrl('/assets/sheirine/slider2.jpg').primary,
+      fallbackImage: getImageUrl('/assets/sheirine/slider2.jpg').fallback,
       title: 'فساتين نسائية أنيقة'
     },
     {
       id: 'banner3',
-      image: getImageUrl('/assets/sherine/sliders/slider4.webp').primary,
-      fallbackImage: getImageUrl('/assets/sherine/sliders/slider4.webp').fallback,
+      image: getImageUrl('/assets/sheirine/slider3.jpg').primary,
+      fallbackImage: getImageUrl('/assets/sheirine/slider3.jpg').fallback,
       title: 'ملابس نسائية مميزة'
     },
     {
       id: 'banner4',
-      image: getImageUrl('/assets/sherine/sliders/slider3.webp').primary,
-      fallbackImage: getImageUrl('/assets/sherine/sliders/slider1.webp').fallback,
+      image: getImageUrl('/assets/sheirine/slider4.jpg').primary,
+      fallbackImage: getImageUrl('/assets/sheirine/slider4.jpg').fallback,
       title: 'مجموعات فساتين خاصة'
     },
   ];
