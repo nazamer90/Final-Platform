@@ -45,7 +45,9 @@ const StoreFrontSlider: React.FC<StoreFrontSliderProps> = ({
   }, [storeSlug]);
 
   const loadSliders = async () => {
-    if (storeSlug) {
+    const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED === 'true';
+
+    if (storeSlug && publicApiEnabled) {
       try {
         const response = await fetch(`/api/sliders/store/${storeSlug}`);
         if (response.ok) {

@@ -285,56 +285,48 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
 
   useEffect(() => {
     const loadDynamicStoreData = async () => {
-      // Always try to load by slug, even if store object isn't fully populated yet
       const currentSlug = storeSlug || store?.slug;
       if (!currentSlug) return;
-      
+
       setLoadingStore(true);
       try {
-        // 1. Try to fetch from Public API first (The Fix)
-        const apiUrl = '/api';
-        try {
-          const response = await fetch(`${apiUrl}/stores/public/${currentSlug}`);
-          if (response.ok) {
-            const result = await response.json();
-            if (result.success && result.data) {
-              const { store: apiStore, products: apiProducts, sliders: apiSliders } = result.data;
-              
-              // Update state with API data
-              setEnhancedStore(prev => ({
-                ...prev,
-                ...apiStore,
-                logo: apiStore.logo || prev?.logo || '/assets/default-store.png'
-              }));
+        const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED === 'true';
+        const hasLocalConfig = Boolean(getStoreConfig(currentSlug));
 
-              setDynamicStoreData({
-                products: apiProducts,
-                sliderImages: apiSliders
-              });
+        if (publicApiEnabled && !hasLocalConfig) {
+          const apiUrl = '/api';
+          try {
+            const response = await fetch(`${apiUrl}/stores/public/${currentSlug}`);
+            if (response.ok) {
+              const result = await response.json();
+              if (result.success && result.data) {
+                const { store: apiStore, products: apiProducts, sliders: apiSliders } = result.data;
 
-              // If we have products from API, use them
-              if (apiProducts && apiProducts.length > 0) {
-                 // Map API products to frontend format if necessary
-                 // (Assuming API returns format compatible with frontend Product type)
-                 // You might need a mapper here if structures differ significantly
+                setEnhancedStore(prev => ({
+                  ...prev,
+                  ...apiStore,
+                  logo: apiStore.logo || prev?.logo || '/assets/default-store.png'
+                }));
+
+                setDynamicStoreData({
+                  products: apiProducts,
+                  sliderImages: apiSliders
+                });
+
+                setLoadingStore(false);
+                return;
               }
-              
-              setLoadingStore(false);
-              return; // Exit if API load successful
             }
+          } catch {
           }
-        } catch (apiError) {
-          console.warn('Failed to load from public API, falling back to local storage', apiError);
         }
 
-        // 2. Fallback to Local Storage / Static Data (Original Logic)
-        // Check for cache corruption and clear if needed
         await detectAndClearCacheCorruption(currentSlug);
-        
+
         const storeData = await loadStoreBySlug(currentSlug);
         if (storeData) {
           setDynamicStoreData(storeData);
-          
+
           if (storeData.logo && store?.logo && storeData.logo !== store.logo) {
             setEnhancedStore({
               ...store,
@@ -344,15 +336,18 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
             setEnhancedStore(store);
           }
         }
-      } catch (error) {
-        // Handle error silently
+      } catch {
       } finally {
         setLoadingStore(false);
       }
     };
-    
+
     loadDynamicStoreData();
-    fetchAds();
+
+    const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED === 'true';
+    if (publicApiEnabled) {
+      fetchAds();
+    }
   }, [storeSlug, store?.slug]);
 
   /**
