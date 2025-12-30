@@ -43,18 +43,9 @@ const AnimatedBackground = () => {
   );
 };
 
-const getBackendUrl = () => {
-  const apiUrl = import.meta.env.VITE_API_URL;
-  if (apiUrl) return apiUrl;
-  return typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:5000'
-    : 'https://eishro-backend.onrender.com';
-};
-
 const getImageUrl = (assetPath: string) => {
-  const backendUrl = getBackendUrl();
   return {
-    primary: `${backendUrl}${assetPath}`,
+    primary: assetPath,
     fallback: assetPath,
   };
 };

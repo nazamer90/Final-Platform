@@ -90,7 +90,7 @@ const UnifiedStoreSlider: React.FC<UnifiedStoreSliderProps> = ({
   
     // Fetch API data in background with timeout
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiUrl = '/api';
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
   
