@@ -400,15 +400,31 @@ export const createStoreWithImages = async (
       });
     }
 
-    const existingStore = await Store.findOne({
-      where: {
-        [Op.or]: [
-          { slug: storeSlug },
-          { name: storeName }
-        ]
-      }
-    });
-    
+    const existingStoreJson = await readStoreJson(storeSlug);
+    if (existingStoreJson) {
+      sendError(
+        res,
+        `Store with name "${storeName}" or slug "${storeSlug}" already exists in the system`,
+        409
+      );
+      return;
+    }
+
+    let existingStore: Store | null = null;
+    try {
+      existingStore = await Store.findOne({
+        where: {
+          [Op.or]: [
+            { slug: storeSlug },
+            { name: storeName }
+          ]
+        }
+      });
+    } catch (error) {
+      logger.warn('⚠️ DB store existence check failed, continuing with filesystem-only mode');
+      existingStore = null;
+    }
+
     if (existingStore) {
       sendError(
         res,
@@ -419,26 +435,34 @@ export const createStoreWithImages = async (
     }
 
     if (primaryOwnerEmail) {
-      const existingUser = await User.findOne({ where: { email: primaryOwnerEmail } });
-      if (existingUser) {
-        sendError(
-          res,
-          `Email "${primaryOwnerEmail}" is already registered in the system`,
-          409
-        );
-        return;
+      try {
+        const existingUser = await User.findOne({ where: { email: primaryOwnerEmail } });
+        if (existingUser) {
+          sendError(
+            res,
+            `Email "${primaryOwnerEmail}" is already registered in the system`,
+            409
+          );
+          return;
+        }
+      } catch (error) {
+        logger.warn('⚠️ DB email check failed, continuing with filesystem-only mode');
       }
     }
 
     if (secondaryOwnerEmail && secondaryOwnerEmail !== primaryOwnerEmail) {
-      const existingUser = await User.findOne({ where: { email: secondaryOwnerEmail } });
-      if (existingUser) {
-        sendError(
-          res,
-          `Email "${secondaryOwnerEmail}" is already registered in the system`,
-          409
-        );
-        return;
+      try {
+        const existingUser = await User.findOne({ where: { email: secondaryOwnerEmail } });
+        if (existingUser) {
+          sendError(
+            res,
+            `Email "${secondaryOwnerEmail}" is already registered in the system`,
+            409
+          );
+          return;
+        }
+      } catch (error) {
+        logger.warn('⚠️ DB secondary email check failed, continuing with filesystem-only mode');
       }
     }
 
@@ -631,7 +655,15 @@ export const createStoreWithImages = async (
       logger.info(`✅ ${cleanupResult.message}`);
     }
 
+    const dbPersistence = {
+      attempted: false,
+      persisted: false,
+      error: '' as string | null
+    };
+
     logger.info(`💾 Persisting merchant credentials, store, sliders, and ads for ${storeSlug}...`);
+    dbPersistence.attempted = true;
+
     try {
       await sequelize.transaction(async (transaction) => {
         persistedMerchant = await User.create(
@@ -711,11 +743,13 @@ export const createStoreWithImages = async (
         }
         logger.info(`✅ Default ads created for store`);
       });
+
+      dbPersistence.persisted = true;
       logger.info(`✅ Merchant credentials, store, sliders, and ads stored for ${storeSlug}`);
     } catch (dbError) {
-      logger.error('❌ Failed to persist store data:', dbError);
-      sendError(res, 'Failed to save store data', 500);
-      return;
+      const msg = (dbError as any)?.message || String(dbError);
+      dbPersistence.error = msg;
+      logger.error('❌ Failed to persist store data (continuing with filesystem store.json only):', dbError);
     }
 
     logger.info(`🎉 Store creation completed successfully for: ${storeName}`);
@@ -745,7 +779,8 @@ export const createStoreWithImages = async (
         checks: verificationResult.checks,
         warnings: verificationResult.warnings
       },
-      merchant: merchantPayload
+      merchant: merchantPayload,
+      dbPersistence
     }, 201, 'Store created successfully with permanent storage verification');
   } catch (error) {
     logger.error('Error creating store with images:', error);
@@ -791,6 +826,50 @@ export const validateStoreData = async (
   }
 };
 
+type StoreJsonPayload = {
+  id?: number;
+  storeId?: number;
+  slug?: string;
+  storeSlug?: string;
+  name?: string;
+  storeName?: string;
+  nameAr?: string;
+  nameEn?: string;
+  description?: string;
+  logo?: string;
+  category?: string;
+  categories?: any[];
+  products?: any[];
+  sliderImages?: any[];
+  sliders?: any[];
+  isActive?: boolean;
+};
+
+const readStoreJson = async (storeSlug: string): Promise<StoreJsonPayload | null> => {
+  let basePath = process.cwd();
+  if (basePath.endsWith('backend')) {
+    basePath = path.join(basePath, '..');
+  }
+
+  const candidates = [
+    path.join(basePath, 'backend', 'public', 'assets', storeSlug, 'store.json'),
+    path.join(basePath, 'public', 'assets', storeSlug, 'store.json')
+  ];
+
+  for (const filePath of candidates) {
+    try {
+      if (!fs.existsSync(filePath)) continue;
+      const raw = await fsPromises.readFile(filePath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      return parsed as StoreJsonPayload;
+    } catch (error) {
+      logger.warn(`⚠️ Failed to read store.json for ${storeSlug} from ${filePath}`);
+    }
+  }
+
+  return null;
+};
+
 export const getStorePublicData = async (
   req: Request,
   res: Response,
@@ -804,11 +883,53 @@ export const getStorePublicData = async (
       return;
     }
 
+    const storeJson = await readStoreJson(slug);
+
+    if (storeJson) {
+      let storeRecord: Store | null = null;
+      try {
+        storeRecord = await Store.findOne({ where: { slug } });
+      } catch {
+        storeRecord = null;
+      }
+
+      const resolvedCategory =
+        storeRecord?.category ||
+        (storeJson.category as string | undefined) ||
+        (Array.isArray(storeJson.categories) ? String(storeJson.categories[0] ?? '') : '') ||
+        '';
+
+      const sliderSource = (storeJson.sliderImages || storeJson.sliders || []) as any[];
+      const sliders = sliderSource.map((s: any, idx: number) => ({
+        id: s.id || `banner${idx + 1}`,
+        title: s.title || '',
+        subtitle: s.subtitle || '',
+        image: s.image || s.imagePath || '',
+        buttonText: s.buttonText || 'تسوق الآن'
+      }));
+
+      sendSuccess(res, {
+        store: {
+          id: storeRecord?.id ?? storeJson.storeId ?? storeJson.id,
+          name: storeRecord?.name ?? storeJson.name ?? storeJson.storeName ?? storeJson.nameAr,
+          slug,
+          description: storeRecord?.description ?? storeJson.description,
+          logo: storeRecord?.logo ?? storeJson.logo,
+          category: resolvedCategory,
+          isActive: storeRecord?.isActive ?? (storeJson.isActive ?? true)
+        },
+        products: Array.isArray(storeJson.products) ? storeJson.products : [],
+        sliders
+      });
+
+      return;
+    }
+
     const store = await Store.findOne({
       where: { slug },
       include: [
-        { 
-          model: StoreSlider, 
+        {
+          model: StoreSlider,
           as: 'sliders',
           where: { isActive: true },
           required: false,
@@ -822,16 +943,12 @@ export const getStorePublicData = async (
       return;
     }
 
-    // Sort sliders manually since we can't easily do it in include with all DB types
     const sliders = ((store as any).sliders || []).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-    // Get Products (assuming we can filter by storeId)
-    // Note: Since Product model might not be directly associated in all versions, 
-    // we fetch using storeId manually if association isn't standard
     const products = await sequelize.models.Product.findAll({
       where: { storeId: store.id },
-      include: ['images'] // Assuming alias is defined
-    }).catch(() => []); // Fallback if association fails
+      include: ['images']
+    }).catch(() => []);
 
     sendSuccess(res, {
       store: {
@@ -865,21 +982,29 @@ export const checkStoreExists = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { storeSlug, storeName } = req.body;
+    const rawSlug = (req.body?.storeSlug ?? '').toString().trim();
+    const rawName = (req.body?.storeName ?? '').toString().trim();
 
-    if (!storeSlug && !storeName) {
+    if (!rawSlug && !rawName) {
       sendError(res, 'Store slug or name is required', 400);
       return;
     }
 
-    const existingStore = await Store.findOne({
-      where: {
-        [Op.or]: [
-          storeSlug ? { slug: storeSlug } : {},
-          storeName ? { name: storeName } : {}
-        ]
-      }
-    });
+    let existingStore: Store | null = null;
+
+    try {
+      existingStore = await Store.findOne({
+        where: {
+          [Op.or]: [
+            rawSlug ? { slug: rawSlug } : {},
+            rawName ? { name: rawName } : {}
+          ]
+        }
+      });
+    } catch (error) {
+      logger.warn('⚠️ DB check-exists query failed, falling back to filesystem check');
+      existingStore = null;
+    }
 
     if (existingStore) {
       sendSuccess(res, {
@@ -888,14 +1013,62 @@ export const checkStoreExists = async (
           id: existingStore.id,
           slug: (existingStore as any).slug,
           name: (existingStore as any).name
+        },
+        emails: []
+      });
+      return;
+    }
+
+    if (rawSlug) {
+      const storeJson = await readStoreJson(rawSlug);
+      if (storeJson) {
+        sendSuccess(res, {
+          exists: true,
+          store: {
+            id: storeJson.storeId ?? storeJson.id,
+            slug: storeJson.storeSlug ?? storeJson.slug ?? rawSlug,
+            name: storeJson.name ?? storeJson.storeName ?? storeJson.nameAr ?? rawName
+          },
+          emails: []
+        });
+        return;
+      }
+
+      let basePath = process.cwd();
+      if (basePath.endsWith('backend')) {
+        basePath = path.join(basePath, '..');
+      }
+      const storeDirCandidates = [
+        path.join(basePath, 'backend', 'public', 'assets', rawSlug),
+        path.join(basePath, 'public', 'assets', rawSlug)
+      ];
+
+      const dirExists = storeDirCandidates.some(p => {
+        try {
+          return fs.existsSync(p);
+        } catch {
+          return false;
         }
       });
-    } else {
-      sendSuccess(res, {
-        exists: false,
-        message: 'Store is available'
-      });
+
+      if (dirExists) {
+        sendSuccess(res, {
+          exists: true,
+          store: {
+            id: null,
+            slug: rawSlug,
+            name: rawName || rawSlug
+          },
+          emails: []
+        });
+        return;
+      }
     }
+
+    sendSuccess(res, {
+      exists: false,
+      message: 'Store is available'
+    });
   } catch (error) {
     logger.error('Error checking store existence:', error);
     next(error);
