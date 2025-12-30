@@ -49,7 +49,7 @@ const StorePage: React.FC<StorePageProps> = ({ storeSlug, onBack, onProductClick
   const fetchAds = async () => {
     try {
       if (storeSlug) {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const apiUrl = '/api';
         const fetchUrl = `${apiUrl}/ads/store/${storeSlug}`;
         const response = await fetch(fetchUrl);
         if (response.ok) {
