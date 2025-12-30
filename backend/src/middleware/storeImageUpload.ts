@@ -15,6 +15,14 @@ const getTempUploadDir = () => {
 
 const tempUploadDir = getTempUploadDir();
 
+const safeBackendRoot = (() => {
+  let basePath = process.cwd();
+  if (basePath.endsWith('backend')) {
+    basePath = path.join(basePath, '..');
+  }
+  return path.join(basePath, 'backend');
+})();
+
 const getStoreUploadPath = (storeSlug: string, imageType: 'products' | 'sliders' | 'logo') => {
   let basePath = process.cwd();
   if (basePath.endsWith('backend')) {
@@ -185,7 +193,7 @@ export const moveUploadedFiles = async (
 
         const newPath = path.join(targetDir, finalFilename);
 
-        if (!isPathSafe(newPath, path.join(process.cwd(), 'backend'))) {
+        if (!isPathSafe(newPath, safeBackendRoot)) {
           throw new Error('Unsafe path detected - potential security threat');
         }
 

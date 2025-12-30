@@ -137,7 +137,9 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
     return Array.from(storeMap.values());
   })();
   
-  const store = allStores.find(s => s.slug === storeSlug);
+  const indexedStore = allStores.find(s => s.slug === storeSlug);
+  const [enhancedStore, setEnhancedStore] = useState<any>(indexedStore);
+  const store = enhancedStore || indexedStore;
 
   const getStoreProducts = (storeSlug: string, storeId?: number) => {
     try {
@@ -277,11 +279,6 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
       window.removeEventListener('storeSliderUpdated', handleSliderUpdate as EventListener);
     };
   }, [dynamicStoreData, storeSlug, storeProducts]);
-  const [enhancedStore, setEnhancedStore] = useState(store);
-
-  useEffect(() => {
-    setEnhancedStore(store);
-  }, [store]);
 
   useEffect(() => {
     const loadDynamicStoreData = async () => {
@@ -308,9 +305,17 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                   logo: apiStore.logo || prev?.logo || '/assets/default-store.png'
                 }));
 
+                const normalizedSliders = Array.isArray(apiSliders)
+                  ? apiSliders.map((slide: any, idx: number) => ({
+                      ...slide,
+                      id: slide.id || `banner${idx + 1}`,
+                      imageUrl: slide.imageUrl || slide.image || slide.imagePath || ''
+                    }))
+                  : [];
+
                 setDynamicStoreData({
                   products: apiProducts,
-                  sliderImages: apiSliders
+                  sliderImages: normalizedSliders
                 });
 
                 setLoadingStore(false);
@@ -445,7 +450,11 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-600 mb-4">متجر غير موجود</h2>
+          {loadingStore ? (
+            <h2 className="text-2xl font-bold text-gray-600 mb-4">جاري تحميل المتجر...</h2>
+          ) : (
+            <h2 className="text-2xl font-bold text-gray-600 mb-4">متجر غير موجود</h2>
+          )}
           <Button onClick={onBack}>العودة للرئيسية</Button>
         </div>
       </div>
