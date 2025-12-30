@@ -128,6 +128,11 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
         return;
       }
 
+      const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED === 'true';
+      if (!publicApiEnabled) {
+        throw new Error('Public API disabled');
+      }
+
       const apiUrl = '/api';
       const response = await fetch(`${apiUrl}/ads/store/${storeId}`);
       
