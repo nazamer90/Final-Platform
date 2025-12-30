@@ -11,7 +11,14 @@ import User from '@models/User';
 import StoreSlider from '@models/StoreSlider';
 import StoreAd from '@models/StoreAd';
 import UnavailableNotification from '@models/UnavailableNotification';
-import { moveUploadedFiles, cleanupTempUploads } from '@middleware/storeImageUpload';
+import { cleanupTempUploads } from '@middleware/storeImageUpload';
+import {
+  fetchPublicStoreJsonFromSupabase,
+  getSupabasePublicUrlForObject,
+  isSupabaseStorageEnabled,
+  uploadFileToSupabaseStorage,
+  uploadJsonToSupabaseStorage
+} from '@services/supabaseStorage';
 import fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import path from 'path';
@@ -335,21 +342,12 @@ export const createStoreWithImages = async (
       return;
     }
 
+    const useSupabaseStorage = isSupabaseStorageEnabled();
+
     if (files && Object.keys(files).length > 0) {
-      logger.info(`📁 Moving ${Object.keys(files).length} file fields from temp directory...`);
+      logger.info(`📥 Received ${Object.keys(files).length} file fields for store creation`);
       logger.info(`   Files available: ${Object.keys(files).join(', ')}`);
-      try {
-        files = await moveUploadedFiles(storeSlug, files);
-        logger.info(`✅ Files moved successfully to /assets/${storeSlug}/`);
-        
-        if (Object.keys(files).length === 0) {
-          logger.warn(`⚠️ No files were moved successfully, will use defaults`);
-        }
-      } catch (moveError) {
-        logger.error('❌ Failed to move uploaded files:', moveError);
-        sendError(res, 'Failed to process uploaded files', 500);
-        return;
-      }
+      logger.info(useSupabaseStorage ? '☁️ Supabase Storage enabled: uploading assets to Supabase' : '📁 Supabase Storage disabled: will use local /assets paths');
     } else {
       logger.info(`ℹ️ No files provided, will use default images`);
     }
@@ -520,10 +518,51 @@ export const createStoreWithImages = async (
       }
     }
 
+    if (useSupabaseStorage) {
+      logger.info(`☁️ Uploading store assets to Supabase bucket...`);
+
+      if (logoFile) {
+        const logoObjectPath = `stores/${storeSlug}/logo/${logoFile.filename}`;
+        const uploaded = await uploadFileToSupabaseStorage({
+          objectPath: logoObjectPath,
+          localFilePath: logoFile.path,
+          contentType: logoFile.mimetype,
+        });
+        (logoFile as any).publicUrl = uploaded?.publicUrl || getSupabasePublicUrlForObject(logoObjectPath);
+      }
+
+      for (const file of sliderFiles) {
+        const sliderObjectPath = `stores/${storeSlug}/sliders/${file.filename}`;
+        const uploaded = await uploadFileToSupabaseStorage({
+          objectPath: sliderObjectPath,
+          localFilePath: file.path,
+          contentType: file.mimetype,
+        });
+        (file as any).publicUrl = uploaded?.publicUrl || getSupabasePublicUrlForObject(sliderObjectPath);
+      }
+
+      for (const [idxRaw, filesForIdx] of Object.entries(productFilesMap)) {
+        const idx = parseInt(idxRaw, 10);
+        const productId = (parsedProducts[idx] as any)?.id || (parsedProducts[idx] as any)?.productId || idx + 1;
+        for (const file of filesForIdx) {
+          const productObjectPath = `stores/${storeSlug}/products/${productId}/${file.filename}`;
+          const uploaded = await uploadFileToSupabaseStorage({
+            objectPath: productObjectPath,
+            localFilePath: file.path,
+            contentType: file.mimetype,
+          });
+          (file as any).publicUrl = uploaded?.publicUrl || getSupabasePublicUrlForObject(productObjectPath);
+        }
+      }
+
+      logger.info(`✅ Supabase uploads completed`);
+    }
+
     const allUploadedImages: string[] = [];
     Object.values(productFilesMap).forEach(files => {
       files.forEach(f => {
-        const imgPath = `/assets/${storeSlug}/products/${f.filename}`;
+        const supabaseUrl = (f as any).publicUrl as string | undefined;
+        const imgPath = useSupabaseStorage && supabaseUrl ? supabaseUrl : `/assets/${storeSlug}/products/${f.filename}`;
         allUploadedImages.push(imgPath);
       });
     });
@@ -536,7 +575,10 @@ export const createStoreWithImages = async (
       
       let images: string[] = [];
       if (filesForThisProduct.length > 0) {
-        images = filesForThisProduct.map(f => `/assets/${storeSlug}/products/${f.filename}`);
+        images = filesForThisProduct.map(f => {
+          const supabaseUrl = (f as any).publicUrl as string | undefined;
+          return useSupabaseStorage && supabaseUrl ? supabaseUrl : `/assets/${storeSlug}/products/${f.filename}`;
+        });
         logger.info(`  📦 Product ${idx} (${product.name}): ✅ ${images.length} image(s) assigned (specific)`);
       } else if (allUploadedImages.length > 0) {
         images = [allUploadedImages[imageIndex % allUploadedImages.length]];
@@ -575,14 +617,14 @@ export const createStoreWithImages = async (
     const defaultSliderImages = [
       {
         id: 'banner1',
-        image: `/assets/${storeSlug}/sliders/default-slider-1.webp`,
+        image: '/assets/default-slider.png',
         title: `اكتشف تشكيلة ${storeName} الحصرية`,
         subtitle: 'جودة عالية وأسعار منافسة',
         buttonText: 'تسوق الآن'
       },
       {
         id: 'banner2',
-        image: `/assets/${storeSlug}/sliders/default-slider-2.webp`,
+        image: '/assets/default-slider.png',
         title: `عروض حصرية من ${storeName}`,
         subtitle: 'لا تفوت الفرصة',
         buttonText: 'تسوق الآن'
@@ -591,8 +633,9 @@ export const createStoreWithImages = async (
     
     const slidersWithImages: SliderImage[] = (parsedSliders.length > 0 ? parsedSliders : defaultSliderImages).map((slider, i) => {
       const file = sliderFiles[i];
-      const image = file 
-        ? `/assets/${storeSlug}/sliders/${file.filename}` 
+      const supabaseUrl = file ? ((file as any).publicUrl as string | undefined) : undefined;
+      const image = file
+        ? (useSupabaseStorage && supabaseUrl ? supabaseUrl : `/assets/${storeSlug}/sliders/${file.filename}`)
         : (slider.image && slider.image.trim() ? slider.image : defaultSliderImages[i]?.image || '/assets/default-slider.png');
       
       logger.info(`  🖼️ Slider ${slider.id}: ${file ? 'uploaded image' : 'using default/provided image'}`);
@@ -603,8 +646,8 @@ export const createStoreWithImages = async (
       };
     });
 
-    const logoUrl = logoFile 
-      ? `/assets/${storeSlug}/logo/${logoFile.filename}` 
+    const logoUrl = logoFile
+      ? (useSupabaseStorage && (logoFile as any).publicUrl ? ((logoFile as any).publicUrl as string) : `/assets/${storeSlug}/logo/${logoFile.filename}`)
       : `/assets/default-store.png`;
     logger.info(`  🏷️ Logo: ${logoUrl}`);
 
@@ -640,6 +683,23 @@ export const createStoreWithImages = async (
     }
 
     logger.info(`✅ Store verification PASSED for: ${storeSlug}`);
+
+    if (useSupabaseStorage) {
+      try {
+        const storeJson = await readStoreJson(storeSlug);
+        if (storeJson) {
+          await uploadJsonToSupabaseStorage({
+            objectPath: `stores/${storeSlug}/store.json`,
+            json: storeJson,
+          });
+          logger.info(`✅ store.json uploaded to Supabase: stores/${storeSlug}/store.json`);
+        } else {
+          logger.warn(`⚠️ store.json not found for Supabase upload (storeSlug=${storeSlug})`);
+        }
+      } catch (error) {
+        logger.warn(`⚠️ Failed to upload store.json to Supabase (non-fatal): ${(error as any)?.message || String(error)}`);
+      }
+    }
     
     logger.info(`🧹 Cleaning up temporary upload files...`);
     try {
@@ -864,6 +924,13 @@ const readStoreJson = async (storeSlug: string): Promise<StoreJsonPayload | null
       return parsed as StoreJsonPayload;
     } catch (error) {
       logger.warn(`⚠️ Failed to read store.json for ${storeSlug} from ${filePath}`);
+    }
+  }
+
+  if (isSupabaseStorageEnabled()) {
+    const supabaseJson = await fetchPublicStoreJsonFromSupabase(storeSlug);
+    if (supabaseJson) {
+      return supabaseJson as StoreJsonPayload;
     }
   }
 
@@ -1234,20 +1301,41 @@ export const uploadSliderImage = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    let basePath = process.cwd();
-    if (basePath.endsWith('backend')) {
-      basePath = path.join(basePath, '..');
+    const useSupabaseStorage = isSupabaseStorageEnabled();
+
+    let imagePath: string;
+
+    if (useSupabaseStorage) {
+      const sliderObjectPath = `stores/${storeSlug}/sliders/${file.filename}`;
+      const uploaded = await uploadFileToSupabaseStorage({
+        objectPath: sliderObjectPath,
+        localFilePath: file.path,
+        contentType: file.mimetype,
+      });
+
+      imagePath = uploaded?.publicUrl || getSupabasePublicUrlForObject(sliderObjectPath);
+      logger.info(`✅ Slider image uploaded to Supabase: ${imagePath}`);
+
+      try {
+        await fsPromises.unlink(file.path);
+      } catch {
+      }
+    } else {
+      let basePath = process.cwd();
+      if (basePath.endsWith('backend')) {
+        basePath = path.join(basePath, '..');
+      }
+      const storeSliderDir = path.join(basePath, 'backend', 'public', 'assets', storeSlug, 'sliders');
+      logger.info(`📁 Creating directory: ${storeSliderDir}`);
+      await fsPromises.mkdir(storeSliderDir, { recursive: true });
+
+      const newPath = path.join(storeSliderDir, file.filename);
+      logger.info(`📋 Moving file from: ${file.path} to: ${newPath}`);
+      await fsPromises.rename(file.path, newPath);
+
+      imagePath = `/assets/${storeSlug}/sliders/${file.filename}`;
+      logger.info(`✅ Slider image uploaded: ${imagePath}`);
     }
-    const storeSliderDir = path.join(basePath, 'backend', 'public', 'assets', storeSlug, 'sliders');
-    logger.info(`📁 Creating directory: ${storeSliderDir}`);
-    await fsPromises.mkdir(storeSliderDir, { recursive: true });
-
-    const newPath = path.join(storeSliderDir, file.filename);
-    logger.info(`📋 Moving file from: ${file.path} to: ${newPath}`);
-    await fsPromises.rename(file.path, newPath);
-
-    const imagePath = `/assets/${storeSlug}/sliders/${file.filename}`;
-    logger.info(`✅ Slider image uploaded: ${imagePath}`);
 
     const slider = await StoreSlider.create({
       storeId: store.id,
