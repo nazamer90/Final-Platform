@@ -48,7 +48,8 @@ router.delete('/admin/:slug', adminDeleteStoreBySlug);
 router.get('/list', async (req, res, next) => {
   try {
     const stores = await Store.findAll({
-      attributes: ['id', 'name', 'slug', 'description', 'logo', 'category', 'isActive', 'createdAt', 'updatedAt']
+      attributes: ['id', 'name', 'slug', 'description', 'logo', 'category', 'isActive', 'createdAt', 'updatedAt'],
+      raw: true
     });
     
     logger.info(`✅ Retrieved ${stores.length} stores`);
