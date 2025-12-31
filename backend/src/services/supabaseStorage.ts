@@ -127,3 +127,126 @@ export const fetchPublicStoreJsonFromSupabase = async (storeSlug: string): Promi
     return null;
   }
 };
+
+export const listSupabaseObjects = async (params: {
+  prefix: string;
+  limit?: number;
+  offset?: number;
+}): Promise<Array<{ name?: string }> | null> => {
+  const { url, serviceRoleKey, bucket } = getSupabaseEnv();
+  if (!url || !serviceRoleKey || !bucket) {
+    return null;
+  }
+
+  const prefix = (params.prefix || '').replace(/^\/+/, '');
+  const limit = typeof params.limit === 'number' ? params.limit : 1000;
+  const offset = typeof params.offset === 'number' ? params.offset : 0;
+
+  const endpoint = `${url}/storage/v1/object/list/${bucket}`;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${serviceRoleKey}`,
+      apikey: serviceRoleKey,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      prefix,
+      limit,
+      offset,
+      sortBy: { column: 'name', order: 'asc' },
+    }),
+  }).catch(() => null);
+
+  if (!response || !response.ok) {
+    const text = await response?.text().catch(() => '');
+    throw new Error(`Supabase list failed (${response?.status ?? 'unknown'}): ${text}`);
+  }
+
+  const payload = await response.json().catch(() => null);
+  if (!Array.isArray(payload)) {
+    return [];
+  }
+  return payload as Array<{ name?: string }>;
+};
+
+export const removeSupabaseObjects = async (objectPaths: string[]): Promise<boolean | null> => {
+  const { url, serviceRoleKey, bucket } = getSupabaseEnv();
+  if (!url || !serviceRoleKey || !bucket) {
+    return null;
+  }
+
+  const paths = (objectPaths || [])
+    .map((p) => (p || '').trim().replace(/^\/+/, ''))
+    .filter(Boolean);
+  if (paths.length === 0) {
+    return true;
+  }
+
+  const endpoint = `${url}/storage/v1/object/remove/${bucket}`;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${serviceRoleKey}`,
+      apikey: serviceRoleKey,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({ prefixes: paths }),
+  }).catch(() => null);
+
+  if (!response || !response.ok) {
+    const text = await response?.text().catch(() => '');
+    throw new Error(`Supabase remove failed (${response?.status ?? 'unknown'}): ${text}`);
+  }
+
+  return true;
+};
+
+export const deleteSupabasePrefix = async (prefix: string): Promise<{ deleted: number } | null> => {
+  const { url, serviceRoleKey, bucket } = getSupabaseEnv();
+  if (!url || !serviceRoleKey || !bucket) {
+    return null;
+  }
+
+  const normalizedPrefix = (prefix || '').trim().replace(/^\/+/, '').replace(/\/+$/, '');
+  if (!normalizedPrefix) {
+    return { deleted: 0 };
+  }
+
+  let offset = 0;
+  const limit = 1000;
+  let deleted = 0;
+
+  for (let page = 0; page < 50; page++) {
+    const listed = await listSupabaseObjects({ prefix: normalizedPrefix, limit, offset });
+    if (!listed) {
+      return null;
+    }
+
+    const objectPaths = listed
+      .map((o: any) => {
+        const name = (o?.name || '').toString();
+        if (!name) return '';
+        const base = normalizedPrefix.endsWith('/') ? normalizedPrefix.slice(0, -1) : normalizedPrefix;
+        return `${base}/${name}`;
+      })
+      .filter(Boolean);
+
+    if (objectPaths.length === 0) {
+      break;
+    }
+
+    for (let i = 0; i < objectPaths.length; i += 100) {
+      const chunk = objectPaths.slice(i, i + 100);
+      await removeSupabaseObjects(chunk);
+      deleted += chunk.length;
+    }
+
+    if (listed.length < limit) {
+      break;
+    }
+    offset += limit;
+  }
+
+  return { deleted };
+};

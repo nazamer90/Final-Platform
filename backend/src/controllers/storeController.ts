@@ -13,6 +13,7 @@ import StoreAd from '@models/StoreAd';
 import UnavailableNotification from '@models/UnavailableNotification';
 import { cleanupTempUploads, moveUploadedFiles } from '@middleware/storeImageUpload';
 import {
+  deleteSupabasePrefix,
   fetchPublicStoreJsonFromSupabase,
   getSupabasePublicUrlForObject,
   isSupabasePublicReadEnabled,
