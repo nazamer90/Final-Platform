@@ -1608,20 +1608,53 @@ export default function Home() {
         const apiUrl = import.meta.env.VITE_API_URL || '/api';
         const backendUrl = apiUrl.replace('/api', '');
         
-        let indexResponse = await fetch(`${backendUrl}/assets/stores/index.json`, { cache: 'no-store' }).catch(() => null);
-        if (!indexResponse?.ok) {
-          indexResponse = await fetch('/assets/stores/index.json', { cache: 'no-store' }).catch(() => null);
+        let storeSummaries: any[] = [];
+
+        try {
+          let indexResponse = await fetch(`${backendUrl}/assets/stores/index.json`, { cache: 'no-store' }).catch(() => null);
+          if (!indexResponse?.ok) {
+            indexResponse = await fetch('/assets/stores/index.json', { cache: 'no-store' }).catch(() => null);
+          }
+          if (!indexResponse?.ok) {
+            indexResponse = await fetch('/index.json', { cache: 'no-store' }).catch(() => null);
+          }
+          if (indexResponse?.ok) {
+            const payload = await indexResponse.json().catch(() => ([]));
+            storeSummaries = Array.isArray(payload)
+              ? payload
+              : (Array.isArray((payload as any)?.stores) ? (payload as any).stores : []);
+          }
+        } catch {
+          storeSummaries = [];
         }
-        if (!indexResponse?.ok) {
-          indexResponse = await fetch('/index.json', { cache: 'no-store' }).catch(() => null);
+
+        try {
+          const listResponse = await fetch(`${apiUrl}/stores/list`, { cache: 'no-store' }).catch(() => null);
+          if (listResponse?.ok) {
+            const listPayload = await listResponse.json().catch(() => null);
+            const dbStores = Array.isArray((listPayload as any)?.data?.stores)
+              ? (listPayload as any).data.stores
+              : (Array.isArray((listPayload as any)?.stores) ? (listPayload as any).stores : []);
+
+            for (const s of dbStores) {
+              storeSummaries.push({
+                id: s.id,
+                storeId: s.id,
+                slug: s.slug,
+                name: s.name,
+                nameAr: s.name,
+                nameEn: s.slug,
+                description: s.description,
+                logo: s.logo,
+                categories: [],
+                status: s.status,
+                lastUpdated: s.updatedAt
+              });
+            }
+          }
+        } catch {
         }
-        if (!indexResponse?.ok) {
-          return;
-        }
-        const payload = await indexResponse.json().catch(() => ([]));
-        const storeSummaries = Array.isArray(payload)
-          ? payload
-          : (Array.isArray((payload as any)?.stores) ? (payload as any).stores : []);
+
         if (storeSummaries.length === 0) {
           return;
         }
