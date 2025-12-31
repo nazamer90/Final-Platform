@@ -1212,6 +1212,125 @@ export const cleanupStoreAndUsers = async (
   }
 };
 
+export const adminDeleteStoreBySlug = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const adminKey = (process.env.ADMIN_API_KEY || '').trim();
+    if (!adminKey) {
+      sendError(res, 'Admin API is not configured', 503);
+      return;
+    }
+
+    const provided = (req.headers['x-admin-key'] || req.headers['x-admin-token'] || '').toString();
+    if (!provided || provided !== adminKey) {
+      sendError(res, 'Forbidden', 403);
+      return;
+    }
+
+    const slug = (req.params.slug || '').toString().trim();
+    if (!slug) {
+      sendError(res, 'Store slug is required', 400);
+      return;
+    }
+
+    let basePath = process.cwd();
+    if (basePath.endsWith('backend')) {
+      basePath = path.join(basePath, '..');
+    }
+
+    const indexCandidates = [
+      path.join(basePath, 'backend', 'public', 'assets', 'stores', 'index.json'),
+      path.join(basePath, 'public', 'assets', 'stores', 'index.json')
+    ];
+
+    const assetsDirCandidates = [
+      path.join(basePath, 'backend', 'public', 'assets', slug),
+      path.join(basePath, 'public', 'assets', slug)
+    ];
+
+    const result: any = {
+      slug,
+      removedFromIndex: false,
+      removedAssetDirs: [] as string[],
+      supabase: { attempted: false, deleted: 0 },
+      db: { attempted: false, deleted: false },
+      warnings: [] as string[]
+    };
+
+    for (const indexPath of indexCandidates) {
+      try {
+        if (!fs.existsSync(indexPath)) {
+          continue;
+        }
+        const raw = await fsPromises.readFile(indexPath, 'utf-8');
+        const parsed = JSON.parse(raw);
+        const list = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.stores) ? parsed.stores : []);
+        if (!Array.isArray(list)) {
+          continue;
+        }
+        const nextList = list.filter((s: any) => (s?.slug || s?.subdomain || '').toString() !== slug);
+        if (nextList.length !== list.length) {
+          const nextPayload = Array.isArray(parsed) ? nextList : { ...parsed, stores: nextList };
+          await fsPromises.writeFile(indexPath, JSON.stringify(nextPayload, null, 2), 'utf-8');
+          result.removedFromIndex = true;
+        }
+      } catch (e: any) {
+        result.warnings.push(`Failed to update index.json at ${indexPath}: ${e?.message || 'unknown error'}`);
+      }
+    }
+
+    for (const dirPath of assetsDirCandidates) {
+      try {
+        if (fs.existsSync(dirPath)) {
+          await fsPromises.rm(dirPath, { recursive: true, force: true });
+          result.removedAssetDirs.push(dirPath);
+        }
+      } catch (e: any) {
+        result.warnings.push(`Failed to remove assets dir ${dirPath}: ${e?.message || 'unknown error'}`);
+      }
+    }
+
+    if (isSupabaseStorageEnabled()) {
+      try {
+        result.supabase.attempted = true;
+        const deleted = await deleteSupabasePrefix(`stores/${slug}`);
+        if (deleted) {
+          result.supabase.deleted = deleted.deleted;
+        }
+      } catch (e: any) {
+        result.warnings.push(`Failed to delete Supabase prefix for ${slug}: ${e?.message || 'unknown error'}`);
+      }
+    } else {
+      result.warnings.push('Supabase delete skipped (missing SUPABASE_* env vars)');
+    }
+
+    try {
+      result.db.attempted = true;
+      const store = await Store.findOne({ where: { slug } }).catch(() => null);
+      if (store?.id) {
+        await StoreSlider.destroy({ where: { storeId: store.id } }).catch(() => undefined);
+        await (sequelize.models as any).Product?.destroy?.({ where: { storeId: store.id } }).catch(() => undefined);
+        await StoreAd.destroy({ where: { storeId: store.id } }).catch(() => undefined);
+        await UnavailableNotification.destroy({ where: { [Op.or]: [{ storeSlug: slug }, { storeId: store.id }] } }).catch(() => undefined);
+        await Store.destroy({ where: { id: store.id } }).catch(() => undefined);
+        result.db.deleted = true;
+      } else {
+        result.db.deleted = false;
+      }
+    } catch (e: any) {
+      result.warnings.push(`DB cleanup failed: ${e?.message || 'unknown error'}`);
+    }
+
+    sendSuccess(res, result, 200, 'Store cleanup completed');
+  } catch (error) {
+    logger.error('Error in adminDeleteStoreBySlug:', error);
+    next(error);
+  }
+};
+
 export const createUnavailableNotification = async (
   req: Request,
   res: Response,
