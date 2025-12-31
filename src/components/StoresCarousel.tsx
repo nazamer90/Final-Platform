@@ -51,30 +51,8 @@ function getLocalDynamicStores() {
       const rawStored = localStorage.getItem('eshro_stores');
       const eshroStores = JSON.parse(rawStored || '[]');
       
-      // Cleanup Logic: Remove hamoda stores from localStorage if found
-      let hasCleanup = false;
-      const filteredStores = eshroStores.filter((store: any) => {
-        const slug = canonicalSlug(store.subdomain || store.id?.toString());
-        if (slug === 'center-hamoda' || slug === 'hamoda-center') {
-            hasCleanup = true;
-            return false;
-        }
-        return true;
-      });
-
-      if (hasCleanup) {
-          localStorage.setItem('eshro_stores', JSON.stringify(filteredStores));
-          // Remove specific store files as well
-          localStorage.removeItem('eshro_store_files_center-hamoda');
-          localStorage.removeItem('store_products_center-hamoda');
-          localStorage.removeItem('store_sliders_center-hamoda');
-          localStorage.removeItem('eshro_store_files_hamoda-center');
-          localStorage.removeItem('store_products_hamoda-center');
-          localStorage.removeItem('store_sliders_hamoda-center');
-      }
-
-      if (Array.isArray(filteredStores)) {
-        for (const store of filteredStores) {
+      if (Array.isArray(eshroStores)) {
+        for (const store of eshroStores) {
           if (store.setupComplete === true) {
             const rawSlug = store.subdomain || store.id?.toString();
             const slug = canonicalSlug(rawSlug);
@@ -144,69 +122,112 @@ async function fetchJsonStores(): Promise<any[]> {
   try {
     const apiUrl = typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL ? import.meta.env.VITE_API_URL : '/api';
     const backendUrl = apiUrl.replace('/api', '');
-    
-    let idxRes = await fetch(`${backendUrl}/assets/stores/index.json`, { cache: 'no-store' }).catch(() => null);
-    if (!idxRes?.ok) {
-      idxRes = await fetch('/assets/stores/index.json', { cache: 'no-store' }).catch(() => null);
-    }
-    if (!idxRes?.ok) {
-      idxRes = await fetch('/index.json', { cache: 'no-store' }).catch(() => null);
-      if (!idxRes?.ok) return [];
-    }
-
-    const jsonData = await idxRes.json().catch(() => ({ stores: [] }));
-    const index: JsonStoreSummary[] = jsonData && jsonData.stores ? jsonData.stores : Array.isArray(jsonData) ? jsonData : [];
-    if (!Array.isArray(index) || index.length === 0) return [];
 
     const getStoreLogoFromStatic = (storeSlug: string): string | null => {
       const staticStore = storesData.find((s) => s.slug === storeSlug);
       return staticStore?.logo || null;
     };
 
-    const jsonStores: any[] = [];
-    for (const item of index) {
-      const rawSlug = item.slug || (item as any).subdomain || item.name?.toLowerCase().replace(/\s+/g, '-');
-      const slug = canonicalSlug(rawSlug);
-      if (!slug) continue;
-      let sRes = await fetch(`${backendUrl}/assets/${slug}/store.json`, { cache: 'no-store' }).catch(() => null);
-      if (!sRes?.ok) {
-        sRes = await fetch(`/assets/${slug}/store.json`, { cache: 'no-store' }).catch(() => null);
+    const storeMap = new Map<string, any>();
+    const addStore = (store: any) => {
+      const key = canonicalSlug(store.slug);
+      if (!key || storeMap.has(key)) {
+        return;
       }
-      if (!sRes?.ok) {
-        const logo = item.logo || getStoreLogoFromStatic(slug);
-        jsonStores.push({
-          id: item.id || slug,
-          name: item.name || item.nameAr || slug,
-          slug,
-          description: item.description || '',
-          logo,
-          categories: item.categories || [],
-          url: `/${slug}`,
-          endpoints: {},
-          social: {},
-          isActive: true,
-        });
-        continue;
-      }
+      storeMap.set(key, { ...store, slug: key });
+    };
 
-      const s: JsonStoreFull = await sRes.json().catch(() => ({} as any));
-      const storeSlug = canonicalSlug((s as any).slug || slug);
-      const logo = s.logo || item.logo || getStoreLogoFromStatic(storeSlug);
-      jsonStores.push({
-        id: (s as any).id || (item as any).id || storeSlug,
-        name: (s as any).name || (s as any).nameAr || item.name || storeSlug,
-        slug: storeSlug,
-        description: s.description || item.description || '',
-        logo,
-        categories: s.categories || item.categories || [],
-        url: `/${storeSlug}`,
-        endpoints: {},
-        social: {},
-        isActive: (s as any).status !== 'inactive',
-      });
+    let idxRes = await fetch(`${backendUrl}/assets/stores/index.json`, { cache: 'no-store' }).catch(() => null);
+    if (!idxRes?.ok) {
+      idxRes = await fetch('/assets/stores/index.json', { cache: 'no-store' }).catch(() => null);
+    }
+    if (!idxRes?.ok) {
+      idxRes = await fetch('/index.json', { cache: 'no-store' }).catch(() => null);
     }
 
-    return jsonStores;
+    if (idxRes?.ok) {
+      const jsonData = await idxRes.json().catch(() => ({ stores: [] }));
+      const index: JsonStoreSummary[] = jsonData && jsonData.stores ? jsonData.stores : Array.isArray(jsonData) ? jsonData : [];
+
+      for (const item of index) {
+        const rawSlug = item.slug || (item as any).subdomain || item.name?.toLowerCase().replace(/\s+/g, '-');
+        const slug = canonicalSlug(rawSlug);
+        if (!slug) continue;
+
+        let sRes = await fetch(`${backendUrl}/assets/${slug}/store.json`, { cache: 'no-store' }).catch(() => null);
+        if (!sRes?.ok) {
+          sRes = await fetch(`/assets/${slug}/store.json`, { cache: 'no-store' }).catch(() => null);
+        }
+
+        if (!sRes?.ok) {
+          const logo = item.logo || getStoreLogoFromStatic(slug);
+          addStore({
+            id: item.id || slug,
+            name: item.name || item.nameAr || slug,
+            slug,
+            description: item.description || '',
+            logo,
+            categories: item.categories || [],
+            url: `/${slug}`,
+            endpoints: {},
+            social: {},
+            isActive: true,
+          });
+          continue;
+        }
+
+        const s: JsonStoreFull = await sRes.json().catch(() => ({} as any));
+        const storeSlug = canonicalSlug((s as any).slug || slug);
+        const logo = s.logo || item.logo || getStoreLogoFromStatic(storeSlug);
+        addStore({
+          id: (s as any).id || (item as any).id || storeSlug,
+          name: (s as any).name || (s as any).nameAr || item.name || storeSlug,
+          slug: storeSlug,
+          description: s.description || item.description || '',
+          logo,
+          categories: s.categories || item.categories || [],
+          url: `/${storeSlug}`,
+          endpoints: {},
+          social: {},
+          isActive: (s as any).status !== 'inactive',
+        });
+      }
+    }
+
+    try {
+      const listResponse = await fetch(`${apiUrl}/stores/list`, { cache: 'no-store' }).catch(() => null);
+      if (listResponse?.ok) {
+        const payload = await listResponse.json().catch(() => null);
+        const dbStores = Array.isArray((payload as any)?.data?.stores)
+          ? (payload as any).data.stores
+          : Array.isArray((payload as any)?.stores)
+            ? (payload as any).stores
+            : [];
+
+        for (const store of dbStores) {
+          const slug = canonicalSlug(store.slug || store.id || store.name);
+          if (!slug) {
+            continue;
+          }
+          addStore({
+            id: store.id || slug,
+            name: store.name || slug,
+            slug,
+            description: store.description || '',
+            logo: store.logo || getStoreLogoFromStatic(slug),
+            categories: store.category ? [store.category] : [],
+            url: `/${slug}`,
+            endpoints: {},
+            social: {},
+            isActive: store.isActive !== false,
+          });
+        }
+      }
+    } catch {
+      // Ignore DB fallback errors
+    }
+
+    return Array.from(storeMap.values());
   } catch {
     return [];
   }
