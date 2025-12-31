@@ -978,6 +978,48 @@ export const getStorePublicData = async (
       return;
     }
 
+    const resolveSupabaseAssetUrl = (storeSlug: string, relativeAssetPath: string, productId?: number): string => {
+      const normalized = (relativeAssetPath || '').toString().trim();
+      if (!normalized) {
+        return normalized;
+      }
+      if (/^https?:\/\//i.test(normalized) || normalized.startsWith('data:')) {
+        return normalized;
+      }
+
+      const base = normalized.startsWith('/') ? normalized : `/${normalized}`;
+
+      const logoMatch = base.match(new RegExp(`^/assets/${storeSlug}/logo/([^/]+)$`));
+      if (logoMatch) {
+        const filename = logoMatch[1];
+        return isSupabasePublicReadEnabled()
+          ? getSupabasePublicUrlForObject(`stores/${storeSlug}/logo/${filename}`)
+          : base;
+      }
+
+      const sliderMatch = base.match(new RegExp(`^/assets/${storeSlug}/sliders/([^/]+)$`));
+      if (sliderMatch) {
+        const filename = sliderMatch[1];
+        return isSupabasePublicReadEnabled()
+          ? getSupabasePublicUrlForObject(`stores/${storeSlug}/sliders/${filename}`)
+          : base;
+      }
+
+      const productMatch = base.match(new RegExp(`^/assets/${storeSlug}/products/([^/]+)$`));
+      if (productMatch) {
+        const filename = productMatch[1];
+        if (isSupabasePublicReadEnabled()) {
+          const pid = typeof productId === 'number' ? productId : undefined;
+          return pid
+            ? getSupabasePublicUrlForObject(`stores/${storeSlug}/products/${pid}/${filename}`)
+            : getSupabasePublicUrlForObject(`stores/${storeSlug}/products/${filename}`);
+        }
+        return base;
+      }
+
+      return base;
+    };
+
     const storeJson = await readStoreJson(slug);
 
     if (storeJson) {
@@ -999,9 +1041,18 @@ export const getStorePublicData = async (
         id: s.id || `banner${idx + 1}`,
         title: s.title || '',
         subtitle: s.subtitle || '',
-        image: s.image || s.imagePath || '',
+        image: resolveSupabaseAssetUrl(slug, s.image || s.imagePath || ''),
         buttonText: s.buttonText || 'تسوق الآن'
       }));
+
+      const rawProducts = Array.isArray(storeJson.products) ? storeJson.products : [];
+      const products = rawProducts.map((p: any) => {
+        const pid = typeof p?.id === 'number' ? (p.id as number) : undefined;
+        const images = Array.isArray(p?.images)
+          ? p.images.map((img: any) => resolveSupabaseAssetUrl(slug, img, pid))
+          : [];
+        return { ...p, images };
+      });
 
       sendSuccess(res, {
         store: {
@@ -1009,11 +1060,11 @@ export const getStorePublicData = async (
           name: storeRecord?.name ?? storeJson.name ?? storeJson.storeName ?? storeJson.nameAr,
           slug,
           description: storeRecord?.description ?? storeJson.description,
-          logo: storeRecord?.logo ?? storeJson.logo,
+          logo: resolveSupabaseAssetUrl(slug, storeRecord?.logo ?? storeJson.logo ?? ''),
           category: resolvedCategory,
           isActive: storeRecord?.isActive ?? (storeJson.isActive ?? true)
         },
-        products: Array.isArray(storeJson.products) ? storeJson.products : [],
+        products,
         sliders
       });
 
@@ -1057,7 +1108,7 @@ export const getStorePublicData = async (
         name: store.name,
         slug: store.slug,
         description: store.description,
-        logo: store.logo,
+        logo: resolveSupabaseAssetUrl(slug, store.logo || ''),
         category: store.category,
         isActive: store.isActive
       },
@@ -1066,7 +1117,7 @@ export const getStorePublicData = async (
         id: s.id,
         title: s.title,
         subtitle: s.subtitle,
-        image: s.imagePath,
+        image: resolveSupabaseAssetUrl(slug, s.imagePath || ''),
         buttonText: s.buttonText
       }))
     });
