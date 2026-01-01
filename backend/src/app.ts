@@ -53,6 +53,18 @@ const corsOptions: cors.CorsOptions = {
     if (!origin) return callback(null, true);
     if (allowedOrigins.length === 0) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
+    
+    if (origin.includes('vercel.app') || origin.includes('ishro.ly')) {
+      logger.info(`✅ CORS: Allowing Vercel/Ishro domain: ${origin}`);
+      return callback(null, true);
+    }
+    
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      logger.info(`✅ CORS: Allowing localhost: ${origin}`);
+      return callback(null, true);
+    }
+    
+    logger.warn(`⚠️ CORS: Blocked origin: ${origin}`);
     return callback(new Error(`CORS blocked for origin: ${origin}`));
   },
   credentials: true,
