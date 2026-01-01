@@ -235,15 +235,15 @@ export async function loadStoreBySlug(slug: string): Promise<StoreData | null> {
     return storeData;
   }
   
+  const apiStoreData = await fetchStoreFromPublicApi(slug);
+  if (apiStoreData) {
+    return apiStoreData;
+  }
+
   const localStoreData = loadStoreFromLocalStorage(slug);
   if (localStoreData) {
     cachedStores.set(slug, localStoreData);
     return localStoreData;
-  }
-
-  const apiStoreData = await fetchStoreFromPublicApi(slug);
-  if (apiStoreData) {
-    return apiStoreData;
   }
 
   return null;
