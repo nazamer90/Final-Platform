@@ -189,9 +189,9 @@ export const removeSupabaseObjects = async (objectPaths: string[]): Promise<bool
     return true;
   }
 
-  const endpoint = `${url}/storage/v1/object/remove/${bucket}`;
+  const endpoint = `${url}/storage/v1/object/${bucket}`;
   const response = await fetch(endpoint, {
-    method: 'POST',
+    method: 'DELETE',
     headers: {
       authorization: `Bearer ${serviceRoleKey}`,
       apikey: serviceRoleKey,
@@ -202,7 +202,12 @@ export const removeSupabaseObjects = async (objectPaths: string[]): Promise<bool
 
   if (!response || !response.ok) {
     const text = await response?.text().catch(() => '');
-    throw new Error(`Supabase remove failed (${response?.status ?? 'unknown'}): ${text}`);
+    const status = response?.status ?? 'unknown';
+    if (status === 404 || text.includes('not found') || text.includes('Bucket not found')) {
+      console.warn(`Supabase bucket or objects not found, treating as already deleted`);
+      return true;
+    }
+    throw new Error(`Supabase remove failed (${status}): ${text}`);
   }
 
   return true;
@@ -223,35 +228,54 @@ export const deleteSupabasePrefix = async (prefix: string): Promise<{ deleted: n
   const limit = 1000;
   let deleted = 0;
 
-  for (let page = 0; page < 50; page++) {
-    const listed = await listSupabaseObjects({ prefix: normalizedPrefix, limit, offset });
-    if (!listed) {
-      return null;
-    }
+  try {
+    for (let page = 0; page < 50; page++) {
+      const listed = await listSupabaseObjects({ prefix: normalizedPrefix, limit, offset }).catch((error) => {
+        const errorMsg = error?.message || String(error);
+        if (errorMsg.includes('404') || errorMsg.includes('not found') || errorMsg.includes('Bucket not found')) {
+          console.warn(`Bucket or prefix not found for ${normalizedPrefix}, treating as empty`);
+          return [];
+        }
+        throw error;
+      });
 
-    const objectPaths = listed
-      .map((o: any) => {
-        const name = (o?.name || '').toString();
-        if (!name) return '';
-        const base = normalizedPrefix.endsWith('/') ? normalizedPrefix.slice(0, -1) : normalizedPrefix;
-        return `${base}/${name}`;
-      })
-      .filter(Boolean);
+      if (!listed || listed.length === 0) {
+        break;
+      }
 
-    if (objectPaths.length === 0) {
-      break;
-    }
+      const objectPaths = listed
+        .map((o: any) => {
+          const name = (o?.name || '').toString();
+          if (!name) return '';
+          const base = normalizedPrefix.endsWith('/') ? normalizedPrefix.slice(0, -1) : normalizedPrefix;
+          return `${base}/${name}`;
+        })
+        .filter(Boolean);
 
-    for (let i = 0; i < objectPaths.length; i += 100) {
-      const chunk = objectPaths.slice(i, i + 100);
-      await removeSupabaseObjects(chunk);
-      deleted += chunk.length;
-    }
+      if (objectPaths.length === 0) {
+        break;
+      }
 
-    if (listed.length < limit) {
-      break;
+      for (let i = 0; i < objectPaths.length; i += 100) {
+        const chunk = objectPaths.slice(i, i + 100);
+        const removed = await removeSupabaseObjects(chunk);
+        if (removed) {
+          deleted += chunk.length;
+        }
+      }
+
+      if (listed.length < limit) {
+        break;
+      }
+      offset += limit;
     }
-    offset += limit;
+  } catch (error) {
+    const errorMsg = (error as any)?.message || String(error);
+    if (errorMsg.includes('404') || errorMsg.includes('not found') || errorMsg.includes('Bucket not found')) {
+      console.warn(`Bucket or objects not found for prefix ${normalizedPrefix}, treating as already deleted`);
+      return { deleted: 0 };
+    }
+    throw error;
   }
 
   return { deleted };
