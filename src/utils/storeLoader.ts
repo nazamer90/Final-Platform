@@ -54,40 +54,86 @@ function getApiBase(): string {
   return import.meta.env.VITE_API_URL?.replace('/api', '') || import.meta.env.VITE_MOAMALAT_HASH_ENDPOINT || 'http://localhost:5000';
 }
 
-function normalizeImagePaths(data: any, apiBase: string, slug: string, isServedStatic: boolean): any {
-  if (!data) return data;
-  
-  if (Array.isArray(data.products)) {
-    data.products = data.products.map((product: any) => ({
-      ...product,
-      images: Array.isArray(product.images) 
-        ? product.images.map((img: string) => {
-            if (img && !img.startsWith('http')) {
-              return isServedStatic ? img : apiBase + img;
-            }
-            return img;
-          })
-        : product.images
-    }));
+function persistStoreCache(slug: string, store: StoreData): void {
+  if (typeof localStorage === 'undefined') {
+    return;
   }
-  
-  if (Array.isArray(data.sliderImages)) {
-    data.sliderImages = data.sliderImages.map((slider: any) => ({
-      ...slider,
-      image: (slider.image && !slider.image.startsWith('http'))
-        ? isServedStatic ? slider.image : apiBase + slider.image
-        : slider.image
-    }));
+  try {
+    const storePayload = {
+      storeData: {
+        id: store.storeId,
+        storeId: store.storeId,
+        storeSlug: slug,
+        name: store.name,
+        nameAr: store.nameAr,
+        nameEn: store.nameEn,
+        description: store.description,
+        logo: store.logo,
+        categories: store.categories,
+        status: 'active'
+      }
+    };
+    localStorage.setItem(`eshro_store_files_${slug}`, JSON.stringify(storePayload));
+    localStorage.setItem(`store_products_${slug}`, JSON.stringify(store.products || []));
+    localStorage.setItem(`store_sliders_${slug}`, JSON.stringify(store.sliderImages || []));
+  } catch {
   }
-  
-  if (data.logo && !data.logo.startsWith('http')) {
-    data.logo = isServedStatic ? data.logo : apiBase + data.logo;
-  }
-  
-  return data;
 }
 
-
+async function fetchStoreFromPublicApi(slug: string): Promise<StoreData | null> {
+  if (typeof fetch !== 'function') {
+    return null;
+  }
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
+  try {
+    const response = await fetch(`${apiUrl}/stores/public/${encodeURIComponent(slug)}`, { cache: 'no-store' }).catch(() => null);
+    if (!response?.ok) {
+      return null;
+    }
+    const payload = await response.json().catch(() => null);
+    const data = payload?.data ?? payload;
+    if (!data?.store) {
+      return null;
+    }
+    const storeInfo = data.store;
+    const normalizedProducts = Array.isArray(data.products) ? data.products : [];
+    const normalizedSliders = Array.isArray(data.sliders)
+      ? data.sliders.map((slider: any, idx: number) => {
+          const image = slider.image || slider.imageUrl || slider.imagePath || '';
+          return {
+            ...slider,
+            id: slider.id || `slider_${idx}`,
+            image,
+            imageUrl: slider.imageUrl || image
+          };
+        })
+      : [];
+    const normalizedStore: StoreData = {
+      id: storeInfo.id ?? storeInfo.storeId ?? 0,
+      storeId: storeInfo.id ?? storeInfo.storeId ?? 0,
+      slug,
+      name: storeInfo.name ?? storeInfo.nameAr ?? slug,
+      nameAr: storeInfo.nameAr ?? storeInfo.name ?? slug,
+      nameEn: storeInfo.nameEn ?? storeInfo.name ?? slug,
+      description: storeInfo.description ?? '',
+      icon: storeInfo.icon || '🏪',
+      color: storeInfo.color || 'from-blue-400 to-blue-600',
+      logo: storeInfo.logo || '/assets/default-store.png',
+      categories: Array.isArray(storeInfo.categories)
+        ? storeInfo.categories
+        : storeInfo.category
+          ? [storeInfo.category]
+          : [],
+      products: normalizedProducts,
+      sliderImages: normalizedSliders
+    };
+    cachedStores.set(slug, normalizedStore);
+    persistStoreCache(slug, normalizedStore);
+    return normalizedStore;
+  } catch {
+    return null;
+  }
+}
 
 function loadStoreFromLocalStorage(slug: string): StoreData | null {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
@@ -193,6 +239,11 @@ export async function loadStoreBySlug(slug: string): Promise<StoreData | null> {
   if (localStoreData) {
     cachedStores.set(slug, localStoreData);
     return localStoreData;
+  }
+
+  const apiStoreData = await fetchStoreFromPublicApi(slug);
+  if (apiStoreData) {
+    return apiStoreData;
   }
 
   return null;

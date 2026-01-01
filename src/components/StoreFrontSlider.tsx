@@ -45,12 +45,13 @@ const StoreFrontSlider: React.FC<StoreFrontSliderProps> = ({
   }, [storeSlug]);
 
   const loadSliders = async () => {
-    const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED === 'true';
+    const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED !== 'false';
 
     if (storeSlug && publicApiEnabled) {
       try {
-        const response = await fetch(`/api/sliders/store/${storeSlug}`);
-        if (response.ok) {
+        const apiUrl = import.meta.env.VITE_API_URL || '/api';
+        const response = await fetch(`${apiUrl}/sliders/store/${storeSlug}`).catch(() => null);
+        if (response?.ok) {
           const result = await response.json();
           const mapped = result.data.map((slider: any) => ({
             id: slider.id,

@@ -287,42 +287,35 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
 
       setLoadingStore(true);
       try {
-        const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED === 'true';
         const hasLocalConfig = Boolean(getStoreConfig(currentSlug));
+        const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-        if (publicApiEnabled && !hasLocalConfig) {
-          const apiUrl = '/api';
-          try {
-            const response = await fetch(`${apiUrl}/stores/public/${currentSlug}`);
-            if (response.ok) {
-              const result = await response.json();
-              if (result.success && result.data) {
-                const { store: apiStore, products: apiProducts, sliders: apiSliders } = result.data;
-
-                setEnhancedStore(prev => ({
-                  ...prev,
-                  ...apiStore,
-                  logo: apiStore.logo || prev?.logo || '/assets/default-store.png'
-                }));
-
-                const normalizedSliders = Array.isArray(apiSliders)
-                  ? apiSliders.map((slide: any, idx: number) => ({
-                      ...slide,
-                      id: slide.id || `banner${idx + 1}`,
-                      imageUrl: slide.imageUrl || slide.image || slide.imagePath || ''
-                    }))
-                  : [];
-
-                setDynamicStoreData({
-                  products: apiProducts,
-                  sliderImages: normalizedSliders
-                });
-
-                setLoadingStore(false);
-                return;
-              }
+        if (!hasLocalConfig) {
+          const response = await fetch(`${apiUrl}/stores/public/${currentSlug}`, { cache: 'no-store' }).catch(() => null);
+          if (response?.ok) {
+            const result = await response.json().catch(() => null);
+            const payload = result?.data ?? result;
+            if (payload?.store) {
+              const { store: apiStore, products: apiProducts, sliders: apiSliders } = payload;
+              setEnhancedStore(prev => ({
+                ...prev,
+                ...apiStore,
+                logo: apiStore.logo || prev?.logo || '/assets/default-store.png'
+              }));
+              const normalizedSliders = Array.isArray(apiSliders)
+                ? apiSliders.map((slide: any, idx: number) => ({
+                    ...slide,
+                    id: slide.id || `banner${idx + 1}`,
+                    imageUrl: slide.imageUrl || slide.image || slide.imagePath || ''
+                  }))
+                : [];
+              setDynamicStoreData({
+                products: Array.isArray(apiProducts) ? apiProducts : [],
+                sliderImages: normalizedSliders
+              });
+              setLoadingStore(false);
+              return;
             }
-          } catch {
           }
         }
 
@@ -348,11 +341,7 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
     };
 
     loadDynamicStoreData();
-
-    const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED === 'true';
-    if (publicApiEnabled) {
-      fetchAds();
-    }
+    fetchAds();
   }, [storeSlug, store?.slug]);
 
   /**
@@ -414,10 +403,10 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
   const fetchAds = async () => {
     try {
       if (storeSlug) {
-        const apiUrl = '/api';
+        const apiUrl = import.meta.env.VITE_API_URL || '/api';
         const fetchUrl = `${apiUrl}/ads/store/${storeSlug}`;
-        const response = await fetch(fetchUrl);
-        if (response.ok) {
+        const response = await fetch(fetchUrl).catch(() => null);
+        if (response?.ok) {
           const result = await response.json();
           setStoreAds(result.data || []);
         }

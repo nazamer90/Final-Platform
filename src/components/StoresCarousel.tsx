@@ -137,6 +137,37 @@ async function fetchJsonStores(): Promise<any[]> {
       storeMap.set(key, { ...store, slug: key });
     };
 
+    const fetchPublicStoreSummary = async (slug: string, fallback?: Partial<JsonStoreSummary>) => {
+      try {
+        const response = await fetch(`${apiUrl}/stores/public/${encodeURIComponent(slug)}`, { cache: 'no-store' }).catch(() => null);
+        if (response?.ok) {
+          const payload = await response.json().catch(() => null);
+          const data = payload?.data ?? payload;
+          if (data?.store) {
+            const info = data.store as any;
+            return {
+              id: info.id || info.storeId || fallback?.id || slug,
+              name: info.name || fallback?.name || fallback?.nameAr || slug,
+              slug,
+              description: info.description || fallback?.description || '',
+              logo: info.logo || fallback?.logo || getStoreLogoFromStatic(slug),
+              categories: Array.isArray(info.categories)
+                ? info.categories
+                : info.category
+                  ? [info.category]
+                  : fallback?.categories || [],
+              url: `/${slug}`,
+              endpoints: {},
+              social: {},
+              isActive: info.isActive !== false,
+            };
+          }
+        }
+      } catch {
+      }
+      return null;
+    };
+
     let idxRes = await fetch(`${backendUrl}/assets/stores/index.json`, { cache: 'no-store' }).catch(() => null);
     if (!idxRes?.ok) {
       idxRes = await fetch('/assets/stores/index.json', { cache: 'no-store' }).catch(() => null);
@@ -153,6 +184,12 @@ async function fetchJsonStores(): Promise<any[]> {
         const rawSlug = item.slug || (item as any).subdomain || item.name?.toLowerCase().replace(/\s+/g, '-');
         const slug = canonicalSlug(rawSlug);
         if (!slug) continue;
+
+        const apiSummary = await fetchPublicStoreSummary(slug, item);
+        if (apiSummary) {
+          addStore(apiSummary);
+          continue;
+        }
 
         let sRes = await fetch(`${backendUrl}/assets/${slug}/store.json`, { cache: 'no-store' }).catch(() => null);
         if (!sRes?.ok) {
@@ -207,6 +244,11 @@ async function fetchJsonStores(): Promise<any[]> {
         for (const store of dbStores) {
           const slug = canonicalSlug(store.slug || store.id || store.name);
           if (!slug) {
+            continue;
+          }
+          const apiSummary = await fetchPublicStoreSummary(slug, store);
+          if (apiSummary) {
+            addStore(apiSummary);
             continue;
           }
           addStore({

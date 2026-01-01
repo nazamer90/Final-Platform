@@ -1266,12 +1266,14 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
       });
     } catch (error) {
       try {
-        const response = await fetch(`/assets/${encodeURIComponent(slug)}/store.json`, { cache: 'no-store' });
-        if (!response.ok) {
-          throw new Error(`STORE_ASSET_${response.status}`);
+        const apiUrl = import.meta.env.VITE_API_URL || '/api';
+        const response = await fetch(`${apiUrl}/stores/public/${encodeURIComponent(slug)}`, { cache: 'no-store' }).catch(() => null);
+        if (!response?.ok) {
+          throw new Error(`STORE_API_${response?.status ?? 'ERR'}`);
         }
-        const payload = await response.json();
-        const sourceProducts = Array.isArray(payload?.products) ? payload.products : [];
+        const payload = await response.json().catch(() => null);
+        const data = payload?.data ?? payload;
+        const sourceProducts = Array.isArray(data?.products) ? data.products : [];
         const normalizedProducts: StoreInventoryProduct[] = sourceProducts.map((product: any) => {
           const images = Array.isArray(product?.images)
             ? product.images
@@ -1289,7 +1291,11 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
             inStock: typeof product?.inStock === 'boolean' ? product.inStock : product?.isAvailable !== false
           } satisfies StoreInventoryProduct;
         });
-        const categorySummaries = buildCategorySummaries(normalizedProducts, payload?.categories, slug);
+        const categorySummaries = buildCategorySummaries(
+          normalizedProducts,
+          data?.store?.categories || (data?.store?.category ? [data.store.category] : []),
+          slug
+        );
         setInventorySnapshot({
           products: normalizedProducts,
           categories: categorySummaries,

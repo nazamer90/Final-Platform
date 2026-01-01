@@ -1681,24 +1681,68 @@ export default function Home() {
           storeMap.set(slug, store);
         });
 
+        const fetchStoreDetail = async (slug: string) => {
+          const encodedSlug = encodeURIComponent(slug);
+          try {
+            const detailResponse = await fetch(`${apiUrl}/stores/public/${encodedSlug}`, { cache: 'no-store' }).catch(() => null);
+            if (detailResponse?.ok) {
+              const payload = await detailResponse.json().catch(() => null);
+              const data = payload?.data ?? payload;
+              if (data?.store) {
+                const storeInfo = data.store;
+                return {
+                  id: storeInfo.id ?? storeInfo.storeId ?? slug,
+                  storeId: storeInfo.id ?? storeInfo.storeId ?? slug,
+                  name: storeInfo.name ?? slug,
+                  nameAr: storeInfo.nameAr ?? storeInfo.name ?? slug,
+                  nameEn: storeInfo.nameEn ?? storeInfo.name ?? slug,
+                  description: storeInfo.description ?? '',
+                  logo: storeInfo.logo || '/assets/default-store.png',
+                  categories: Array.isArray(storeInfo.categories)
+                    ? storeInfo.categories
+                    : storeInfo.category
+                      ? [storeInfo.category]
+                      : [],
+                  status: storeInfo.isActive === false ? 'inactive' : 'active',
+                  products: Array.isArray(data.products) ? data.products : [],
+                  sliderImages: Array.isArray(data.sliders)
+                    ? data.sliders.map((slide: any, idx: number) => ({
+                        ...slide,
+                        id: slide.id || `banner${idx + 1}`,
+                        image: slide.image || slide.imageUrl || slide.imagePath || '',
+                        imageUrl: slide.imageUrl || slide.image || slide.imagePath || ''
+                      }))
+                    : []
+                };
+              }
+            }
+          } catch {
+          }
+
+          const assetUrls = [
+            `${backendUrl}/assets/${slug}/store.json`,
+            `/assets/${slug}/store.json`
+          ];
+          for (const url of assetUrls) {
+            const response = await fetch(url, { cache: 'no-store' }).catch(() => null);
+            if (response?.ok) {
+              try {
+                return await response.json();
+              } catch {
+                return null;
+              }
+            }
+          }
+          return null;
+        };
+
         for (const summary of storeSummaries) {
           const slug = canonicalStoreSlug(summary.slug || (summary as any).subdomain || summary.name);
           if (!slug) {
             continue;
           }
 
-          let storeDetail: any = null;
-          try {
-            let detailResponse = await fetch(`${backendUrl}/assets/${slug}/store.json`, { cache: 'no-store' }).catch(() => null);
-            if (!detailResponse?.ok) {
-              detailResponse = await fetch(`/assets/${slug}/store.json`, { cache: 'no-store' }).catch(() => null);
-            }
-            if (detailResponse?.ok) {
-              storeDetail = await detailResponse.json();
-            }
-          } catch (error) {
-            // Silent error handling for storage change
-          }
+          const storeDetail = await fetchStoreDetail(slug);
 
           const normalizedEntry = {
             id: storeDetail?.id || summary.id || slug,
@@ -1742,6 +1786,12 @@ export default function Home() {
             );
 
             localStorage.setItem(storeKey, JSON.stringify(mergedStoreRecord));
+            if (Array.isArray(storeDetail.products)) {
+              localStorage.setItem(`store_products_${slug}`, JSON.stringify(storeDetail.products));
+            }
+            if (Array.isArray(storeDetail.sliderImages)) {
+              localStorage.setItem(`store_sliders_${slug}`, JSON.stringify(storeDetail.sliderImages));
+            }
           }
         }
 
