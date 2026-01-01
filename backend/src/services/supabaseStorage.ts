@@ -17,6 +17,12 @@ const getSupabaseEnv = () => {
   return { url, serviceRoleKey, bucket };
 };
 
+console.log('Supabase env:', {
+  url: process.env.SUPABASE_URL,
+  bucket: process.env.SUPABASE_STORAGE_BUCKET,
+  hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+});
+
 export const isSupabasePublicReadEnabled = (): boolean => {
   const { url, bucket } = getSupabaseEnv();
   return Boolean(url && bucket);
