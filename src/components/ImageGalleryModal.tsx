@@ -47,15 +47,31 @@ const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
     setError(null);
     
     try {
-      const response = await fetch(`/assets/${storeSlug}/store.json`);
-      if (!response.ok) {
-        throw new Error('فشل في تحميل بيانات المتجر');
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      let storeData: any = null;
+
+      const apiResponse = await fetch(`${apiUrl}/stores/public/${encodeURIComponent(storeSlug)}`, { cache: 'no-store' }).catch(() => null);
+      if (apiResponse?.ok) {
+        const payload = await apiResponse.json().catch(() => null);
+        const data = payload?.data ?? payload;
+        if (data?.store) {
+          storeData = {
+            products: Array.isArray(data.products) ? data.products : [],
+            sliderImages: Array.isArray(data.sliders) ? data.sliders : []
+          };
+        }
+      }
+
+      if (!storeData) {
+        const assetResponse = await fetch(`/assets/${storeSlug}/store.json`, { cache: 'no-store' }).catch(() => null);
+        if (!assetResponse?.ok) {
+          throw new Error('فشل في تحميل بيانات المتجر');
+        }
+        storeData = await assetResponse.json();
       }
       
-      const storeData = await response.json();
       const foundImages: ImageItem[] = [];
 
-      // Extract images from products
       if (storeData.products && Array.isArray(storeData.products)) {
         storeData.products.forEach((product: any, productIndex: number) => {
           if (product.images && Array.isArray(product.images)) {
@@ -70,7 +86,7 @@ const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
                   url,
                   filename,
                   extension,
-                  size: 0 // Size would need to be fetched separately
+                  size: 0
                 });
               }
             });
@@ -78,24 +94,31 @@ const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
         });
       }
 
-      // Extract slider images
-      if (storeData.slider && storeData.slider.images) {
-        storeData.slider.images.forEach((imageUrl: string, index: number) => {
-          const url = imageUrl;
-          const filename = url.split('/').pop() || `slider-${index}`;
-          const extension = filename.split('.').pop()?.toLowerCase() || '';
-          
-          if (allImageExtensions.includes(extension)) {
-            foundImages.push({
-              id: `slider-${index}`,
-              url,
-              filename,
-              extension,
-              size: 0
-            });
-          }
-        });
-      }
+      const sliderSources = Array.isArray(storeData.sliderImages)
+        ? storeData.sliderImages
+        : Array.isArray(storeData.sliders)
+          ? storeData.sliders
+          : storeData.slider?.images
+            ? storeData.slider.images.map((image: string) => ({ image }))
+            : [];
+
+      sliderSources.forEach((slide: any, index: number) => {
+        const imageUrl = typeof slide === 'string' ? slide : slide.imageUrl || slide.image;
+        if (!imageUrl) {
+          return;
+        }
+        const filename = imageUrl.split('/').pop() || `slider-${index}`;
+        const extension = filename.split('.').pop()?.toLowerCase() || '';
+        if (allImageExtensions.includes(extension)) {
+          foundImages.push({
+            id: `slider-${index}`,
+            url: imageUrl,
+            filename,
+            extension,
+            size: 0
+          });
+        }
+      });
 
       setImages(foundImages);
     } catch (err) {

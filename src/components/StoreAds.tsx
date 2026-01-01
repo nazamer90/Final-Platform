@@ -128,15 +128,15 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
         return;
       }
 
-      const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED === 'true';
+      const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED !== 'false';
       if (!publicApiEnabled) {
         throw new Error('Public API disabled');
       }
 
-      const apiUrl = '/api';
-      const response = await fetch(`${apiUrl}/ads/store/${storeId}`);
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      const response = await fetch(`${apiUrl}/ads/store/${storeId}`).catch(() => null);
       
-      if (response.ok) {
+      if (response?.ok) {
         const result = await response.json();
         
         const adsData = Array.isArray(result.data) ? result.data : [];

@@ -88,14 +88,14 @@ const UnifiedStoreSlider: React.FC<UnifiedStoreSliderProps> = ({
       }
     }
   
-    const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED === 'true';
+    const publicApiEnabled = import.meta.env.VITE_PUBLIC_API_ENABLED !== 'false';
     if (!publicApiEnabled || staticConfig?.sliders) {
       return;
     }
 
     // Fetch API data in background with timeout
     try {
-      const apiUrl = '/api';
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
   
