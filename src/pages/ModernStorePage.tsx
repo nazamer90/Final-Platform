@@ -568,8 +568,8 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
           onToggleFavorite={onToggleFavorite}
           favorites={favorites}
         />
-      ) : storeConfig ? (
-        <UnifiedStoreSlider storeSlug={store.slug} initialSliders={sliderImages} />
+      ) : storeConfig && store ? (
+        <UnifiedStoreSlider storeSlug={store.slug} />
       ) : sliderImages.length > 0 ? (
         /* السلايدر العادي للمتاجر الديناميكية بدون إعدادات مركزية */
           <div className="relative h-96 bg-gradient-to-r from-primary/10 to-primary/5 overflow-hidden">
