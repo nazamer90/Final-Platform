@@ -9,6 +9,9 @@ import { normalizeSliderImagePath } from '@utils/sliderPath';
 import { sendSuccess, sendError } from '@utils/response';
 import Store from '@models/Store';
 import User from '@models/User';
+import Product from '@models/Product';
+import { hashPassword, validatePasswordStrength } from '@utils/password';
+import { validateEmail } from '@utils/helpers';
 import StoreSlider from '@models/StoreSlider';
 import StoreAd from '@models/StoreAd';
 import UnavailableNotification from '@models/UnavailableNotification';
@@ -296,7 +299,7 @@ export const createStoreWithImages = async (
       password
     } = req.body as any;
 
-    if (!storeSlug || !storeName || !storeId) {
+    if (!storeSlug || !storeName) {
       sendError(res, 'Missing required fields', 400);
       return;
     }
@@ -345,25 +348,21 @@ export const createStoreWithImages = async (
       return;
     }
 
-    if (files && Object.keys(files).length > 0) {
-      logger.info(`📁 Moving ${Object.keys(files).length} file fields from temp directory...`);
-      logger.info(`   Files available: ${Object.keys(files).join(', ')}`);
-      try {
-        files = await moveUploadedFiles(storeSlug, files);
-        logger.info(`✅ Files moved successfully to /assets/${storeSlug}/`);
-        
-        if (Object.keys(files).length === 0) {
-          logger.warn(`⚠️ No files were moved successfully, will use defaults`);
-        }
-      } catch (moveError) {
-        logger.error('❌ Failed to move uploaded files:', moveError);
-        sendError(res, 'Failed to process uploaded files', 500);
-        return;
-      }
-    } else {
+    if (!validateEmail(primaryOwnerEmail)) {
+      sendError(res, 'Invalid email format', 400);
+      return;
+    }
+
+    const passwordStrength = validatePasswordStrength(ownerPlainPassword);
+    if (!passwordStrength.valid) {
+      sendError(res, 'Password does not meet security requirements', 400);
+      return;
+    }
+
+    if (!files || Object.keys(files).length === 0) {
       logger.info(`ℹ️ No files provided, will use default images`);
     }
-    
+
     logger.info(`\n🔍 Processing files for store: ${storeName}`);
     
     const productFilesMap: Record<number, Express.Multer.File[]> = {};
@@ -459,6 +458,7 @@ export const createStoreWithImages = async (
     type PersistedStoreInstance = Awaited<ReturnType<typeof Store.create>>;
     let persistedMerchant: PersistedMerchantInstance | null = null;
     let persistedStoreRecord: PersistedStoreInstance | null = null;
+    const persistedProducts: any[] = [];
 
     try {
       parsedProducts = JSON.parse(productsJson || '[]');
@@ -548,10 +548,19 @@ export const createStoreWithImages = async (
       }
     }
 
+    const failedProductUploads = Object.values(productFilesMap)
+      .flat()
+      .filter(file => !uploadedProductUrls[file.filename]);
+
+    if (failedProductUploads.length > 0) {
+      sendError(res, 'Failed to upload product images to Supabase', 500);
+      return;
+    }
+
     const allUploadedImages: string[] = [];
     Object.values(productFilesMap).forEach(files => {
       files.forEach(f => {
-        const imgPath = uploadedProductUrls[f.filename] || `/assets/${storeSlug}/products/${f.filename}`;
+        const imgPath = uploadedProductUrls[f.filename] || '/assets/default-product.png';
         allUploadedImages.push(imgPath);
       });
     });
@@ -564,7 +573,7 @@ export const createStoreWithImages = async (
       
       let images: string[] = [];
       if (filesForThisProduct.length > 0) {
-        images = filesForThisProduct.map(f => uploadedProductUrls[f.filename] || `/assets/${storeSlug}/products/${f.filename}`);
+        images = filesForThisProduct.map(f => uploadedProductUrls[f.filename] || '/assets/default-product.png');
         logger.info(`  📦 Product ${idx} (${product.name}): ✅ ${images.length} image(s) assigned (specific)`);
       } else if (allUploadedImages.length > 0) {
         images = [allUploadedImages[imageIndex % allUploadedImages.length]];
@@ -616,6 +625,11 @@ export const createStoreWithImages = async (
       }
     }
 
+    if (sliderFiles.length > 0 && Object.keys(uploadedSliderUrls).length !== sliderFiles.length) {
+      sendError(res, 'Failed to upload slider images to Supabase', 500);
+      return;
+    }
+
     logger.info(`\n🔄 Uploading store logo to Supabase...\n`);
     
     let uploadedLogoUrl = '';
@@ -632,17 +646,22 @@ export const createStoreWithImages = async (
       }
     }
 
+    if (logoFile && !uploadedLogoUrl) {
+      sendError(res, 'Failed to upload store logo to Supabase', 500);
+      return;
+    }
+
     const defaultSliderImages = [
       {
         id: 'banner1',
-        image: `/assets/${storeSlug}/sliders/default-slider-1.webp`,
+        image: '/assets/default-slider.png',
         title: `اكتشف تشكيلة ${storeName} الحصرية`,
         subtitle: 'جودة عالية وأسعار منافسة',
         buttonText: 'تسوق الآن'
       },
       {
         id: 'banner2',
-        image: `/assets/${storeSlug}/sliders/default-slider-2.webp`,
+        image: '/assets/default-slider.png',
         title: `عروض حصرية من ${storeName}`,
         subtitle: 'لا تفوت الفرصة',
         buttonText: 'تسوق الآن'
@@ -652,7 +671,7 @@ export const createStoreWithImages = async (
     const slidersWithImages: SliderImage[] = (parsedSliders.length > 0 ? parsedSliders : defaultSliderImages).map((slider, i) => {
       const file = sliderFiles[i];
       const image = file 
-        ? (uploadedSliderUrls[file.filename] || `/assets/${storeSlug}/sliders/${file.filename}`)
+        ? (uploadedSliderUrls[file.filename] || '/assets/default-slider.png')
         : (slider.image && slider.image.trim() ? slider.image : defaultSliderImages[i]?.image || '/assets/default-slider.png');
       
       logger.info(`  🖼️ Slider ${slider.id}: ${file ? 'uploaded image to Supabase' : 'using default/provided image'}`);
@@ -663,63 +682,18 @@ export const createStoreWithImages = async (
       };
     });
 
-    const logoUrl = uploadedLogoUrl || (logoFile ? `/assets/${storeSlug}/logo/${logoFile.filename}` : `/assets/default-store.png`);
+    const logoUrl = uploadedLogoUrl || '/assets/default-store.png';
     logger.info(`  🏷️ Logo: ${logoUrl}`);
 
-    logger.info(`📝 Generating store files for: ${storeName}`);
-    
-    await runGeneration({
-      storeId: Number(storeId),
-      storeSlug,
-      storeName,
-      storeNameEn: storeNameEn || storeName,
-      description,
-      logo: logoUrl,
-      icon: icon || '✨',
-      color: color || 'from-purple-400 to-pink-600',
-      categories: normalizedCategories,
-      products: parsedProducts,
-      sliderImages: slidersWithImages
-    });
+    const hashedPassword = await hashPassword(ownerPlainPassword);
 
-    logger.info(`✅ Store files generated successfully for: ${storeName}`);
-
-    logger.info(`🔍 Verifying permanent storage for: ${storeSlug}`);
-    const verificationResult = await verifyStorePermanentStorage(storeSlug);
-    
-    if (!verificationResult.success) {
-      logger.error(`🚨 Store verification failed for ${storeSlug}:`, verificationResult);
-      sendError(
-        res,
-        `Store creation verification failed. Errors: ${verificationResult.errors.join('; ')}`,
-        500
-      );
-      return;
-    }
-
-    logger.info(`✅ Store verification PASSED for: ${storeSlug}`);
-    
-    logger.info(`🧹 Cleaning up temporary upload files...`);
-    try {
-      await cleanupTempUploads();
-      logger.info(`✅ Temporary files cleaned up successfully`);
-    } catch (cleanupError) {
-      logger.warn(`⚠️ Non-critical: Failed to cleanup temp files:`, cleanupError);
-    }
-
-    logger.info(`🔍 Checking for duplicate assets...`);
-    const cleanupResult = await cleanupDuplicateAssets(storeSlug);
-    if (cleanupResult.removed > 0) {
-      logger.info(`✅ ${cleanupResult.message}`);
-    }
-
-    logger.info(`💾 Persisting merchant credentials, store, sliders, and ads for ${storeSlug}...`);
+    logger.info(`💾 Persisting merchant, store, products, sliders, and ads for ${storeSlug}...`);
     try {
       await sequelize.transaction(async (transaction) => {
         persistedMerchant = await User.create(
           {
             email: primaryOwnerEmail,
-            password: ownerPlainPassword,
+            password: hashedPassword,
             firstName: ownerFirstName,
             lastName: ownerLastName,
             phone: primaryOwnerPhone || '000000000',
@@ -747,6 +721,39 @@ export const createStoreWithImages = async (
           },
           { transaction }
         );
+
+        for (const product of parsedProducts) {
+          const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
+          const safeImages = images.length > 0 ? images : ['/assets/default-product.png'];
+
+          const createdProduct = await Product.create(
+            {
+              name: product.name,
+              description: product.description,
+              price: product.price,
+              originalPrice: product.originalPrice,
+              category: product.category || primaryCategoryValue,
+              image: safeImages[0],
+              thumbnail: safeImages[0],
+              images: safeImages,
+              storeId: persistedStoreRecord!.id,
+              inStock: product.inStock !== undefined ? product.inStock : true,
+              quantity: typeof (product as any).quantity === 'number' ? (product as any).quantity : 12,
+              rating: product.rating || 4.5,
+              reviewCount: product.reviews || 0,
+              views: 0,
+              likes: 0,
+              orders: 0,
+              tags: Array.isArray(product.tags) ? product.tags : [],
+              badge: Array.isArray(product.tags) && product.tags.length > 0 ? product.tags[0] : undefined
+            } as any,
+            { transaction }
+          );
+
+          persistedProducts.push(createdProduct);
+        }
+
+        logger.info(`✅ ${persistedProducts.length} products persisted to database`);
 
         logger.info(`💾 Persisting ${slidersWithImages.length} sliders to database...`);
         for (let i = 0; i < slidersWithImages.length; i++) {
@@ -793,11 +800,16 @@ export const createStoreWithImages = async (
         }
         logger.info(`✅ Default ads created for store`);
       });
-      logger.info(`✅ Merchant credentials, store, sliders, and ads stored for ${storeSlug}`);
+      logger.info(`✅ Merchant, store, products, sliders, and ads stored for ${storeSlug}`);
     } catch (dbError) {
       logger.error('❌ Failed to persist store data:', dbError);
       sendError(res, 'Failed to save store data', 500);
       return;
+    }
+
+    try {
+      await cleanupTempUploads();
+    } catch {
     }
 
     logger.info(`🎉 Store creation completed successfully for: ${storeName}`);
@@ -811,24 +823,52 @@ export const createStoreWithImages = async (
         }
       : undefined;
 
+    const productsPayload = persistedProducts.map((product: any) => {
+      const price = product?.price ? Number(product.price) : 0;
+      const originalPrice = product?.originalPrice ? Number(product.originalPrice) : price;
+      const images = Array.isArray(product?.images) && product.images.length > 0
+        ? product.images
+        : ([product?.image].filter(Boolean) as string[]);
+
+      return {
+        id: product.id,
+        storeId: product.storeId,
+        name: product.name,
+        description: product.description || '',
+        price,
+        originalPrice,
+        images,
+        sizes: ['واحد'],
+        availableSizes: ['واحد'],
+        colors: [{ name: 'افتراضي', value: '#000000' }],
+        rating: product?.rating ? Number(product.rating) : 4.5,
+        reviews: product?.reviewCount ?? 0,
+        views: product?.views ?? 0,
+        likes: product?.likes ?? 0,
+        orders: product?.orders ?? 0,
+        category: product?.category || primaryCategoryValue,
+        inStock: Boolean(product?.inStock),
+        isAvailable: Boolean(product?.inStock),
+        tags: Array.isArray(product?.tags) ? product.tags : [],
+        badge: product?.badge,
+        quantity: product?.quantity ?? 0,
+      };
+    });
+
     sendSuccess(res, {
-      message: 'Store created successfully with permanent storage verification',
+      message: 'Store created successfully',
       store: {
         storeSlug,
         storeName,
-        productsCount: parsedProducts.length,
+        storeId: persistedStoreRecord?.id,
+        productsCount: productsPayload.length,
         slidersCount: slidersWithImages.length,
         logo: logoUrl
       },
-      products: parsedProducts,
+      products: productsPayload,
       sliderImages: slidersWithImages,
-      verification: {
-        success: verificationResult.success,
-        checks: verificationResult.checks,
-        warnings: verificationResult.warnings
-      },
       merchant: merchantPayload
-    }, 201, 'Store created successfully with permanent storage verification');
+    }, 201, 'Store created successfully');
   } catch (error) {
     logger.error('Error creating store with images:', error);
     next(error);
@@ -904,10 +944,41 @@ export const getStorePublicData = async (
     // Get Products (assuming we can filter by storeId)
     // Note: Since Product model might not be directly associated in all versions, 
     // we fetch using storeId manually if association isn't standard
-    const products = await sequelize.models.Product.findAll({
-      where: { storeId: store.id },
-      include: ['images'] // Assuming alias is defined
-    }).catch(() => []); // Fallback if association fails
+    const products = await Product.findAll({
+      where: { storeId: store.id }
+    }).catch(() => []);
+
+    const normalizedProducts = (products as any[]).map((product: any) => {
+      const price = product?.price ? Number(product.price) : 0;
+      const originalPrice = product?.originalPrice ? Number(product.originalPrice) : price;
+      const images = Array.isArray(product?.images) && product.images.length > 0
+        ? product.images
+        : ([product?.image].filter(Boolean) as string[]);
+
+      return {
+        id: product.id,
+        storeId: store.id,
+        name: product.name,
+        description: product.description || '',
+        price,
+        originalPrice,
+        images,
+        sizes: ['واحد'],
+        availableSizes: ['واحد'],
+        colors: [{ name: 'افتراضي', value: '#000000' }],
+        rating: product?.rating ? Number(product.rating) : 4.5,
+        reviews: product?.reviewCount ?? 0,
+        views: product?.views ?? 0,
+        likes: product?.likes ?? 0,
+        orders: product?.orders ?? 0,
+        category: product?.category || store.category || 'general',
+        inStock: Boolean(product?.inStock),
+        isAvailable: Boolean(product?.inStock),
+        tags: Array.isArray(product?.tags) ? product.tags : [],
+        badge: product?.badge,
+        quantity: product?.quantity ?? 0
+      };
+    });
 
     sendSuccess(res, {
       store: {
@@ -919,7 +990,7 @@ export const getStorePublicData = async (
         category: store.category,
         isActive: store.isActive
       },
-      products,
+      products: normalizedProducts,
       sliders: sliders.map((s: any) => ({
         id: s.id,
         title: s.title,
