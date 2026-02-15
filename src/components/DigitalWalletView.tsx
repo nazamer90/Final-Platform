@@ -769,7 +769,7 @@ export const DigitalWalletView: React.FC<DigitalWalletViewProps> = ({
                     <div className="space-y-3 rtl-text">
                       <div className="rtl-text">
                         <Label className="block text-sm font-medium text-gray-700 mb-1 rtl-text">اسم صاحب الحساب</Label>
-                        <p className="text-sm bg-white p-2 rounded border rtl-text">Nawaem Store</p>
+                        <p className="text-sm bg-white p-2 rounded border rtl-text">{storeData?.nameAr || storeData?.name || 'متجر إشرو'}</p>
                       </div>
                       <div className="rtl-text">
                         <Label className="block text-sm font-medium text-gray-700 mb-1 rtl-text">اسم المصرف</Label>
@@ -789,7 +789,7 @@ export const DigitalWalletView: React.FC<DigitalWalletViewProps> = ({
                     <div className="space-y-3 rtl-text">
                       <div className="rtl-text">
                         <Label className="block text-sm font-medium text-gray-700 mb-1 rtl-text">اسم صاحب الحساب</Label>
-                        <p className="text-sm bg-white p-2 rounded border rtl-text">Nawaem Store</p>
+                        <p className="text-sm bg-white p-2 rounded border rtl-text">{storeData?.nameAr || storeData?.name || 'متجر إشرو'}</p>
                       </div>
                       <div className="rtl-text">
                         <Label className="block text-sm font-medium text-gray-700 mb-1 rtl-text">اسم المصرف</Label>

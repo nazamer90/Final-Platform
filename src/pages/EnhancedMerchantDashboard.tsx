@@ -151,140 +151,7 @@ interface LogisticsCompany {
   lng?: number;
 }
 
-const INITIAL_LOGISTICS_COMPANIES: LogisticsCompany[] = [
-  {
-    name: 'هدهد',
-    phone: '+218 91 000 0001',
-    mobilePhone: '+218 91 000 1001',
-    email: 'info@hudhud.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/hudhud.jpeg',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'دي اتش ال',
-    phone: '+218 91 000 0002',
-    mobilePhone: '+218 91 000 1002',
-    email: 'info@dhl.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/dhl.png',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'ارامكس',
-    phone: '+218 91 000 0003',
-    mobilePhone: '+218 91 000 1003',
-    email: 'info@aramex.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/aramex.webp',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'برستو',
-    phone: '+218 91 000 0004',
-    mobilePhone: '+218 91 000 1004',
-    email: 'info@presto.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/presto.jpg',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'فانيكس',
-    phone: '+218 91 000 0005',
-    mobilePhone: '+218 91 000 1005',
-    email: 'info@vanex.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/vanex.png',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'زام',
-    phone: '+218 91 000 0006',
-    mobilePhone: '+218 91 000 1006',
-    email: 'info@zam.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/ZAM.png',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'ديبو فاست',
-    phone: '+218 91 000 0007',
-    mobilePhone: '+218 91 000 1007',
-    email: 'info@bebo_fast.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/bebo_fast.webp',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'درب السيل',
-    phone: '+218 91 000 0008',
-    mobilePhone: '+218 91 000 1008',
-    email: 'info@darbsail.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/darbsail.png',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'سونيك اكسبريس',
-    phone: '+218 91 000 0009',
-    mobilePhone: '+218 91 000 1009',
-    email: 'info@sonicexpress.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/sonicexpress.webp',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'جو دليفيري',
-    phone: '+218 91 000 0010',
-    mobilePhone: '+218 91 000 1010',
-    email: 'info@go-delivery.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/go-delivery.webp',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'وينغيس',
-    phone: '+218 91 000 0011',
-    mobilePhone: '+218 91 000 1011',
-    email: 'info@wings.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/wingsly.webp',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-  {
-    name: 'دراجات نارية',
-    phone: '+218 91 000 0012',
-    mobilePhone: '+218 91 000 1012',
-    email: 'info@motorcycles.ly',
-    location: 'طرابلس، ليبيا',
-    city: 'طرابلس',
-    src: '/assets/partners/transport/other_delivery.png',
-    lat: 32.8872,
-    lng: 13.1913,
-  },
-];
+const INITIAL_LOGISTICS_COMPANIES: LogisticsCompany[] = [];
 
 type DashboardSection =
   | 'overview'
@@ -387,102 +254,9 @@ interface StoreInventorySnapshot {
   lastFetchedAt: string | null;
 }
 
-const FALLBACK_INVENTORY_PRODUCTS: StoreInventoryProduct[] = [
-  {
-    id: 'fallback-1',
-    name: 'فستان صيفي أنيق',
-    price: 89.99,
-    originalPrice: 120,
-    images: ['/assets/products/clothing/womens-dress-1.jpg'],
-    category: 'ملابس نسائية',
-    inStock: true,
-    quantity: 15,
-    productCode: 'WD001'
-  },
-  {
-    id: 'fallback-2',
-    name: 'قميص بولو كاجوال',
-    price: 24.99,
-    originalPrice: 32.5,
-    images: ['/assets/products/clothing/mens-polo-1.jpg'],
-    category: 'ملابس رجالية',
-    inStock: true,
-    quantity: 30,
-    productCode: 'MP001'
-  },
-  {
-    id: 'fallback-3',
-    name: 'فستان أطفال جميل',
-    price: 19.99,
-    originalPrice: 28.99,
-    images: ['/assets/products/clothing/kids-dress-1.jpg'],
-    category: 'ملابس أطفال',
-    inStock: true,
-    quantity: 12,
-    productCode: 'KD001'
-  },
-  {
-    id: 'fallback-4',
-    name: 'فستان سهرة فاخر',
-    price: 149.99,
-    originalPrice: 199.99,
-    images: ['/assets/products/clothing/womens-dress-1.jpg'],
-    category: 'فساتين مسائية',
-    inStock: true,
-    quantity: 8,
-    productCode: 'EVT001'
-  },
-  {
-    id: 'fallback-5',
-    name: 'طقم أطفال مميز',
-    price: 35,
-    originalPrice: 45,
-    images: ['/assets/products/clothing/kids-dress-1.jpg'],
-    category: 'ملابس أطفال',
-    inStock: true,
-    quantity: 18,
-    productCode: 'KD002'
-  }
-];
+const FALLBACK_INVENTORY_PRODUCTS: StoreInventoryProduct[] = [];
 
-const FALLBACK_INVENTORY_CATEGORIES: StoreInventoryCategory[] = [
-  {
-    id: 'fallback-cat-1',
-    name: 'ملابس نسائية',
-    description: 'أزياء وملابس عصرية للنساء',
-    image: '/assets/categories/womens-clothing.jpg',
-    productCount: 25,
-    sortOrder: 1,
-    isActive: true
-  },
-  {
-    id: 'fallback-cat-2',
-    name: 'ملابس رجالية',
-    description: 'ملابس أنيقة وعصرية للرجال',
-    image: '/assets/categories/mens-clothing.jpg',
-    productCount: 18,
-    sortOrder: 2,
-    isActive: true
-  },
-  {
-    id: 'fallback-cat-3',
-    name: 'ملابس أطفال',
-    description: 'ملابس مريحة وجميلة للأطفال',
-    image: '/assets/categories/kids-clothing.jpg',
-    productCount: 12,
-    sortOrder: 3,
-    isActive: true
-  },
-  {
-    id: 'fallback-cat-4',
-    name: 'إكسسوارات',
-    description: 'إكسسوارات مكملة لإطلالة متكاملة',
-    image: '/assets/categories/baby-clothing.jpg',
-    productCount: 8,
-    sortOrder: 4,
-    isActive: true
-  }
-];
+const FALLBACK_INVENTORY_CATEGORIES: StoreInventoryCategory[] = [];
 
 const formatPriceValue = (value?: number | string) => {
   if (value === null || value === undefined || value === '') {
@@ -891,15 +665,15 @@ const OVERVIEW_WEEK_LABELS: string[] = ['الأحد', 'الإثنين', 'الث�
 const OVERVIEW_MONTH_LABELS: string[] = ['الأسبوع 1', 'الأسبوع 2', 'الأسبوع 3', 'الأسبوع 4', 'الأسبوع 5'];
 
 const OVERVIEW_WEEK_BASE: Record<OverviewMetricKey, number[]> = {
-  sales: [8200, 9100, 8640, 9480, 10220, 9860, 10920],
-  orders: [62, 70, 66, 72, 79, 75, 83],
-  visitors: [1220, 1345, 1290, 1410, 1525, 1460, 1560]
+  sales: [0, 0, 0, 0, 0, 0, 0],
+  orders: [0, 0, 0, 0, 0, 0, 0],
+  visitors: [0, 0, 0, 0, 0, 0, 0]
 };
 
 const OVERVIEW_MONTH_BASE: Record<OverviewMetricKey, number[]> = {
-  sales: [32800, 34250, 35620, 37110, 38940],
-  orders: [248, 264, 279, 296, 318],
-  visitors: [5280, 5480, 5680, 5860, 6080]
+  sales: [0, 0, 0, 0, 0],
+  orders: [0, 0, 0, 0, 0],
+  visitors: [0, 0, 0, 0, 0]
 };
 
 const OVERVIEW_CHANNEL_COLORS = ['#4f46e5', '#0ea5e9', '#f97316'];
@@ -991,26 +765,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
   const [biddingSelectedCoordinates, setBiddingSelectedCoordinates] = useState<{lat: number, lng: number} | null>(null);
 
   // Ticket system states
-  const [tickets, setTickets] = useState<Ticket[]>([
-    {
-      id: 'TS-2024-001',
-      title: 'مشكلة في تسجيل الدخول',
-      description: 'العميل لا يستطيع الدخول إلى حسابه رغم إدخال البيانات الصحيحة',
-      customer: 'أحمد محمد',
-      priority: 'عالية',
-      status: 'مفتوحة',
-      createdAt: 'منذ 2 ساعة'
-    },
-    {
-      id: 'TS-2024-002',
-      title: 'تأخير في التوصيل',
-      description: 'الطلب رقم 12345 تأخر عن الموعد المحدد',
-      customer: 'فاطمة علي',
-      priority: 'متوسطة',
-      status: 'قيد المعالجة',
-      createdAt: 'منذ 4 ساعات'
-    }
-  ]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [ticketModalOpen, setTicketModalOpen] = useState(false);
   const [newTicket, setNewTicket] = useState<{ title: string; description: string; customer: string; priority: TicketPriority }>({
     title: '',
@@ -1062,26 +817,7 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
     iban: ''
   });
 
-  const [bankAccounts, setBankAccounts] = useState([
-    {
-      name: 'مصرف الجمهورية',
-      companyName: 'شركة النجم الساطع للملابس النسائية الراقية',
-      holder: 'شركة النجم الساطع للملابس النسائية الراقية',
-      email: 'info@star-clothing.com',
-      phone: '+218911234567',
-      number: '000296608010756115',
-      iban: 'SA4380000296608010756115'
-    },
-    {
-      name: 'مصرف شمال أفريقيا',
-      companyName: 'شركة دانيا للمواد للعطور والزينة',
-      holder: 'شركة دانيا للمواد للعطور والزينة',
-      email: 'contact@dania-perfumes.com',
-      phone: '+218922345678',
-      number: '092287897788771110',
-      iban: 'SA4380000868666862226'
-    }
-  ]);
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
 
   const libyanBanks = [
     { name: 'مصرف الجمهورية', logo: 'jumhouria.png' },
@@ -1375,8 +1111,8 @@ const EnhancedMerchantDashboard: React.FC<{ currentMerchant?: any; onLogout?: ()
   }, [merchantStoreSlug, inventorySnapshot.categories]);
 
   const hasInventoryResponse = Boolean(inventorySnapshot.lastFetchedAt);
-  const productsToDisplay = hasInventoryResponse ? inventorySnapshot.products : FALLBACK_INVENTORY_PRODUCTS;
-  const categoriesToDisplay = hasInventoryResponse ? inventorySnapshot.categories : FALLBACK_INVENTORY_CATEGORIES;
+  const productsToDisplay = hasInventoryResponse ? inventorySnapshot.products : [];
+  const categoriesToDisplay = hasInventoryResponse ? inventorySnapshot.categories : [];
   const formattedInventorySync = useMemo(() => {
     if (!inventorySnapshot.lastFetchedAt) {
       return '';
@@ -1839,98 +1575,7 @@ useEffect(() => {
    });
 
    // Ad data
-   const [ads, setAds] = useState([
-     {
-       id: 1,
-       name: 'دعاية السمعات',
-       clicks: 46,
-       expiryDate: '2027-04-07',
-       status: 'مفعل',
-       location: 'الشريط الجانبي للمنتج',
-       addDate: '2025-10-15',
-       link: 'https://eshro.ly/products/headphones',
-       owner: 'مونير',
-       store: 'نواعم',
-       views: 234,
-       ctr: '19.7%',
-       image: '/PictureMerchantPortal/1.png'
-     },
-     {
-       id: 2,
-       name: 'الدعاية الفردية',
-       clicks: 52,
-       expiryDate: '2027-01-04',
-       status: 'مفعل',
-       location: 'غير محدد',
-       addDate: '2025-10-10',
-       link: 'https://eshro.ly/store/nawaem',
-       owner: 'مونير',
-       store: 'نواعم',
-       views: 189,
-       ctr: '27.5%',
-       image: '/PictureMerchantPortal/2.png'
-     },
-     {
-       id: 3,
-       name: 'الدعاية الثنائية -2-',
-       clicks: 35,
-       expiryDate: '2027-01-04',
-       status: 'مفعل',
-       location: 'محدد',
-       addDate: '2025-10-08',
-       link: 'https://eshro.ly/category/dresses',
-       owner: 'مونير',
-       store: 'نواعم',
-       views: 156,
-       ctr: '22.4%',
-       image: '/PictureMerchantPortal/3.png'
-     },
-     {
-       id: 4,
-       name: 'الدعاية الثنائية -1-',
-       clicks: 60,
-       expiryDate: '2027-01-04',
-       status: 'مفعل',
-       location: 'الشريط الجانبي للمنتج',
-       addDate: '2025-10-05',
-       link: 'https://eshro.ly/products/dress-123',
-       owner: 'مونير',
-       store: 'نواعم',
-       views: 298,
-       ctr: '20.1%',
-       image: '/PictureMerchantPortal/4.png'
-     },
-     {
-       id: 5,
-       name: 'الدعاية الثلاثية 3',
-       clicks: 43,
-       expiryDate: '2027-01-04',
-       status: 'مفعل',
-       location: 'غير محدد',
-       addDate: '2025-10-01',
-       link: 'https://eshro.ly/special-offers',
-       owner: 'مونير',
-       store: 'نواعم',
-       views: 187,
-       ctr: '23.0%',
-       image: '/PictureMerchantPortal/5.png'
-     },
-     {
-       id: 6,
-       name: 'أثاث منزللي',
-       clicks: 0,
-       expiryDate: '2027-06-04',
-       status: 'مسودة',
-       location: 'محدد',
-       addDate: '2025-10-20',
-       link: 'https://eshro.ly/furniture',
-       owner: 'مونير',
-       store: 'نواعم',
-       views: 0,
-       ctr: '0%',
-       image: '/PictureMerchantPortal/6.png'
-     }
-   ]);
+  const [ads, setAds] = useState<any[]>([]);
 
   // Filter handlers for ads
   const handleAdsFilterChange = (value: string) => {
@@ -1999,8 +1644,8 @@ useEffect(() => {
       location: adForm.location === 'not-specified' ? 'غير محدد' : adForm.location === 'specified' ? 'محدد' : adForm.location,
       addDate: new Date().toLocaleDateString('en-LY'),
       link: adForm.link,
-      owner: 'مونير',
-      store: 'نواعم',
+      owner: merchantOwnerName,
+      store: merchantStoreName,
       views: 0,
       clicks: 0,
       ctr: '0%',
@@ -2196,7 +1841,7 @@ useEffect(() => {
       } else {
         // Shipping and order notifications for existing stores
         const shippingStatuses = ['تم الشحن', 'قيد التوصيل', 'تم التسليم', 'في انتظار الشحن'];
-        const customers = ['أحمد محمد', 'فاطمة علي', 'محمد حسن', 'سارة أحمد'];
+        const customers: string[] = [];
 
         // Generate 2-4 random shipping notifications
         const numNotifications = Math.floor(Math.random() * 3) + 2;
@@ -2269,13 +1914,7 @@ useEffect(() => {
     isActive?: boolean;
   }
 
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([
-    { id: 1, name: 'مخزن طريق المطار', location: 'طريق المطار', city: 'طرابلس', country: 'ليبيا', status: 'نشط', coordinates: { lat: 32.8872, lng: 13.1913 } },
-    { id: 2, name: 'مخزن غوط الشعال', location: 'غوط الشعال', city: 'طرابلس', country: 'ليبيا', status: 'نشط', coordinates: { lat: 32.8756, lng: 13.2001 } },
-    { id: 3, name: 'مخزن شهداء الشط', location: 'شهداء الشط', city: 'طرابلس', country: 'ليبيا', status: 'نشط', coordinates: { lat: 32.8523, lng: 13.1745 } },
-    { id: 4, name: 'مخزن الكريمية', location: 'الكريمية', city: 'طرابلس', country: 'ليبيا', status: 'نشط', coordinates: { lat: 32.8234, lng: 13.1567 } },
-    { id: 5, name: 'مخزن قمينس', location: 'قمينس', city: 'بنغازي', country: 'ليبيا', status: 'معطل', coordinates: { lat: 32.1167, lng: 20.0667 } }
-  ]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -3101,7 +2740,7 @@ useEffect(() => {
                   id="warehouse-phone"
                   value={warehouseForm.phone}
                   onChange={(e) => setWarehouseForm({ ...warehouseForm, phone: e.target.value })}
-                  placeholder="+218911234567"
+                  placeholder="+2189110567"
                 />
               </div>
 
@@ -4584,7 +4223,7 @@ useEffect(() => {
                       </CardHeader>
                       <CardContent>
                         <div className="text-center mb-4">
-                          <p className="text-3xl font-bold text-gray-900 mb-1">1</p>
+                          <p className="text-3xl font-bold text-gray-900 mb-1">0</p>
                           <p className="text-sm text-gray-600">زائر نشط الآن</p>
                         </div>
                         <div className="space-y-2">
@@ -4608,12 +4247,12 @@ useEffect(() => {
                       <CardContent>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm">ليبيا - طرابلس</span>
+                            <span className="text-sm">لا توجد بيانات حالياً</span>
                             <div className="flex items-center gap-2">
                               <div className="w-20 bg-gray-200 rounded-full h-2">
-                                <div className="bg-green-500 h-2 rounded-full" style={{ width: '100%' }} />
+                                <div className="bg-green-500 h-2 rounded-full" style={{ width: '0%' }} />
                               </div>
-                              <span className="text-sm font-medium">100%</span>
+                              <span className="text-sm font-medium">0%</span>
                             </div>
                           </div>
                           <Button variant="outline" size="sm" className="w-full">
@@ -4677,11 +4316,11 @@ useEffect(() => {
                         <p className="text-sm text-gray-600 mb-4">اربط بكل سهولة بجميع حملاتك في مكان واحد</p>
                         <div className="grid grid-cols-2 gap-4 mb-4">
                           <div className="text-center p-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg">
-                            <p className="text-2xl font-bold">7,571</p>
+                            <p className="text-2xl font-bold">0</p>
                             <p className="text-xs">د.ل إجمالي</p>
                           </div>
                           <div className="text-center p-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg">
-                            <p className="text-2xl font-bold">4,600</p>
+                            <p className="text-2xl font-bold">0</p>
                             <p className="text-xs">د.ل صافي</p>
                           </div>
                         </div>
@@ -4705,9 +4344,9 @@ useEffect(() => {
                               <span className="text-sm">{day}</span>
                               <div className="flex items-center gap-2">
                                 <div className="w-24 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${Math.random() * 100}%` }} />
+                                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: `0%` }} />
                                 </div>
-                                <span className="text-sm font-medium w-12 text-right">{Math.floor(Math.random() * 1000)} د.ل</span>
+                                <span className="text-sm font-medium w-12 text-right">0 د.ل</span>
                               </div>
                             </div>
                           ))}
@@ -4730,9 +4369,9 @@ useEffect(() => {
                               <span className="text-sm">{hour}:00</span>
                               <div className="flex items-center gap-2">
                                 <div className="w-24 bg-gray-200 rounded-full h-2">
-                                  <div className="bg-green-500 h-2 rounded-full" style={{ width: `${Math.random() * 100}%` }} />
+                                  <div className="bg-green-500 h-2 rounded-full" style={{ width: `0%` }} />
                                 </div>
-                                <span className="text-sm font-medium w-8 text-right">{Math.floor(Math.random() * 50)}</span>
+                                <span className="text-sm font-medium w-8 text-right">0</span>
                               </div>
                             </div>
                           ))}
@@ -4752,12 +4391,7 @@ useEffect(() => {
                       <CardContent>
                         <p className="text-sm text-gray-600 mb-4">حسب التصنيف</p>
                         <div className="space-y-3">
-                          {[
-                            { name: 'فستان صيفي أنيق', category: 'ملابس نسائية', sales: 45 },
-                            { name: 'حقيبة جلد طبيعي', category: 'إكسسوارات', sales: 32 },
-                            { name: 'عطر فرنسي أصلي', category: 'عطور', sales: 28 },
-                            { name: 'ساعة ذكية', category: 'إلكترونيات', sales: 19 }
-                          ].map((product, index) => (
+                          {([] as any[]).map((product, index) => (
                             <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                               <div>
                                 <p className="font-medium text-sm">{product.name}</p>
@@ -4785,16 +4419,16 @@ useEffect(() => {
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
                             <span className="text-sm">الإيرادات</span>
-                            <span className="font-bold text-green-600">12,450 د.ل</span>
+                            <span className="font-bold text-green-600">0 د.ل</span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-sm">التكاليف</span>
-                            <span className="font-bold text-red-600">8,200 د.ل</span>
+                            <span className="font-bold text-red-600">0 د.ل</span>
                           </div>
                           <div className="border-t pt-3">
                             <div className="flex items-center justify-between">
                               <span className="font-medium">صافي الربح</span>
-                              <span className="font-bold text-2xl text-green-600">4,250 د.ل</span>
+                              <span className="font-bold text-2xl text-green-600">0 د.ل</span>
                             </div>
                           </div>
                         </div>
@@ -4814,10 +4448,10 @@ useEffect(() => {
                         <p className="text-sm text-gray-600 mb-4">التوزيع الحالي</p>
                         <div className="space-y-3">
                           {[
-                            { status: 'مكتملة', count: 45, color: 'bg-green-500' },
-                            { status: 'قيد المعالجة', count: 12, color: 'bg-yellow-500' },
-                            { status: 'ملغية', count: 3, color: 'bg-red-500' },
-                            { status: 'في الانتظار', count: 8, color: 'bg-gray-500' }
+                            { status: 'مكتملة', count: 0, color: 'bg-green-500' },
+                            { status: 'قيد المعالجة', count: 0, color: 'bg-yellow-500' },
+                            { status: 'ملغية', count: 0, color: 'bg-red-500' },
+                            { status: 'في الانتظار', count: 0, color: 'bg-gray-500' }
                           ].map((item, index) => (
                             <div key={index} className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
@@ -4840,7 +4474,7 @@ useEffect(() => {
                       </CardHeader>
                       <CardContent>
                         <div className="text-center mb-4">
-                          <p className="text-4xl font-bold text-purple-600 mb-1">94%</p>
+                          <p className="text-4xl font-bold text-purple-600 mb-1">0%</p>
                           <p className="text-sm text-gray-600">مؤشر الأداء الحالي</p>
                         </div>
                         <div className="space-y-2">
@@ -4848,9 +4482,9 @@ useEffect(() => {
                             <span className="text-sm">الأداء</span>
                             <div className="flex items-center gap-2">
                               <div className="w-20 bg-gray-200 rounded-full h-2">
-                                <div className="bg-purple-500 h-2 rounded-full" style={{ width: '94%' }} />
+                                <div className="bg-purple-500 h-2 rounded-full" style={{ width: '0%' }} />
                               </div>
-                              <span className="text-sm font-medium">94%</span>
+                              <span className="text-sm font-medium">0%</span>
                             </div>
                           </div>
                         </div>
@@ -4885,7 +4519,7 @@ useEffect(() => {
                             <p className="text-gray-600">إجمالي الطلبات</p>
                           </div>
                           <div className="bg-white p-3 rounded-lg shadow-sm">
-                            <p className="font-bold text-orange-600">94%</p>
+                            <p className="font-bold text-orange-600">0%</p>
                             <p className="text-gray-600">معدل النجاح</p>
                           </div>
                         </div>
@@ -5263,7 +4897,7 @@ useEffect(() => {
                               </div>
                               <div>
                                 <Label htmlFor="customer-phone">رقم الهاتف</Label>
-                                <Input id="customer-phone" placeholder="+218912345678" />
+                                <Input id="customer-phone" placeholder="+2189105678" />
                               </div>
                               <div>
                                 <Label htmlFor="customer-city">المدينة</Label>
@@ -5386,7 +5020,7 @@ useEffect(() => {
                                 <div className="space-y-3">
                                   <div className="flex justify-between">
                                     <span>قيمة المنتجات</span>
-                                    <span className="font-bold">850 د.ل</span>
+                                    <span className="font-bold">0 د.ل</span>
                                   </div>
                                   <div className="flex justify-between">
                                     <span>رسوم الشحن</span>
@@ -5399,7 +5033,7 @@ useEffect(() => {
                                   <div className="border-t pt-3">
                                     <div className="flex justify-between text-lg font-bold">
                                       <span>المجموع الكلي</span>
-                                      <span className="text-blue-600">850 د.ل</span>
+                                      <span className="text-blue-600">0 د.ل</span>
                                     </div>
                                   </div>
                                 </div>
@@ -5447,7 +5081,7 @@ useEffect(() => {
                     <Card className="shadow-lg">
                       <CardContent className="p-6">
                         <div className="text-center">
-                          <p className="text-3xl font-bold text-blue-600 mb-1">1,234</p>
+                          <p className="text-3xl font-bold text-blue-600 mb-1">1,0</p>
                           <p className="text-sm text-gray-600">إجمالي الطلبات</p>
                           <div className="flex items-center justify-center text-sm text-green-600 mt-2">
                             <TrendingUp className="h-4 w-4 mr-1" />
@@ -5470,7 +5104,7 @@ useEffect(() => {
                     <Card className="shadow-lg">
                       <CardContent className="p-6">
                         <div className="text-center">
-                          <p className="text-3xl font-bold text-orange-600 mb-1">156</p>
+                          <p className="text-3xl font-bold text-orange-600 mb-1">0</p>
                           <p className="text-sm text-gray-600">طلبات قيد المعالجة</p>
                           <p className="text-sm text-gray-600 mt-1">يحتاج للمتابعة</p>
                         </div>
@@ -5512,44 +5146,7 @@ useEffect(() => {
                             </tr>
                           </thead>
                           <tbody>
-                            {[
-                              {
-                                id: '#1234',
-                                code: 'ES2024001234',
-                                customer: 'أحمد محمد الليبي',
-                                phone: '+218912345678',
-                                status: 'مكتمل',
-                                amount: '1,200 د.ل',
-                                items: '2 عنصر',
-                                payment: 'تحويل بنكي',
-                                date: '15‏/12‏/2024',
-                                time: '12:30 م'
-                              },
-                              {
-                                id: '#1233',
-                                code: 'ES2024001233',
-                                customer: 'فاطمة سالم بن علي',
-                                phone: '+218923456789',
-                                status: 'قيد المعالجة',
-                                amount: '1,800 د.ل',
-                                items: '1 عنصر',
-                                payment: 'تقسيط',
-                                date: '15‏/12‏/2024',
-                                time: '11:15 ص'
-                              },
-                              {
-                                id: '#1232',
-                                code: 'ES2024001232',
-                                customer: 'محمد عمر الزاوي',
-                                phone: '+218934567890',
-                                status: 'ملغي',
-                                amount: '750 د.ل',
-                                items: '1 عنصر',
-                                payment: 'دفع عند الاستلام',
-                                date: '14‏/12‏/2024',
-                                time: '05:45 م'
-                              }
-                            ].map((order, index) => (
+                            {([] as any[]).map((order, index) => (
                               <tr key={index} className="border-b hover:bg-gray-50">
                                 <td className="p-3">
                                   <div>
@@ -5703,7 +5300,7 @@ useEffect(() => {
                                 <Label htmlFor="product-barcode">الباركود</Label>
                                 <Input
                                   id="product-barcode"
-                                  placeholder="123456789012"
+                                  placeholder="1056789012"
                                   value={productSKU}
                                   onChange={(e) => setProductSKU(e.target.value)}
                                 />
@@ -6760,7 +6357,7 @@ useEffect(() => {
                           <Card className="shadow-lg bg-gradient-to-br from-indigo-50 to-blue-100">
                             <CardContent className="p-6 text-center">
                               <div className="relative">
-                                <div className="text-3xl font-bold text-indigo-600 mb-1">94%</div>
+                                <div className="text-3xl font-bold text-indigo-600 mb-1">0%</div>
                                 <p className="text-sm text-gray-600">معدل التحويل</p>
                                 <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                                   <TrendingUp className="h-3 w-3 text-white" />
@@ -6786,7 +6383,7 @@ useEffect(() => {
                           <Card className="shadow-lg bg-gradient-to-br from-orange-50 to-red-100">
                             <CardContent className="p-6 text-center">
                               <div className="relative">
-                                <div className="text-3xl font-bold text-orange-600 mb-1">156</div>
+                                <div className="text-3xl font-bold text-orange-600 mb-1">0</div>
                                 <p className="text-sm text-gray-600">منتج مباع</p>
                                 <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                                   <ShoppingBag className="h-3 w-3 text-white" />
@@ -6798,10 +6395,10 @@ useEffect(() => {
                           <Card className="shadow-lg bg-gradient-to-br from-purple-50 to-pink-100">
                             <CardContent className="p-6 text-center">
                               <div className="relative">
-                                <div className="text-3xl font-bold text-purple-600 mb-1">89%</div>
+                                <div className="text-3xl font-bold text-purple-600 mb-1">0%</div>
                                 <p className="text-sm text-gray-600">معدل الرضا</p>
                                 <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style={{width: '89%'}}></div>
+                                  <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style={{width: '0%'}}></div>
                                 </div>
                               </div>
                             </CardContent>
@@ -6846,7 +6443,7 @@ useEffect(() => {
                               {/* Chart overlay info */}
                               <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3">
                                 <div className="text-xs text-gray-600">الذروة: 14:00</div>
-                                <div className="text-sm font-bold text-gray-800">156 زيارة</div>
+                                <div className="text-sm font-bold text-gray-800">0 زيارة</div>
                               </div>
 
                               <div className="absolute bottom-4 left-4 text-xs text-gray-600">
@@ -6938,13 +6535,7 @@ useEffect(() => {
                                 <h4 className="font-bold text-gray-800">إحصائيات تفصيلية</h4>
 
                                 <div className="space-y-3">
-                                  {[
-                                    { city: 'طرابلس', customers: 1247, sales: '45,231 د.ل', orders: 234, color: 'blue' },
-                                    { city: 'بنغازي', customers: 892, sales: '32,450 د.ل', orders: 156, color: 'green' },
-                                    { city: 'مصراتة', customers: 654, sales: '28,120 د.ل', orders: 98, color: 'purple' },
-                                    { city: 'سبها', customers: 423, sales: '18,750 د.ل', orders: 67, color: 'orange' },
-                                    { city: 'الزاوية', customers: 287, sales: '12,340 د.ل', orders: 45, color: 'red' }
-                                  ].map((location, index) => (
+                                  {([] as any[]).map((location, index) => (
                                     <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border hover:shadow-md transition-shadow cursor-pointer">
                                       <div className="flex items-center gap-3">
                                         <div className={`w-4 h-4 bg-${location.color}-500 rounded-full`}></div>
@@ -6964,11 +6555,11 @@ useEffect(() => {
                                 {/* Summary Stats */}
                                 <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                                   <div className="text-center p-3 bg-blue-50 rounded-lg">
-                                    <p className="text-xl font-bold text-blue-600">3,604</p>
+                                    <p className="text-xl font-bold text-blue-600">0</p>
                                     <p className="text-xs text-gray-600">إجمالي العملاء</p>
                                   </div>
                                   <div className="text-center p-3 bg-green-50 rounded-lg">
-                                    <p className="text-xl font-bold text-green-600">136,891 د.ل</p>
+                                    <p className="text-xl font-bold text-green-600">0 د.ل</p>
                                     <p className="text-xs text-gray-600">إجمالي المبيعات</p>
                                   </div>
                                 </div>
@@ -7006,30 +6597,8 @@ useEffect(() => {
 
                               <div className="space-y-3">
                                 <h4 className="font-bold text-gray-800">أداء المخازن</h4>
-                                <div className="space-y-2">
-                                  <div className="flex justify-between text-sm">
-                                    <span>مخزن طريق المطار</span>
-                                    <span className="font-bold text-green-600">89% كفاءة</span>
-                                  </div>
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full" style={{width: '89%'}}></div>
-                                  </div>
-
-                                  <div className="flex justify-between text-sm">
-                                    <span>مخزن غوط الشعال</span>
-                                    <span className="font-bold text-blue-600">76% كفاءة</span>
-                                  </div>
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full" style={{width: '76%'}}></div>
-                                  </div>
-
-                                  <div className="flex justify-between text-sm">
-                                    <span>مخزن شهداء الشط</span>
-                                    <span className="font-bold text-purple-600">82% كفاءة</span>
-                                  </div>
-                                  <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div className="bg-gradient-to-r from-purple-500 to-purple-400 h-2 rounded-full" style={{width: '82%'}}></div>
-                                  </div>
+                                <div className="space-y-2 text-center text-gray-500 py-4">
+                                  لا توجد بيانات أداء للمخازن حالياً
                                 </div>
                               </div>
                             </div>
@@ -7068,10 +6637,10 @@ useEffect(() => {
                               </div>
 
                               <div className="text-center p-4 bg-white rounded-lg">
-                                <div className="text-2xl font-bold text-purple-600 mb-1">89%</div>
+                                <div className="text-2xl font-bold text-purple-600 mb-1">0%</div>
                                 <div className="text-sm text-gray-600">معدل التفاعل</div>
                                 <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full" style={{width: '89%'}}></div>
+                                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full" style={{width: '0%'}}></div>
                                 </div>
                               </div>
                             </div>
@@ -7398,7 +6967,7 @@ useEffect(() => {
                                   <span className="font-bold text-green-600">89,200 د.ل</span>
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-3">
-                                  <div className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full" style={{width: '89%'}}></div>
+                                  <div className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full" style={{width: '0%'}}></div>
                                 </div>
 
                                 <div className="flex justify-between text-sm">
@@ -7588,35 +7157,7 @@ useEffect(() => {
                             </tr>
                           </thead>
                           <tbody>
-                            {[
-                              {
-                                customer: 'سارة علي',
-                                email: 'sarah.tripoli@gmail.com',
-                                phone: '+218945678901',
-                                items: [
-                                  { name: 'حقيبة بحر راقية', quantity: 1, price: '260 د.ل' },
-                                  { name: 'شبشب صيفي جلد', quantity: 1, price: '210 د.ل' }
-                                ],
-                                total: '470 د.ل',
-                                date: '15‏/12‏/2024',
-                                time: '02:30 م',
-                                reminders: 1,
-                                discount: '10%'
-                              },
-                              {
-                                customer: 'عمر محمد',
-                                email: 'omar.misrata@yahoo.com',
-                                phone: '+218956789012',
-                                items: [
-                                  { name: 'فستان صيفي بحرزام جلد', quantity: 1, price: '680 د.ل' }
-                                ],
-                                total: '680 د.ل',
-                                date: '14‏/12‏/2024',
-                                time: '10:15 م',
-                                reminders: 2,
-                                discount: '5%'
-                              }
-                            ].map((cart, index) => (
+                            {([] as any[]).map((cart, index) => (
                               <tr key={index} className="border-b hover:bg-gray-50">
                                 <td className="p-3">
                                   <div>
@@ -7700,13 +7241,17 @@ useEffect(() => {
               {activeSection === 'settings-store' && (
                 <StoreSettingsView
                   storeData={{
-                    name: 'متجر نواعم',
-                    phone: '0942161516',
-                    address: 'طرابلس - سوق الجمعة',
-                    email: 'contact@ishro.ly'
+                    name: merchantStoreName || merchantStoreData?.nameAr || merchantStoreData?.name || 'متجر جديد',
+                    phone: merchantStoreData?.phone || merchantStoreData?.merchantPhone || '',
+                    address: merchantStoreData?.address || merchantStoreData?.location || '',
+                    email: merchantStoreData?.email || merchantStoreData?.merchantEmail || ''
                   }}
-                  setStoreData={() => {}}
-                  onSave={() => {}}
+                  setStoreData={(newData: any) => {
+                    setMerchantStoreData((prev: any) => ({ ...prev, ...newData }));
+                  }}
+                  onSave={async () => {
+                    // Save logic if needed
+                  }}
                 />
               )}
 
@@ -8137,29 +7682,7 @@ useEffect(() => {
                       </div>
 
                       <div className="space-y-4">
-                        {[
-                          {
-                            comment: 'معاملة طيبة، مع منتجات في قمة الروعة',
-                            customer: 'عبدالله التاجوري',
-                            date: '13/07/2025',
-                            status: 'مفعل',
-                            product: 'حقيبة بحر Vibes'
-                          },
-                          {
-                            comment: 'جودة عالية وسعر مناسب جداً',
-                            customer: 'فاطمة محمد الزهراني',
-                            date: '25/08/2025',
-                            status: 'مفعل',
-                            product: 'فستان بحزام أكمام فانوس حافة مكشكشة'
-                          },
-                          {
-                            comment: 'تجربة رائعة وخدمة ممتازة',
-                            customer: 'أحمد علي الشريف',
-                            date: '02/09/2025',
-                            status: 'مفعل',
-                            product: 'فستان ماكسي أحمر مكشوف الكتف بصدر دانتيل'
-                          }
-                        ].map((review, index) => (
+                        {([] as any[]).map((review, index) => (
                           <div key={index} className="border rounded-lg p-4">
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex items-center gap-3">
@@ -8209,7 +7732,7 @@ useEffect(() => {
                     <Card className="shadow-lg">
                       <CardContent className="p-6">
                         <div className="text-center">
-                          <p className="text-3xl font-bold text-blue-600 mb-1">120</p>
+                          <p className="text-3xl font-bold text-blue-600 mb-1">0</p>
                           <p className="text-sm text-gray-600">عدد الإشعارات المسجلة</p>
                           <p className="text-sm text-gray-600 mt-1">خلال الشهر الجاري</p>
                         </div>
@@ -8219,7 +7742,7 @@ useEffect(() => {
                     <Card className="shadow-lg">
                       <CardContent className="p-6">
                         <div className="text-center">
-                          <p className="text-3xl font-bold text-green-600 mb-1">30</p>
+                          <p className="text-3xl font-bold text-green-600 mb-1">0</p>
                           <p className="text-sm text-gray-600">إجمالي الإشعارات المرسلة</p>
                         </div>
                       </CardContent>
@@ -8279,38 +7802,7 @@ useEffect(() => {
                                 </tr>
                               </thead>
                               <tbody>
-                                {[
-                                  {
-                                    product: 'فستان أحمر بالدانتيل',
-                                    brand: 'SAMARA',
-                                    notificationDate: '20/04/2025 10:30:23 صباحا',
-                                    email: 'ahmed.salem@gmail.com',
-                                    phone: '0922682101',
-                                    quantity: 2,
-                                    subscriptionDate: '10/01/2025',
-                                    status: 'مفعل'
-                                  },
-                                  {
-                                    product: 'حذاء نسائي أنيق',
-                                    brand: 'ZARA',
-                                    notificationDate: '18/04/2025 14:15:45 ظهرا',
-                                    email: 'fatima.mohammed@hotmail.com',
-                                    phone: '0915234567',
-                                    quantity: 1,
-                                    subscriptionDate: '05/02/2025',
-                                    status: 'مفعل'
-                                  },
-                                  {
-                                    product: 'فستان سهرين طويل Hermes',
-                                    brand: 'Hermes',
-                                    notificationDate: '15/04/2025 09:20:12 صباحا',
-                                    email: 'omar.ali@gmail.com',
-                                    phone: '0918765432',
-                                    quantity: 1,
-                                    subscriptionDate: '20/01/2025',
-                                    status: 'مفعل'
-                                  }
-                                ].map((notification, index) => (
+                                {([] as any[]).map((notification, index) => (
                                   <tr key={index} className="border-b hover:bg-gray-50">
                                     <td className="p-3">
                                       <p className="font-medium">{notification.product}</p>
@@ -8918,7 +8410,7 @@ useEffect(() => {
                         </CardHeader>
                         <CardContent>
                           <div className="text-center py-8">
-                            <p className="text-3xl font-bold text-purple-600 mb-4">94%</p>
+                            <p className="text-3xl font-bold text-purple-600 mb-4">0%</p>
                             <p className="text-gray-600 mb-6">كفاءة إدارة المخزون</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                               <div className="bg-green-50 p-4 rounded-lg">
@@ -9015,7 +8507,7 @@ useEffect(() => {
                               <div className="flex items-center justify-between">
                                 <div>
                                   <p className="text-sm font-medium text-gray-600">إجمالي العملاء</p>
-                                  <p className="text-3xl font-bold text-blue-600">2,847</p>
+                                  <p className="text-3xl font-bold text-blue-600">0</p>
                                   <p className="text-sm text-blue-600">عميل مسجل</p>
                                 </div>
                                 <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -9032,7 +8524,7 @@ useEffect(() => {
                               <div className="flex items-center justify-between">
                                 <div>
                                   <p className="text-sm font-medium text-gray-600">العملاء النشطون</p>
-                                  <p className="text-3xl font-bold text-green-600">2,156</p>
+                                  <p className="text-3xl font-bold text-green-600">2,0</p>
                                   <p className="text-sm text-green-600">76% من الإجمالي</p>
                                 </div>
                                 <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -9049,7 +8541,7 @@ useEffect(() => {
                               <div className="flex items-center justify-between">
                                 <div>
                                   <p className="text-sm font-medium text-gray-600">عملاء جدد</p>
-                                  <p className="text-3xl font-bold text-purple-600">234</p>
+                                  <p className="text-3xl font-bold text-purple-600">0</p>
                                   <p className="text-sm text-purple-600">هذا الشهر</p>
                                 </div>
                                 <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -9143,13 +8635,7 @@ useEffect(() => {
                                 </tr>
                               </thead>
                               <tbody>
-                                {[
-                                  { name: 'أحمد محمد', orders: 12, totalSpent: 2450, lastOrder: '2024-01-15' },
-                                  { name: 'فاطمة علي', orders: 8, totalSpent: 1890, lastOrder: '2024-01-14' },
-                                  { name: 'محمد حسن', orders: 15, totalSpent: 3200, lastOrder: '2024-01-13' },
-                                  { name: 'سارة أحمد', orders: 6, totalSpent: 1250, lastOrder: '2024-01-12' },
-                                  { name: 'علي محمود', orders: 9, totalSpent: 1680, lastOrder: '2024-01-11' }
-                                ].map((customer, index) => (
+                                {([] as any[]).map((customer, index) => (
                                   <tr key={index} className="border-b hover:bg-gray-50">
                                     <td className="p-3 font-medium">{customer.name}</td>
                                     <td className="p-3">{customer.orders}</td>
@@ -9178,7 +8664,7 @@ useEffect(() => {
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {[
-                              { segment: 'عملاء جدد', count: 234, percentage: 8.2, color: 'bg-green-500' },
+                              { segment: 'عملاء جدد', count: 0, percentage: 8.2, color: 'bg-green-500' },
                               { segment: 'عملاء منتظمون', count: 1892, percentage: 66.5, color: 'bg-blue-500' },
                               { segment: 'عملاء VIP', count: 456, percentage: 16.0, color: 'bg-purple-500' },
                               { segment: 'عملاء غير نشطين', count: 265, percentage: 9.3, color: 'bg-gray-500' }
@@ -9214,14 +8700,7 @@ useEffect(() => {
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-4">
-                            {[
-                              { month: 'يناير', newCustomers: 180, totalCustomers: 2450 },
-                              { month: 'فبراير', newCustomers: 195, totalCustomers: 2645 },
-                              { month: 'مارس', newCustomers: 210, totalCustomers: 2855 },
-                              { month: 'أبريل', newCustomers: 225, totalCustomers: 3080 },
-                              { month: 'مايو', newCustomers: 240, totalCustomers: 3320 },
-                              { month: 'يونيو', newCustomers: 234, totalCustomers: 3554 }
-                            ].map((month, index) => (
+                            {([] as any[]).map((month, index) => (
                               <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                                 <div>
                                   <p className="font-medium text-gray-900 dark:text-white">{month.month}</p>
@@ -9265,11 +8744,11 @@ useEffect(() => {
                                 <p className="text-sm text-gray-600">متوسط التقييم</p>
                               </div>
                               <div className="bg-blue-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-blue-600">89%</p>
+                                <p className="text-2xl font-bold text-blue-600">0%</p>
                                 <p className="text-sm text-gray-600">معدل الإعادة</p>
                               </div>
                               <div className="bg-green-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-green-600">156</p>
+                                <p className="text-2xl font-bold text-green-600">0</p>
                                 <p className="text-sm text-gray-600">عميل عائد</p>
                               </div>
                               <div className="bg-purple-50 p-4 rounded-lg">
@@ -9333,31 +8812,31 @@ useEffect(() => {
                           <Card className="shadow-lg bg-gradient-to-br from-green-50 to-green-100">
                             <CardContent className="p-6 text-center">
                               <h4 className="font-bold text-gray-800 mb-2">إجمالي الإيرادات</h4>
-                              <p className="text-3xl font-bold text-green-600">45,231 د.ل</p>
-                              <p className="text-sm text-gray-600">+20.1% من الشهر الماضي</p>
+                              <p className="text-3xl font-bold text-green-600">0 د.ل</p>
+                              <p className="text-sm text-gray-600">+0% من الشهر الماضي</p>
                             </CardContent>
                           </Card>
 
                           <Card className="shadow-lg bg-gradient-to-br from-red-50 to-red-100">
                             <CardContent className="p-6 text-center">
                               <h4 className="font-bold text-gray-800 mb-2">إجمالي المصروفات</h4>
-                              <p className="text-3xl font-bold text-red-600">12,450 د.ل</p>
-                              <p className="text-sm text-gray-600">-5% من الشهر الماضي</p>
+                              <p className="text-3xl font-bold text-red-600">0 د.ل</p>
+                              <p className="text-sm text-gray-600">+0% من الشهر الماضي</p>
                             </CardContent>
                           </Card>
 
                           <Card className="shadow-lg bg-gradient-to-br from-blue-50 to-blue-100">
                             <CardContent className="p-6 text-center">
                               <h4 className="font-bold text-gray-800 mb-2">صافي الربح</h4>
-                              <p className="text-3xl font-bold text-blue-600">32,781 د.ل</p>
-                              <p className="text-sm text-gray-600">+15% نمو</p>
+                              <p className="text-3xl font-bold text-blue-600">0 د.ل</p>
+                              <p className="text-sm text-gray-600">+0% نمو</p>
                             </CardContent>
                           </Card>
 
                           <Card className="shadow-lg bg-gradient-to-br from-purple-50 to-purple-100">
                             <CardContent className="p-6 text-center">
                               <h4 className="font-bold text-gray-800 mb-2">هامش الربح</h4>
-                              <p className="text-3xl font-bold text-purple-600">72.5%</p>
+                              <p className="text-3xl font-bold text-purple-600">0%</p>
                               <p className="text-sm text-gray-600">نسبة مئوية</p>
                             </CardContent>
                           </Card>
@@ -9377,29 +8856,17 @@ useEffect(() => {
                               <div className="flex items-center justify-center">
                                 <div className="relative w-48 h-48">
                                   <div className="w-48 h-48 rounded-full" style={{
-                                    background: 'conic-gradient(#10B981 0% 60%, #3B82F6 60% 80%, #F59E0B 80% 95%, #EF4444 95% 100%)'
+                                    background: '#E5E7EB'
                                   }} />
                                   <div className="absolute inset-0 m-6 rounded-full bg-white" />
                                   <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-lg font-bold">100%</span>
+                                    <span className="text-lg font-bold text-gray-400">0%</span>
                                   </div>
                                 </div>
                                 <div className="ml-6 space-y-2">
                                   <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                    <span className="text-sm">مبيعات المنتجات (60%)</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                    <span className="text-sm">خدمات (20%)</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                                    <span className="text-sm">عمولات (15%)</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                                    <span className="text-sm">أخرى (5%)</span>
+                                    <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+                                    <span className="text-sm">لا توجد بيانات (0%)</span>
                                   </div>
                                 </div>
                               </div>
@@ -9421,7 +8888,7 @@ useEffect(() => {
                                     <div key={i} className="flex flex-col items-center">
                                       <div
                                         className="w-4 bg-gradient-to-t from-blue-500 to-blue-400 rounded-t"
-                                        style={{height: `${30 + Math.sin(i/2) * 40}%`}}
+                                        style={{height: `0%`}}
                                       ></div>
                                       <span className="text-xs text-gray-600 mt-1">{i+1}</span>
                                     </div>
@@ -9439,7 +8906,7 @@ useEffect(() => {
                           <Card className="shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100">
                             <CardContent className="p-6 text-center">
                               <h4 className="font-bold text-gray-800 mb-2">التدفق النقدي</h4>
-                              <p className="text-3xl font-bold text-indigo-600">+18,450 د.ل</p>
+                              <p className="text-3xl font-bold text-indigo-600">+0 د.ل</p>
                               <p className="text-sm text-gray-600">هذا الشهر</p>
                             </CardContent>
                           </Card>
@@ -9503,15 +8970,15 @@ useEffect(() => {
                         </CardHeader>
                         <CardContent>
                           <div className="text-center py-8">
-                            <p className="text-4xl font-bold text-green-600 mb-4">45,231 د.ل</p>
+                            <p className="text-4xl font-bold text-green-600 mb-4">0 د.ل</p>
                             <p className="text-gray-600 mb-6">إجمالي الإيرادات</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                               <div className="bg-green-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-green-600">15,750</p>
+                                <p className="text-2xl font-bold text-green-600">0</p>
                                 <p className="text-sm text-gray-600">شهري</p>
                               </div>
                               <div className="bg-blue-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-blue-600">525</p>
+                                <p className="text-2xl font-bold text-blue-600">0</p>
                                 <p className="text-sm text-gray-600">يومي</p>
                               </div>
                               <div className="bg-purple-50 p-4 rounded-lg">
@@ -9519,7 +8986,7 @@ useEffect(() => {
                                 <p className="text-sm text-gray-600">نمو</p>
                               </div>
                               <div className="bg-orange-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-orange-600">89%</p>
+                                <p className="text-2xl font-bold text-orange-600">0%</p>
                                 <p className="text-sm text-gray-600">من المبيعات</p>
                               </div>
                             </div>
@@ -9538,7 +9005,7 @@ useEffect(() => {
                         </CardHeader>
                         <CardContent>
                           <div className="text-center py-8">
-                            <p className="text-4xl font-bold text-red-600 mb-4">12,450 د.ل</p>
+                            <p className="text-4xl font-bold text-red-600 mb-4">0 د.ل</p>
                             <p className="text-gray-600 mb-6">إجمالي المصروفات</p>
                             <div className="space-y-4">
                               <div className="flex justify-between p-3 bg-gray-50 rounded-lg">
@@ -9576,15 +9043,15 @@ useEffect(() => {
                             <div className="space-y-3">
                               <div className="flex justify-between">
                                 <span className="text-sm">إجمالي الإيرادات</span>
-                                <span className="font-bold">45,231 د.ل</span>
+                                <span className="font-bold">0 د.ل</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-sm">إجمالي المصروفات</span>
-                                <span className="font-bold text-red-600">12,450 د.ل</span>
+                                <span className="font-bold text-red-600">0 د.ل</span>
                               </div>
                               <div className="flex justify-between border-t pt-2">
                                 <span className="font-bold">صافي الربح</span>
-                                <span className="font-bold text-green-600">32,781 د.ل</span>
+                                <span className="font-bold text-green-600">0 د.ل</span>
                               </div>
                             </div>
                           </div>
@@ -9602,23 +9069,23 @@ useEffect(() => {
                         </CardHeader>
                         <CardContent>
                           <div className="text-center py-8">
-                            <p className="text-3xl font-bold text-indigo-600 mb-4">+18,450 د.ل</p>
+                            <p className="text-3xl font-bold text-indigo-600 mb-4">+0 د.ل</p>
                             <p className="text-gray-600 mb-6">تدفق نقدي إيجابي هذا الشهر</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                               <div className="bg-indigo-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-indigo-600">+25,000</p>
+                                <p className="text-2xl font-bold text-indigo-600">+0</p>
                                 <p className="text-sm text-gray-600">إيرادات</p>
                               </div>
                               <div className="bg-red-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-red-600">-6,550</p>
+                                <p className="text-2xl font-bold text-red-600">-0</p>
                                 <p className="text-sm text-gray-600">مصروفات</p>
                               </div>
                               <div className="bg-green-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-green-600">+12,450</p>
+                                <p className="text-2xl font-bold text-green-600">+0</p>
                                 <p className="text-sm text-gray-600">صافي</p>
                               </div>
                               <div className="bg-blue-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-blue-600">89%</p>
+                                <p className="text-2xl font-bold text-blue-600">0%</p>
                                 <p className="text-sm text-gray-600">كفاءة</p>
                               </div>
                             </div>
@@ -9632,22 +9099,30 @@ useEffect(() => {
 
               {activeSection === 'finance-wallet' && hasModuleAccess('finance-wallet') && (
                 <DigitalWalletView
-                  storeData={null}
-                  setStoreData={() => {}}
-                  onSave={() => {}}
+                  storeData={merchantStoreData}
+                  setStoreData={(newData: any) => {
+                    setMerchantStoreData((prev: any) => ({ ...prev, ...newData }));
+                  }}
+                  onSave={async () => {
+                    // Save logic if needed
+                  }}
                 />
               )}
 
               {activeSection === 'settings-interface' && (
                 <StoreSettingsView
                   storeData={{
-                    name: 'متجر نواعم',
-                    phone: '0942161516',
-                    address: 'طرابلس - سوق الجمعة',
-                    email: 'contact@ishro.ly'
+                    name: merchantStoreName,
+                    phone: merchantStoreData?.phone || merchantStoreData?.merchantPhone || '',
+                    address: merchantStoreData?.address || merchantStoreData?.location || '',
+                    email: merchantStoreData?.email || merchantStoreData?.merchantEmail || 'contact@ishro.ly'
                   }}
-                  setStoreData={() => {}}
-                  onSave={() => {}}
+                  setStoreData={(newData: any) => {
+                    setMerchantStoreData((prev: any) => ({ ...prev, ...newData }));
+                  }}
+                  onSave={async () => {
+                    // Save logic if needed
+                  }}
                 />
               )}
 
@@ -9922,7 +9397,7 @@ useEffect(() => {
                               { name: 'التواصل معنا', status: 'مفعل', date: '2022-01-03', views: '892', color: 'green' },
                               { name: 'شروط الإستخدام', status: 'مفعل', date: '2022-01-03', views: '654', color: 'green' },
                               { name: 'سياسة الاسترجاع والاستبدال والإلغاء', status: 'مفعل', date: '2022-01-03', views: '423', color: 'green' },
-                              { name: 'صفحة تجريبية', status: 'مفعل', date: '2024-02-27', views: '156', color: 'green' },
+                              { name: 'صفحة تجريبية', status: 'مفعل', date: '2024-02-27', views: '0', color: 'green' },
                               { name: 'صفحة تجريبية', status: 'مفعل', date: '2024-02-27', views: '89', color: 'green' }
                             ].map((page, index) => (
                               <tr key={index} className="border-b hover:bg-gray-50">
@@ -10400,7 +9875,7 @@ useEffect(() => {
                           <Card className="shadow-lg bg-gradient-to-br from-green-50 to-green-100">
                             <CardContent className="p-6 text-center">
                               <h4 className="font-bold text-gray-800 mb-2">المبيعات الشهرية</h4>
-                              <p className="text-3xl font-bold text-green-600">15,750 د.ل</p>
+                              <p className="text-3xl font-bold text-green-600">0 د.ل</p>
                               <p className="text-sm text-gray-600">+12% من الشهر الماضي</p>
                             </CardContent>
                           </Card>
@@ -10408,7 +9883,7 @@ useEffect(() => {
                           <Card className="shadow-lg bg-gradient-to-br from-purple-50 to-purple-100">
                             <CardContent className="p-6 text-center">
                               <h4 className="font-bold text-gray-800 mb-2">المبيعات السنوية</h4>
-                              <p className="text-3xl font-bold text-purple-600">189,000 د.ل</p>
+                              <p className="text-3xl font-bold text-purple-600">0 د.ل</p>
                               <p className="text-sm text-gray-600">+25% من العام الماضي</p>
                             </CardContent>
                           </Card>
@@ -10576,7 +10051,7 @@ useEffect(() => {
                                 <p className="text-sm text-gray-600">طلب معلق</p>
                               </div>
                               <div className="bg-purple-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-purple-600">156</p>
+                                <p className="text-2xl font-bold text-purple-600">0</p>
                                 <p className="text-sm text-gray-600">منتج مباع</p>
                               </div>
                             </div>
@@ -10595,20 +10070,20 @@ useEffect(() => {
                         </CardHeader>
                         <CardContent>
                           <div className="text-center py-8">
-                            <p className="text-4xl font-bold text-green-600 mb-4">15,750 د.ل</p>
+                            <p className="text-4xl font-bold text-green-600 mb-4">0 د.ل</p>
                             <p className="text-gray-600 mb-6">إجمالي المبيعات الشهرية</p>
                             <div className="space-y-4">
                               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <span className="text-sm">متوسط المبيعات اليومية</span>
-                                <span className="font-bold text-green-600">525 د.ل</span>
+                                <span className="font-bold text-green-600">0 د.ل</span>
                               </div>
                               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <span className="text-sm">أفضل يوم مبيعات</span>
-                                <span className="font-bold text-green-600">890 د.ل</span>
+                                <span className="font-bold text-green-600">0 د.ل</span>
                               </div>
                               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <span className="text-sm">عدد الطلبات</span>
-                                <span className="font-bold text-green-600">234 طلب</span>
+                                <span className="font-bold text-green-600">0 طلب</span>
                               </div>
                             </div>
                           </div>
@@ -10626,19 +10101,19 @@ useEffect(() => {
                         </CardHeader>
                         <CardContent>
                           <div className="text-center py-8">
-                            <p className="text-4xl font-bold text-purple-600 mb-4">189,000 د.ل</p>
+                            <p className="text-4xl font-bold text-purple-600 mb-4">0 د.ل</p>
                             <p className="text-gray-600 mb-6">إجمالي المبيعات السنوية</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                               <div className="bg-purple-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-purple-600">15,750</p>
+                                <p className="text-2xl font-bold text-purple-600">0</p>
                                 <p className="text-sm text-gray-600">متوسط شهري</p>
                               </div>
                               <div className="bg-indigo-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-indigo-600">525</p>
+                                <p className="text-2xl font-bold text-indigo-600">0</p>
                                 <p className="text-sm text-gray-600">متوسط يومي</p>
                               </div>
                               <div className="bg-pink-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-pink-600">2,847</p>
+                                <p className="text-2xl font-bold text-pink-600">0</p>
                                 <p className="text-sm text-gray-600">إجمالي الطلبات</p>
                               </div>
                               <div className="bg-orange-50 p-4 rounded-lg">
@@ -10668,15 +10143,15 @@ useEffect(() => {
                             <div className="space-y-3">
                               <div className="flex justify-between">
                                 <span className="text-sm">إجمالي المبيعات</span>
-                                <span className="font-bold">15,750 د.ل</span>
+                                <span className="font-bold">0 د.ل</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-sm">إجمالي التكاليف</span>
-                                <span className="font-bold text-red-600">12,125 د.ل</span>
+                                <span className="font-bold text-red-600">0 د.ل</span>
                               </div>
                               <div className="flex justify-between border-t pt-2">
                                 <span className="font-bold">صافي الربح</span>
-                                <span className="font-bold text-green-600">3,625 د.ل</span>
+                                <span className="font-bold text-green-600">0 د.ل</span>
                               </div>
                             </div>
                           </div>
@@ -10706,11 +10181,11 @@ useEffect(() => {
                                 <p className="text-sm text-gray-600">منتج مباع</p>
                               </div>
                               <div className="bg-green-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-green-600">89%</p>
+                                <p className="text-2xl font-bold text-green-600">0%</p>
                                 <p className="text-sm text-gray-600">نسبة النجاح</p>
                               </div>
                               <div className="bg-blue-50 p-4 rounded-lg">
-                                <p className="text-2xl font-bold text-blue-600">1,125 د.ل</p>
+                                <p className="text-2xl font-bold text-blue-600">0 د.ل</p>
                                 <p className="text-sm text-gray-600">قيمة المسترجعات</p>
                               </div>
                             </div>
@@ -11262,11 +10737,7 @@ useEffect(() => {
                             </tr>
                           </thead>
                           <tbody>
-                            {[
-                              { order: 'ORD-001', customer: 'أحمد محمد', tracking: 'TRK-12345', cost: '15.00', currency: 'د.ل', boxes: '2', service: 'عادي', company: 'الهدهد', status: 'في الطريق', date: '2025-01-15' },
-                              { order: 'ORD-002', customer: 'فاطمة علي', tracking: 'TRK-67890', cost: '25.00', currency: 'د.ل', boxes: '1', service: 'سريع', company: 'دي اتش ال', status: 'تم التسليم', date: '2025-01-14' },
-                              { order: 'ORD-003', customer: 'عمر حسن', tracking: 'TRK-11111', cost: '18.50', currency: 'د.ل', boxes: '3', service: 'عادي', company: 'ارامكس', status: 'قيد المعالجة', date: '2025-01-13' }
-                            ].map((shipment, index) => (
+                            {([] as any[]).map((shipment, index) => (
                               <tr key={index} className="border-b hover:bg-gray-50">
                                 <td className="p-3 font-medium">{shipment.order}</td>
                                 <td className="p-3">{shipment.customer}</td>
@@ -12876,7 +12347,7 @@ useEffect(() => {
                                   bank: 'مصرف شمال أفريقيا',
                                   transactions: 32,
                                   amount: '45,620',
-                                  phone: '+218 92 234 5678',
+                                  phone: '+218 92 0 5678',
                                   lastTransaction: '13:45:00'
                                 },
                                 {
@@ -13162,12 +12633,7 @@ useEffect(() => {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {[
-                                    { id: 'POS-001', terminal: 'Terminal Point 1', customer: 'أحمد محمد الشريف', amount: '450 د.ل', method: 'بطاقة ائتمانية', time: '14:30:22', status: 'ناجحة' },
-                                    { id: 'POS-002', terminal: 'Terminal Point 2', customer: 'فاطمة علي السنوسي', amount: '780 د.ل', method: 'بطاقة خصم', time: '13:45:15', status: 'ناجحة' },
-                                    { id: 'POS-003', terminal: 'Terminal Point 1', customer: 'عمر خالد القذافي', amount: '1,200 د.ل', method: 'بطاقة ائتمانية', time: '12:20:30', status: 'فاشلة' },
-                                    { id: 'POS-004', terminal: 'Terminal Point 3', customer: 'مريم عبدالله الزنتاني', amount: '320 د.ل', method: 'بطاقة خصم', time: '11:15:45', status: 'ناجحة' }
-                                  ].map((transaction, index) => (
+                                  {([] as any[]).map((transaction, index) => (
                                     <tr key={index} className="border-b hover:bg-gray-50">
                                       <td className="p-3 font-medium">{transaction.id}</td>
                                       <td className="p-3">{transaction.terminal}</td>
@@ -13528,7 +12994,7 @@ useEffect(() => {
                         <h3 className="text-lg font-bold text-gray-900 mb-2">العمليات</h3>
                         <p className="text-sm text-gray-600 mb-4">مراقبة العمليات والمعاملات</p>
                         <div className="flex items-center justify-center gap-2 text-sm text-indigo-600">
-                          <span>234 عملية اليوم</span>
+                          <span>0 عملية اليوم</span>
                           <ArrowRight className="h-4 w-4" />
                         </div>
                       </CardContent>
@@ -13688,7 +13154,7 @@ useEffect(() => {
                               <span className="text-sm font-medium">خط الدعم الرئيسي</span>
                               <Badge variant="secondary" className="bg-green-100 text-green-800">متاح</Badge>
                             </div>
-                            <div className="text-lg font-bold text-green-600 mt-1">+218 91-234-5678</div>
+                            <div className="text-lg font-bold text-green-600 mt-1">+218 91-0-5678</div>
                           </div>
                           <div className="p-3 bg-blue-50 rounded-lg">
                             <div className="flex items-center justify-between">
@@ -13713,11 +13179,11 @@ useEffect(() => {
                         <h4 className="font-medium mb-2">إحصائيات المكالمات</h4>
                         <div className="grid grid-cols-4 gap-4 text-center">
                           <div>
-                            <div className="text-xl font-bold text-green-600">156</div>
+                            <div className="text-xl font-bold text-green-600">0</div>
                             <div className="text-sm text-gray-600">مكالمة اليوم</div>
                           </div>
                           <div>
-                            <div className="text-xl font-bold text-blue-600">89%</div>
+                            <div className="text-xl font-bold text-blue-600">0%</div>
                             <div className="text-sm text-gray-600">معدل الإجابة</div>
                           </div>
                           <div>
@@ -13771,7 +13237,7 @@ useEffect(() => {
                         <h4 className="font-medium mb-2">إحصائيات البريد الإلكتروني</h4>
                         <div className="grid grid-cols-4 gap-4 text-center">
                           <div>
-                            <div className="text-xl font-bold text-purple-600">234</div>
+                            <div className="text-xl font-bold text-purple-600">0</div>
                             <div className="text-sm text-gray-600">رسالة اليوم</div>
                           </div>
                           <div>
@@ -13833,11 +13299,11 @@ useEffect(() => {
                         <h4 className="font-medium mb-2">إحصائيات التواصل الاجتماعي</h4>
                         <div className="grid grid-cols-3 gap-4 text-center">
                           <div>
-                            <div className="text-xl font-bold text-blue-600">156</div>
+                            <div className="text-xl font-bold text-blue-600">0</div>
                             <div className="text-sm text-gray-600">تفاعل اليوم</div>
                           </div>
                           <div>
-                            <div className="text-xl font-bold text-green-600">94%</div>
+                            <div className="text-xl font-bold text-green-600">0%</div>
                             <div className="text-sm text-gray-600">معدل الاستجابة</div>
                           </div>
                           <div>
@@ -13969,11 +13435,11 @@ useEffect(() => {
                         <h4 className="font-medium mb-2">إحصائيات الواتساب</h4>
                         <div className="grid grid-cols-4 gap-4 text-center">
                           <div>
-                            <div className="text-xl font-bold text-green-600">156</div>
+                            <div className="text-xl font-bold text-green-600">0</div>
                             <div className="text-sm text-gray-600">رسالة اليوم</div>
                           </div>
                           <div>
-                            <div className="text-xl font-bold text-blue-600">89%</div>
+                            <div className="text-xl font-bold text-blue-600">0%</div>
                             <div className="text-sm text-gray-600">معدل الرد</div>
                           </div>
                           <div>
@@ -14040,7 +13506,7 @@ useEffect(() => {
                         <h4 className="font-medium mb-2">إحصائيات الذكاء الاصطناعي</h4>
                         <div className="grid grid-cols-4 gap-4 text-center">
                           <div>
-                            <div className="text-xl font-bold text-indigo-600">1,234</div>
+                            <div className="text-xl font-bold text-indigo-600">1,0</div>
                             <div className="text-sm text-gray-600">استعلام اليوم</div>
                           </div>
                           <div>
@@ -14197,7 +13663,7 @@ useEffect(() => {
                         <h4 className="font-medium mb-2">إحصائيات مركز الاتصال</h4>
                         <div className="grid grid-cols-4 gap-4 text-center">
                           <div>
-                            <div className="text-xl font-bold text-teal-600">234</div>
+                            <div className="text-xl font-bold text-teal-600">0</div>
                             <div className="text-sm text-gray-600">مكالمة اليوم</div>
                           </div>
                           <div>
@@ -14382,11 +13848,7 @@ useEffect(() => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {[
-                    { id: 1, customer: 'أحمد محمد', phone: '+218 91 234 5678', duration: '2:34', status: 'active' },
-                    { id: 2, customer: 'فاطمة علي', phone: '+218 92 345 6789', duration: '1:12', status: 'active' },
-                    { id: 3, customer: 'محمد سالم', phone: '+218 90 123 4567', duration: '0:45', status: 'ringing' }
-                  ].map((call) => (
+                  {([] as any[]).map((call) => (
                     <div key={call.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${call.status === 'active' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
@@ -14485,13 +13947,7 @@ useEffect(() => {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {[
-                    { id: 1, customer: 'أحمد محمد', phone: '+218 91 234 5678', type: 'واردة', date: '2025-01-14 14:30', duration: '5:23', status: 'مكتملة' },
-                    { id: 2, customer: 'فاطمة علي', phone: '+218 92 345 6789', type: 'صادرة', date: '2025-01-14 13:15', duration: '3:45', status: 'مكتملة' },
-                    { id: 3, customer: 'محمد سالم', phone: '+218 90 123 4567', type: 'واردة', date: '2025-01-14 12:00', duration: '0:00', status: 'لم يرد' },
-                    { id: 4, customer: 'سارة أحمد', phone: '+218 91 987 6543', type: 'واردة', date: '2025-01-14 11:30', duration: '8:12', status: 'مكتملة' },
-                    { id: 5, customer: 'علي حسن', phone: '+218 92 456 7890', type: 'صادرة', date: '2025-01-14 10:45', duration: '2:18', status: 'مكتملة' }
-                  ].map((call) => (
+                  {([] as any[]).map((call) => (
                     <tr key={call.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">{call.customer}</td>
                       <td className="px-4 py-3">{call.phone}</td>
@@ -14543,7 +13999,7 @@ useEffect(() => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">94%</div>
+                  <div className="text-3xl font-bold text-blue-600 mb-2">0%</div>
                   <div className="text-sm text-gray-600">معدل الإجابة</div>
                   <div className="text-xs text-green-600 mt-1">↑ 2% من الشهر الماضي</div>
                 </CardContent>
@@ -14564,7 +14020,7 @@ useEffect(() => {
               </Card>
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-orange-600 mb-2">156</div>
+                  <div className="text-3xl font-bold text-orange-600 mb-2">0</div>
                   <div className="text-sm text-gray-600">إجمالي المكالمات اليوم</div>
                   <div className="text-xs text-green-600 mt-1">↑ 12 من الأمس</div>
                 </CardContent>
@@ -14590,13 +14046,7 @@ useEffect(() => {
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {[
-                        { name: 'أحمد محمد', calls: 45, answerRate: '96%', avgDuration: '4:23', rating: 4.8, status: 'نشط' },
-                        { name: 'فاطمة علي', calls: 38, answerRate: '92%', avgDuration: '3:45', rating: 4.6, status: 'نشط' },
-                        { name: 'محمد سالم', calls: 52, answerRate: '98%', avgDuration: '5:12', rating: 4.9, status: 'نشط' },
-                        { name: 'سارة أحمد', calls: 29, answerRate: '89%', avgDuration: '3:18', rating: 4.5, status: 'في استراحة' },
-                        { name: 'علي حسن', calls: 41, answerRate: '94%', avgDuration: '4:05', rating: 4.7, status: 'نشط' }
-                      ].map((agent, index) => (
+                      {([] as any[]).map((agent, index) => (
                         <tr key={index} className="hover:bg-gray-50">
                           <td className="px-4 py-3 font-medium">{agent.name}</td>
                           <td className="px-4 py-3">{agent.calls}</td>

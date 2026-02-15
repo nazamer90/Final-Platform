@@ -8,8 +8,6 @@ export const shekhaStoreConfig = {
   nameEn: "Shekha Store",
   description: "متجر شيخة - متجركم الشامل",
   categories: [
-    "المنتجات المميزة",
-    "العروض الخاصة",
-    "جديد المنتجات"
+    "أزياء وملابس"
   ]
 };
