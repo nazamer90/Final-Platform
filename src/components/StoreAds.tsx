@@ -238,35 +238,44 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
             const mainSizeClass = getMainTextSizeClass(ad.mainTextSize);
             const subSizeClass = getSubTextSizeClass(ad.subTextSize);
             const fontClass = getFontClass(ad.textFont);
+            const positionClass = getTextPositionClass(ad.textPosition);
             
             return (
             <div
               key={adKey}
-              className="w-full bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              className="w-full bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer relative min-h-[120px]"
               onClick={() => handleAdClick(ad)}
             >
-              <div className="flex flex-col md:flex-row items-center p-4 md:p-6 gap-4">
-                {ad.imageUrl && (
-                  <div className="w-full md:w-32 h-32 md:h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
-                    <img
-                      src={getProxyImageUrl(ad.imageUrl)}
-                      alt={ad.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform"
-                    />
+              {ad.imageUrl ? (
+                <div className="relative w-full h-full min-h-[200px] md:min-h-[250px]">
+                  <img
+                    src={getProxyImageUrl(ad.imageUrl)}
+                    alt={ad.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all" />
+                  <div className={`absolute ${positionClass} p-6 w-full`} style={{ color: ad.textColor || '#ffffff' }}>
+                    <h4 className={`${fontClass} ${mainSizeClass} md:text-2xl mb-2 drop-shadow-md`}>{ad.title}</h4>
+                    {ad.description && (
+                      <p className={`${fontClass} ${subSizeClass} md:text-lg opacity-90 line-clamp-3 drop-shadow-md`}>{ad.description}</p>
+                    )}
                   </div>
-                )}
-                <div className="flex-1 text-center md:text-right" style={{ color: textColor }}>
-                  <h4 className={`${fontClass} ${mainSizeClass} md:text-base mb-1`}>{ad.title}</h4>
-                  {ad.description && (
-                    <p className={`${fontClass} ${subSizeClass} md:text-sm line-clamp-2`} style={{ color: textColor, opacity: 0.8 }}>{ad.description}</p>
-                  )}
                 </div>
-                <div className="flex-shrink-0">
-                  <button className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-medium hover:from-green-600 hover:to-emerald-600 transition">
-                    عرض
-                  </button>
+              ) : (
+                <div className="flex flex-col md:flex-row items-center p-4 md:p-6 gap-4">
+                  <div className="flex-1 text-center md:text-right" style={{ color: textColor }}>
+                    <h4 className={`${fontClass} ${mainSizeClass} md:text-base mb-1`}>{ad.title}</h4>
+                    {ad.description && (
+                      <p className={`${fontClass} ${subSizeClass} md:text-sm line-clamp-2`} style={{ color: textColor, opacity: 0.8 }}>{ad.description}</p>
+                    )}
+                  </div>
+                  <div className="flex-shrink-0">
+                    <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg text-sm font-medium hover:from-blue-600 hover:to-indigo-600 transition">
+                      عرض
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             );
           })}
