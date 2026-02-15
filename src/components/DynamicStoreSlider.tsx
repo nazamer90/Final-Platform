@@ -261,10 +261,42 @@ const DynamicStoreSlider: React.FC<DynamicStoreSliderProps> = ({
         accent: 'from-pink-400 via-purple-400 to-fuchsia-400',
         gradient: 'from-pink-500 to-purple-600',
         button: 'from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700'
+      },
+      'pretty': {
+        background: 'from-emerald-50 via-teal-50 to-cyan-50',
+        accent: 'from-emerald-400 via-teal-400 to-cyan-400',
+        gradient: 'from-emerald-500 to-teal-600',
+        button: 'from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700'
+      },
+      'magna': {
+        background: 'from-orange-50 via-amber-50 to-yellow-50',
+        accent: 'from-orange-400 via-amber-400 to-yellow-400',
+        gradient: 'from-orange-500 to-amber-600',
+        button: 'from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700'
+      },
+      'indeesh': {
+        background: 'from-indigo-50 via-blue-50 to-sky-50',
+        accent: 'from-indigo-400 via-blue-400 to-sky-400',
+        gradient: 'from-indigo-500 to-blue-600',
+        button: 'from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700'
+      },
+      'shekha': {
+        background: 'from-yellow-50 via-amber-50 to-orange-50',
+        accent: 'from-yellow-400 via-amber-400 to-orange-400',
+        gradient: 'from-yellow-500 to-amber-600',
+        button: 'from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700'
       }
     };
     
-    return colorSchemes[store as keyof typeof colorSchemes] || colorSchemes['nawaem'];
+    // Default fallback to a neutral or blue scheme instead of specifically nawaem
+    const defaultScheme = {
+      background: 'from-slate-50 via-gray-50 to-zinc-50',
+      accent: 'from-blue-400 via-indigo-400 to-purple-400',
+      gradient: 'from-blue-500 to-indigo-600',
+      button: 'from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700'
+    };
+
+    return colorSchemes[store as keyof typeof colorSchemes] || defaultScheme;
   };
 
   const storeColors = getStoreColors(storeSlug);

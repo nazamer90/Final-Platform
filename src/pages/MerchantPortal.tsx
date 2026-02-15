@@ -626,7 +626,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
 
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">{activeSection}</h1>
-                  <p className="text-gray-600 mt-1">إدارة متجر نواعم الإلكتروني</p>
+                  <p className="text-gray-600 mt-1">إدارة متجر {storeData?.name || 'إشرو'} الإلكتروني</p>
                 </div>
               </div>
 

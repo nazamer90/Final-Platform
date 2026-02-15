@@ -68,38 +68,38 @@ const MerchantSettings: React.FC = () => {
 
   const [storeData, setStoreData] = useState({
     id: 'store-1',
-    name: 'متجر نواعم',
-    phone: '0942161516',
-    address: 'طرابلس - سوق الجمعة',
+    name: 'متجر جديد',
+    phone: '',
+    address: 'طرابلس',
     city: 'طرابلس',
-    region: 'سوق الجمعة',
+    region: '',
     location: { lat: 32.8872, lng: 13.1913 }
   });
 
   const [storeLocations, setStoreLocations] = useState<StoreLocation[]>([
     {
       id: '1',
-      name: 'سوق الجمعة',
+      name: 'الموقع الرئيسي',
       email: '',
-      phone: '0942161516',
-      address: 'طرابلس - سوق الجمعة, طرابلس, سوق الجمعة, Libya',
+      phone: '',
+      address: 'طرابلس',
       isPrimary: true
     }
   ]);
 
   const [interfaceSettings, setInterfaceSettings] = useState({
-    storeName: 'متجر نمو',
-    contactHours: 'اتصل بنا 24/7',
-    phone: '0942161516',
-    address: 'طرابلس - سوق الجمعة',
-    email: 'Contact@noumo.ly',
-    about: 'منصة نمو للتجارة الإلكترونية نقدم مجموعة من الخدمات و الأدوات العملية لإفتتاح متجرك الإلكتروني والدخول الى عالم التجارة الإلكترونية بشكل سهل وسريع ، في منصة نمو نعمل على تمكين التجار من تطوير وتنمية تجارتهم و تسهل الوصول والتواصل مع العملاء.',
+    storeName: 'متجر جديد',
+    contactHours: '24/7',
+    phone: '',
+    address: 'طرابلس',
+    email: '',
+    about: 'منصة إشرو للتجارة الإلكترونية نقدم مجموعة من الخدمات و الأدوات العملية لإفتتاح متجرك الإلكتروني والدخول الى عالم التجارة الإلكترونية بشكل سهل وسريع.',
     copyright: '© 2025 منصة إشرو للتجارة الإلكترونية',
-    seoTitle: 'منصة إشرو للتجارة الإلكتونية - تمكين وإنتشار -',
-    seoDescription: 'بوابة التجارة الإلكترونية في ليبيا ، تجارة الكترونية',
+    seoTitle: 'منصة إشرو للتجارة الإلكترونية',
+    seoDescription: 'بوابة التجارة الإلكترونية في ليبيا',
     popupEnabled: false,
     popupDelay: 10,
-    welcomeMessage: 'أهلا بك في متجر نمو التجريبي'
+    welcomeMessage: 'أهلا بك في متجرنا'
   });
 
   const StoreDataTab: React.FC = () => (

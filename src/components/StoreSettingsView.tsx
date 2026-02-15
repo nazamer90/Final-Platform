@@ -131,22 +131,22 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
 
   // Store data
   const localStoreData = {
-    name: 'متجر نواعم',
-    phone: '0942161516',
-    address: 'طرابلس - سوق الجمعة',
-    email: 'contact@ishro.ly',
-    about: 'منصة إشرو للتجارة الإلكترونية نقدم مجموعة من الخدمات و الأدوات العملية لإفتتاح متجرك الإلكتروني والدخول الى عالم التجارة الإلكترونية بشكل سهل وسريع ، في منصة إشرو نعمل على تمكين التجار من تطوير وتنمية تجارتهم و تسهل الوصول والتواصل مع العملاء.',
-    workingHours: '24/7',
-    copyright: '© 2025 منصة إشرو للتجارة الإلكترونية',
-    seoTitle: 'منصة إشرو للتجارة الإلكترونية - تمكين وإنتشار',
-    seoDescription: 'بوابة التجارة الإلكترونية في ليبيا ، تجارة الكترونية',
-    logo: '/assets/stores/1.webp',
-    favicon: '/assets/stores/1.webp',
-    seoImage: '/assets/stores/1.webp',
-    popupEnabled: false,
-    popupDelay: 10,
-    popupMessage: 'أهلا بك في متجر نواعم التجريبي',
-    popupImage: '/assets/stores/1.webp',
+    name: storeData?.name || 'متجر جديد',
+    phone: storeData?.phone || '',
+    address: storeData?.address || '',
+    email: storeData?.email || '',
+    about: storeData?.about || 'منصة إشرو للتجارة الإلكترونية نقدم مجموعة من الخدمات و الأدوات العملية لإفتتاح متجرك الإلكتروني والدخول الى عالم التجارة الإلكترونية بشكل سهل وسريع.',
+    workingHours: storeData?.workingHours || '24/7',
+    copyright: storeData?.copyright || '© 2025 منصة إشرو للتجارة الإلكترونية',
+    seoTitle: storeData?.seoTitle || storeData?.name || 'منصة إشرو للتجارة الإلكترونية',
+    seoDescription: storeData?.seoDescription || 'بوابة التجارة الإلكترونية في ليبيا',
+    logo: storeData?.logo || '/assets/stores/1.webp',
+    favicon: storeData?.favicon || '/assets/stores/1.webp',
+    seoImage: storeData?.seoImage || '/assets/stores/1.webp',
+    popupEnabled: storeData?.popupEnabled || false,
+    popupDelay: storeData?.popupDelay || 10,
+    popupMessage: storeData?.popupMessage || `أهلا بك في متجر ${storeData?.name || ''}`,
+    popupImage: storeData?.popupImage || '/assets/stores/1.webp',
   };
 
   // Image upload states for SEO settings
@@ -193,13 +193,13 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
   const storeLocations = [
     {
       id: '1',
-      name: 'سوق الجمعة',
-      address: 'طرابلس - سوق الجمعة, طرابلس, سوق الجمعة, Libya',
+      name: storeData?.address || 'الموقع الرئيسي',
+      address: storeData?.address || '',
       city: 'طرابلس',
-      region: 'سوق الجمعة',
+      region: '',
       manager: 'مدير فرع',
-      phone: '0942161516',
-      email: 'contact@ishro.ly',
+      phone: storeData?.phone || '',
+      email: storeData?.email || '',
       status: 'نشط',
       isMain: true,
       longitude: '13.191338',
@@ -1546,7 +1546,7 @@ const StoreSettingsView: React.FC<StoreSettingsViewProps> = ({ storeData, setSto
                       <div className="space-y-2">
                         <Label className="text-right rtl-text">رسالة الترحيب</Label>
                         <Textarea
-                          defaultValue="أهلا بك في متجر نواعم التجريبي"
+                          defaultValue={localStoreData.popupMessage}
                           className="text-right rtl-text min-h-[100px]"
                         />
                       </div>
