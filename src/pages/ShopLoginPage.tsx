@@ -133,6 +133,7 @@ const ShopLoginPage: React.FC<ShopLoginPageProps> = ({
         setError(result.error || 'فشل تسجيل الدخول');
       }
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Login Error:', err);
       setError('حدث خطأ غير متوقع أثناء تسجيل الدخول');
     } finally {

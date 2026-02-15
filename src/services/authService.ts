@@ -116,7 +116,33 @@ class AuthService {
    * البحث المحلي في حال انقطاع الإنترنت (Fallback)
    */
   private localLoginFallback(email: string, password: string): { success: boolean; user?: AuthSession; error?: string } {
-    // 1. التحقق من المتاجر
+    // قائمة المتاجر الأساسية الموثقة
+    const HARDCODED_MERCHANTS = [
+      { email: "mounir@gmail.com", password: "mounir123", storeSlug: "nawaem", nameAr: "متجر نواعم", owner: "منير" },
+      { email: "salem@gmail.com", password: "salem123", storeSlug: "sherine", nameAr: "متجر شيرين", owner: "سالم" },
+      { email: "majed@gmail.com", password: "majed123", storeSlug: "delta-store", nameAr: "متجر دلتا", owner: "ماجد" },
+      { email: "kamel@gmail.com", password: "kamel123", storeSlug: "pretty", nameAr: "متجر بريتي", owner: "كامل" },
+      { email: "hasan@gmail.com", password: "hasan123", storeSlug: "magna-beauty", nameAr: "متجر ماجنا", owner: "حسن" },
+      { email: "salem.masgher@gmail.com", password: "salem1234", storeSlug: "indeesh", nameAr: "متجر انديش", owner: "سالم محمد الأشقر" },
+      { email: "salem.mfurjani@gmail.com", password: "S@lem2026", storeSlug: "shekha", nameAr: "متجر شيخة", owner: "سالم الفرجياني" }
+    ];
+
+    const hardcodedMatch = HARDCODED_MERCHANTS.find(m => m.email === email && m.password === password);
+    if (hardcodedMatch) {
+      const session: AuthSession = {
+        id: Math.floor(Math.random() * 1000000),
+        email: hardcodedMatch.email,
+        storeName: hardcodedMatch.nameAr,
+        storeSlug: hardcodedMatch.storeSlug,
+        role: 'merchant',
+        setupComplete: true,
+        loginTime: new Date().toISOString()
+      };
+      this.saveSession(session);
+      return { success: true, user: session };
+    }
+
+    // 1. التحقق من المتاجر في الذاكرة المحلية (للمتاجر الجديدة التي تم إنشاؤها)
     const stores = JSON.parse(localStorage.getItem(this.STORES_LIST_KEY) || '[]');
     const localMerchant = stores.find((s: any) => s.email === email && s.password === password);
 

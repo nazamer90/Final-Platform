@@ -225,7 +225,7 @@ const merchants: MerchantProfile[] = [
     icon: Sparkles,
     emblem: "🌸",
     logo: "/assets/stores/nawaem.webp",
-    stats: { orders: 1280, satisfaction: 97, growth: "+18%" },
+    stats: { orders: 0, satisfaction: 100, growth: "+0%" },
     disabled: ["logistics-bidding"]
   },
   {
@@ -239,7 +239,7 @@ const merchants: MerchantProfile[] = [
     icon: Shirt,
     emblem: "👗",
     logo: "/assets/stores/sheirine.webp",
-    stats: { orders: 1124, satisfaction: 94, growth: "+12%" },
+    stats: { orders: 0, satisfaction: 100, growth: "+0%" },
     disabled: ["logistics-bidding"]
   },
   {
@@ -253,7 +253,7 @@ const merchants: MerchantProfile[] = [
     icon: Flower2,
     emblem: "💄",
     logo: "/assets/stores/pretty.webp",
-    stats: { orders: 980, satisfaction: 92, growth: "+9%" },
+    stats: { orders: 0, satisfaction: 100, growth: "+0%" },
     disabled: ["logistics-bidding", "finance-wallet"]
   },
   {
@@ -267,7 +267,7 @@ const merchants: MerchantProfile[] = [
     icon: Cpu,
     emblem: "💡",
     logo: "/assets/stores/delta-store.webp",
-    stats: { orders: 846, satisfaction: 90, growth: "+7%" },
+    stats: { orders: 0, satisfaction: 100, growth: "+0%" },
     disabled: ["marketing-loyalty", "logistics-bidding"]
   },
   {
@@ -281,7 +281,7 @@ const merchants: MerchantProfile[] = [
     icon: Gem,
     emblem: "🛍️",
     logo: "/assets/stores/magna-beauty.webp",
-    stats: { orders: 772, satisfaction: 89, growth: "+6%" },
+    stats: { orders: 0, satisfaction: 100, growth: "+0%" },
     disabled: ["analytics-stock", "logistics-bidding"]
   },
   {
@@ -295,7 +295,7 @@ const merchants: MerchantProfile[] = [
     icon: Package,
     emblem: "🧼",
     logo: "/assets/indeesh/logo/1764003949069-2wl3b2-Indeesh.png",
-    stats: { orders: 640, satisfaction: 95, growth: "+14%" },
+    stats: { orders: 0, satisfaction: 100, growth: "+0%" },
     disabled: []
   },
   {
@@ -309,7 +309,7 @@ const merchants: MerchantProfile[] = [
     icon: Sparkles,
     emblem: "👑",
     logo: "/assets/stores/shekha.webp",
-    stats: { orders: 450, satisfaction: 98, growth: "+22%" },
+    stats: { orders: 0, satisfaction: 100, growth: "+0%" },
     disabled: []
   }
 ];

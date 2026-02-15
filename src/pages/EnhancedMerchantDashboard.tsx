@@ -6619,18 +6619,18 @@ useEffect(() => {
                           <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                               <div className="text-center p-4 bg-white rounded-lg">
-                                <div className="text-2xl font-bold text-blue-600 mb-1">1,247</div>
+                                <div className="text-2xl font-bold text-blue-600 mb-1">0</div>
                                 <div className="text-sm text-gray-600">إجمالي الزيارات</div>
                                 <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style={{width: '100%'}}></div>
+                                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style={{width: '0%'}}></div>
                                 </div>
                               </div>
 
                               <div className="text-center p-4 bg-white rounded-lg">
-                                <div className="text-2xl font-bold text-green-600 mb-1">4</div>
+                                <div className="text-2xl font-bold text-green-600 mb-1">0</div>
                                 <div className="text-sm text-gray-600">صفحات نشطة</div>
                                 <div className="flex justify-center mt-2">
-                                  {Array.from({length: 4}).map((_, i) => (
+                                  {Array.from({length: 0}).map((_, i) => (
                                     <div key={i} className="w-2 h-2 bg-green-500 rounded-full mx-1 animate-pulse"></div>
                                   ))}
                                 </div>
@@ -6647,10 +6647,10 @@ useEffect(() => {
 
                             <div className="space-y-4">
                               {[
-                                { name: 'الصفحة الرئيسية', visits: 450, percentage: 36, color: 'blue', trend: '+12%' },
-                                { name: 'صفحة المنتجات', visits: 320, percentage: 26, color: 'green', trend: '+8%' },
-                                { name: 'صفحة العروض الخاصة', visits: 280, percentage: 22, color: 'purple', trend: '+15%' },
-                                { name: 'صفحة التواصل معنا', visits: 197, percentage: 16, color: 'orange', trend: '+5%' }
+                                { name: 'الصفحة الرئيسية', visits: 0, percentage: 0, color: 'blue', trend: '+0%' },
+                                { name: 'صفحة المنتجات', visits: 0, percentage: 0, color: 'green', trend: '+0%' },
+                                { name: 'صفحة العروض الخاصة', visits: 0, percentage: 0, color: 'purple', trend: '+0%' },
+                                { name: 'صفحة التواصل معنا', visits: 0, percentage: 0, color: 'orange', trend: '+0%' }
                               ].map((page, index) => (
                                 <div key={index} className="relative bg-white rounded-lg p-4 border hover:shadow-lg transition-all duration-300 cursor-pointer group">
                                   <div className="flex items-center justify-between">
@@ -6790,10 +6790,10 @@ useEffect(() => {
                             <div className="relative h-64 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4">
                               <div className="flex items-end justify-between h-full">
                                 {[
-                                  {week: 'الأسبوع 1', sales: 12500, growth: '+5%'},
-                                  {week: 'الأسبوع 2', sales: 15200, growth: '+22%'},
-                                  {week: 'الأسبوع 3', sales: 18900, growth: '+24%'},
-                                  {week: 'الأسبوع 4', sales: 22100, growth: '+17%'}
+                                  {week: 'الأسبوع 1', sales: 0, growth: '+0%'},
+                                  {week: 'الأسبوع 2', sales: 0, growth: '+0%'},
+                                  {week: 'الأسبوع 3', sales: 0, growth: '+0%'},
+                                  {week: 'الأسبوع 4', sales: 0, growth: '+0%'}
                                 ].map((week, i) => (
                                   <div key={i} className="flex flex-col items-center group">
                                     <div
@@ -6832,18 +6832,18 @@ useEffect(() => {
                             <div className="relative h-64 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4">
                               <div className="flex items-end justify-between h-full">
                                 {[
-                                  {month: 'يناير', sales: 45200, growth: '+12%'},
-                                  {month: 'فبراير', sales: 52100, growth: '+15%'},
-                                  {month: 'مارس', sales: 48900, growth: '-6%'},
-                                  {month: 'أبريل', sales: 61200, growth: '+25%'},
-                                  {month: 'مايو', sales: 58700, growth: '-4%'},
-                                  {month: 'يونيو', sales: 67800, growth: '+15%'},
-                                  {month: 'يوليو', sales: 72300, growth: '+7%'},
-                                  {month: 'أغسطس', sales: 69500, growth: '-4%'},
-                                  {month: 'سبتمبر', sales: 78400, growth: '+13%'},
-                                  {month: 'أكتوبر', sales: 82100, growth: '+5%'},
-                                  {month: 'نوفمبر', sales: 79800, growth: '-3%'},
-                                  {month: 'ديسمبر', sales: 89300, growth: '+12%'}
+                                  {month: 'يناير', sales: 0, growth: '+0%'},
+                                  {month: 'فبراير', sales: 0, growth: '+0%'},
+                                  {month: 'مارس', sales: 0, growth: '+0%'},
+                                  {month: 'أبريل', sales: 0, growth: '+0%'},
+                                  {month: 'مايو', sales: 0, growth: '+0%'},
+                                  {month: 'يونيو', sales: 0, growth: '+0%'},
+                                  {month: 'يوليو', sales: 0, growth: '+0%'},
+                                  {month: 'أغسطس', sales: 0, growth: '+0%'},
+                                  {month: 'سبتمبر', sales: 0, growth: '+0%'},
+                                  {month: 'أكتوبر', sales: 0, growth: '+0%'},
+                                  {month: 'نوفمبر', sales: 0, growth: '+0%'},
+                                  {month: 'ديسمبر', sales: 0, growth: '+0%'}
                                 ].map((month, i) => (
                                   <div key={i} className="flex flex-col items-center group">
                                     <div
@@ -6877,12 +6877,12 @@ useEffect(() => {
                             <div className="relative h-64 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-4">
                               <div className="flex items-end justify-between h-full">
                                 {[
-                                  {year: '2020', sales: 450000, growth: 'baseline'},
-                                  {year: '2021', sales: 567000, growth: '+26%'},
-                                  {year: '2022', sales: 678000, growth: '+20%'},
-                                  {year: '2023', sales: 789000, growth: '+16%'},
-                                  {year: '2024', sales: 892000, growth: '+13%'},
-                                  {year: '2025', sales: 956000, growth: '+7%'}
+                                  {year: '2020', sales: 0, growth: 'baseline'},
+                                  {year: '2021', sales: 0, growth: '+0%'},
+                                  {year: '2022', sales: 0, growth: '+0%'},
+                                  {year: '2023', sales: 0, growth: '+0%'},
+                                  {year: '2024', sales: 0, growth: '+0%'},
+                                  {year: '2025', sales: 0, growth: '+0%'}
                                 ].map((year, i) => (
                                   <div key={i} className="flex flex-col items-center group">
                                     <div
@@ -11135,14 +11135,7 @@ useEffect(() => {
                             </tr>
                           </thead>
                           <tbody>
-                            {[
-                              { name: 'محمد على جابر', type: 'مركبة آلية', products: '5', price: '50 د.ل', status: 'فاز بالمزايدة' },
-                              { name: 'علي عبدالله المقرحي', type: 'مركبة آلية', products: '5', price: '60 د.ل', status: 'خسر المزايدة' },
-                              { name: 'جميل حسن القماطي', type: 'مركبة آلية', products: '5', price: '55 د.ل', status: 'خسر المزايدة' },
-                              { name: 'أحمد فرج السيفاو', type: 'مركبة آلية', products: '5', price: '65 د.ل', status: 'خسر المزايدة' },
-                              { name: 'ساسي حمد الفالح', type: 'دراجة نارية', products: '5', price: '45 د.ل', status: 'فاز بالمزايدة' },
-                              { name: 'عبد الباسط سليمان الغول', type: 'دراجة نارية', products: '5', price: '50 د.ل', status: 'خسر المزايدة' }
-                            ].map((bid, index) => (
+                            {([] as any[]).map((bid, index) => (
                               <tr key={index} className="border-b hover:bg-gray-50">
                                 <td className="p-3 font-medium">{bid.name}</td>
                                 <td className="p-3">{bid.type}</td>
@@ -11437,7 +11430,7 @@ useEffect(() => {
                     <Card className="shadow-lg">
                       <CardContent className="p-6">
                         <div className="text-center">
-                          <p className="text-3xl font-bold text-blue-600 mb-1">23000 د.ل</p>
+                          <p className="text-3xl font-bold text-blue-600 mb-1">0 د.ل</p>
                           <p className="text-sm text-gray-600">الرصيد الحالي</p>
                         </div>
                       </CardContent>
@@ -11445,7 +11438,7 @@ useEffect(() => {
                     <Card className="shadow-lg">
                       <CardContent className="p-6">
                         <div className="text-center">
-                          <p className="text-3xl font-bold text-green-600 mb-1">12800 د.ل</p>
+                          <p className="text-3xl font-bold text-green-600 mb-1">0 د.ل</p>
                           <p className="text-sm text-gray-600">المستحقات قيد الإيداع</p>
                         </div>
                       </CardContent>
@@ -11453,9 +11446,9 @@ useEffect(() => {
                     <Card className="shadow-lg">
                       <CardContent className="p-6">
                         <div className="text-center">
-                          <p className="text-3xl font-bold text-purple-600 mb-1">7800 د.ل</p>
+                          <p className="text-3xl font-bold text-purple-600 mb-1">0 د.ل</p>
                           <p className="text-sm text-gray-600">آخر إيداع</p>
-                          <p className="text-xs text-gray-500">12/08/2025 10:15:20 صباحا</p>
+                          <p className="text-xs text-gray-500">-</p>
                         </div>
                       </CardContent>
                     </Card>

@@ -390,8 +390,8 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">إجمالي المبيعات</p>
-                <p className="text-3xl font-bold text-gray-900">45,231 د.ل</p>
-                <p className="text-sm text-green-600">+20.1% من الشهر الماضي</p>
+                <p className="text-3xl font-bold text-gray-900">0 د.ل</p>
+                <p className="text-sm text-green-600">+0% من الشهر الماضي</p>
               </div>
               <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -407,8 +407,8 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">الطلبات الجديدة</p>
-                <p className="text-3xl font-bold text-gray-900">12</p>
-                <p className="text-sm text-green-600">+2 من الأمس</p>
+                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-sm text-green-600">+0 من الأمس</p>
               </div>
               <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -424,7 +424,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">المنتجات</p>
-                <p className="text-3xl font-bold text-gray-900">156</p>
+                <p className="text-3xl font-bold text-gray-900">0</p>
                 <p className="text-sm text-blue-600">نشطة في المتجر</p>
               </div>
               <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -441,8 +441,8 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">العملاء</p>
-                <p className="text-3xl font-bold text-gray-900">1,234</p>
-                <p className="text-sm text-green-600">+12% نمو</p>
+                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-sm text-green-600">+0% نمو</p>
               </div>
               <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -472,26 +472,10 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
-                  <td className="p-3">#1234</td>
-                  <td className="p-3">أحمد محمد</td>
-                  <td className="p-3">150 د.ل</td>
-                  <td className="p-3"><Badge className="bg-green-100 text-green-800">مكتمل</Badge></td>
-                  <td className="p-3">2024-01-15</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-3">#1235</td>
-                  <td className="p-3">فاطمة علي</td>
-                  <td className="p-3">89 د.ل</td>
-                  <td className="p-3"><Badge className="bg-blue-100 text-blue-800">قيد المعالجة</Badge></td>
-                  <td className="p-3">2024-01-15</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-3">#1236</td>
-                  <td className="p-3">محمد حسن</td>
-                  <td className="p-3">245 د.ل</td>
-                  <td className="p-3"><Badge className="bg-yellow-100 text-yellow-800">في الانتظار</Badge></td>
-                  <td className="p-3">2024-01-14</td>
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-gray-500">
+                    لا توجد طلبات حالياً
+                  </td>
                 </tr>
               </tbody>
             </table>

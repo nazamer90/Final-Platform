@@ -430,22 +430,22 @@ const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
       return status === 'pending' || status === 'processing' || status === 'confirmed';
     }).length;
     const totalSpent = orders.reduce((sum, order) => sum + getOrderTotal(order), 0);
-    const monthlyGoal = customerInfo.monthlyGoal ?? 4500;
+    const monthlyGoal = customerInfo.monthlyGoal ?? 0;
     const monthlyProgress = monthlyGoal > 0 ? Math.min(100, Math.round((totalSpent / monthlyGoal) * 100)) : 0;
     const loyaltyPoints = customerInfo.loyaltyPoints ?? Math.round(totalSpent * 0.35) + favorites.length * 25;
-    const loyaltyGain = Math.max(50, Math.round((totalOrders || 1) * 45 + favorites.length * 8));
+    const loyaltyGain = Math.max(0, Math.round((totalOrders || 0) * 45 + favorites.length * 8));
     const membershipTier = resolveMembershipTier(customerInfo, totalSpent);
     const joinDate = customerInfo.joinDate ? parseOrderDate({ id: 'join', date: customerInfo.joinDate }) : new Date();
-    const monthsActive = Math.max(1, Math.round((Date.now() - joinDate.getTime()) / (30 * 24 * 60 * 60 * 1000)));
-    const activeDays = customerInfo.activityDays ?? monthsActive * 7;
-    const satisfaction = customerInfo.satisfactionRate ?? Math.min(100, 85 + favorites.length * 0.8);
-    const referralsCount = customerInfo.referralsCount ?? 8;
-    const referralsJoined = customerInfo.referralsJoined ?? 5;
+    const monthsActive = Math.max(0, Math.round((Date.now() - joinDate.getTime()) / (30 * 24 * 60 * 60 * 1000)));
+    const activeDays = customerInfo.activityDays ?? 0;
+    const satisfaction = customerInfo.satisfactionRate ?? 0;
+    const referralsCount = customerInfo.referralsCount ?? 0;
+    const referralsJoined = customerInfo.referralsJoined ?? 0;
     const loyaltyLevel = monthlyProgress >= 80 ? 'امتياز' : monthlyProgress >= 60 ? 'متألق' : 'في تقدم';
     const recentOrders = [...orders]
       .sort((a, b) => parseOrderDate(b).getTime() - parseOrderDate(a).getTime())
       .slice(0, 3);
-    const newFriends = Math.max(3, Math.round(referralsJoined * 0.6 + favorites.length * 0.4));
+    const newFriends = 0;
     return {
       totalOrders,
       deliveredOrders,

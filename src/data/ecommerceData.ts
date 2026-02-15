@@ -678,8 +678,8 @@ export const availableCoupons = [
 // statsData: Statistics data for the homepage display
 // بيانات الإحصائيات للصفحة الرئيسية
 export const statsData = [
-  { label: 'معدل الرضا', value: '98%' },
-  { label: 'عميل راضي', value: '+25K' },
-  { label: 'منتج متاح', value: '+5K' },
-  { label: 'متجر نشط', value: '6' }
+  { label: 'معدل الرضا', value: '0%' },
+  { label: 'عميل راضي', value: '0' },
+  { label: 'منتج متاح', value: '0' },
+  { label: 'متجر نشط', value: '0' }
 ];

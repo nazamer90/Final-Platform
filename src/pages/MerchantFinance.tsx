@@ -138,79 +138,33 @@ const MerchantFinance: React.FC = () => {
   ];
 
   const walletData: WalletData = {
-    totalBalance: 45750.50,
-    availableBalance: 42300.25,
-    pendingBalance: 3450.25,
-    transactions: [
-      {
-        id: '1',
-        type: 'credit',
-        amount: 1200,
-        description: 'دفعة من طلب #1234',
-        date: '2024-12-15',
-        status: 'completed',
-        method: 'تحويل بنكي'
-      },
-      {
-        id: '2',
-        type: 'debit',
-        amount: 45.50,
-        description: 'رسوم الشحن - أرامكس',
-        date: '2024-12-15',
-        status: 'completed',
-        method: 'محفظة'
-      },
-      {
-        id: '3',
-        type: 'credit',
-        amount: 850.25,
-        description: 'دفعة من طلب #1235',
-        date: '2024-12-14',
-        status: 'pending',
-        method: 'سداد'
-      },
-      {
-        id: '4',
-        type: 'debit',
-        amount: 142.50,
-        description: 'عمولة منصة إشرو',
-        date: '2024-12-14',
-        status: 'completed',
-        method: 'محفظة'
-      },
-      {
-        id: '5',
-        type: 'credit',
-        amount: 2150,
-        description: 'دفعة من طلب #1236',
-        date: '2024-12-13',
-        status: 'completed',
-        method: 'موبي كاش'
-      }
-    ],
+    totalBalance: 0,
+    availableBalance: 0,
+    pendingBalance: 0,
+    transactions: [],
     paymentMethods: [
       {
         name: 'سداد',
-        transactions: 142,
-        amount: 18500.50,
+        transactions: 0,
+        amount: 0,
         status: 'active'
       },
       {
         name: 'موبي كاش',
-        transactions: 89,
-        amount: 12750.25,
+        transactions: 0,
+        amount: 0,
         status: 'active'
       },
       {
         name: 'ادفعلي',
-        transactions: 67,
-        amount: 9890.75,
+        transactions: 0,
+        amount: 0,
         status: 'active'
       },
       {
         name: 'تحويل بنكي',
-        transactions: 201,
-        amount: 28650,
+        transactions: 0,
+        amount: 0,
         status: 'active'
       }
     ]
@@ -235,12 +189,12 @@ const MerchantFinance: React.FC = () => {
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <Calendar className="h-8 w-8 text-blue-500 mx-auto mb-2" />
               <p className="font-semibold">تاريخ الاشتراك</p>
-              <p className="text-lg">20/01/2024</p>
+              <p className="text-lg">-</p>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <Calendar className="h-8 w-8 text-green-500 mx-auto mb-2" />
               <p className="font-semibold">تاريخ الانتهاء</p>
-              <p className="text-lg">17/01/2025</p>
+              <p className="text-lg">-</p>
             </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
               <div className="flex items-center justify-center gap-1 mb-2">
@@ -255,7 +209,7 @@ const MerchantFinance: React.FC = () => {
           {/* Days Remaining */}
           <div className="text-center p-6 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg">
             <p className="text-sm text-muted-foreground mb-1">متبقي</p>
-            <p className="text-3xl font-bold text-orange-600">45 يوم</p>
+            <p className="text-3xl font-bold text-orange-600">-</p>
           </div>
 
           {/* Notifications */}
