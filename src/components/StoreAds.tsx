@@ -211,6 +211,7 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
             const mainSizeClass = getMainTextSizeClass(ad.mainTextSize);
             const subSizeClass = getSubTextSizeClass(ad.subTextSize);
             const fontClass = getFontClass(ad.textFont);
+            const adImageUrl = ad.imageUrl || (ad.templateId ? `/AdsForms/${ad.templateId}.jpg` : null);
             
             return (
             <div
@@ -218,9 +219,9 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
               className="relative w-full h-40 md:h-48 lg:h-56 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer group"
               onClick={() => handleAdClick(ad)}
             >
-              {ad.imageUrl ? (
+              {adImageUrl ? (
                 <img
-                  src={getProxyImageUrl(ad.imageUrl)}
+                  src={getProxyImageUrl(adImageUrl)}
                   alt={ad.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -233,13 +234,19 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
                 </div>
               )}
 
-              {ad.imageUrl && (
+              {adImageUrl && (
                 <>
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
-                  <div className={`absolute inset-0 flex flex-col ${positionClass} p-4`} style={{ color: ad.textColor || '#ffffff' }}>
-                    <h3 className={`${fontClass} ${mainSizeClass} mb-1 drop-shadow-lg w-full`} style={{ color: 'inherit' }}>{ad.title}</h3>
+                  <div 
+                    className={`absolute inset-0 flex flex-col ${positionClass} p-4`} 
+                    style={{ 
+                      color: ad.textColor || '#ffffff',
+                      fontFamily: ad.textFont?.split('-')[0] || 'Cairo' 
+                    }}
+                  >
+                    <h3 className={`${fontClass} ${mainSizeClass} mb-1 drop-shadow-lg`} style={{ color: 'inherit' }}>{ad.title}</h3>
                     {ad.description && (
-                      <p className={`${fontClass} ${subSizeClass} opacity-90 px-2 line-clamp-2 drop-shadow-lg w-full`} style={{ color: 'inherit' }}>{ad.description}</p>
+                      <p className={`${fontClass} ${subSizeClass} opacity-90 px-2 line-clamp-2 drop-shadow-lg`} style={{ color: 'inherit' }}>{ad.description}</p>
                     )}
                   </div>
                 </>
@@ -259,6 +266,7 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
             const subSizeClass = getSubTextSizeClass(ad.subTextSize);
             const fontClass = getFontClass(ad.textFont);
             const positionClass = getTextPositionClass(ad.textPosition);
+            const adImageUrl = ad.imageUrl || (ad.templateId ? `/AdsForms/${ad.templateId}.jpg` : null);
             
             return (
             <div
@@ -266,18 +274,24 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
               className="w-full bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer relative min-h-[120px] group"
               onClick={() => handleAdClick(ad)}
             >
-              {ad.imageUrl ? (
+              {adImageUrl ? (
                 <div className="relative w-full h-full min-h-[250px] md:min-h-[400px]">
                   <img
-                    src={getProxyImageUrl(ad.imageUrl)}
+                    src={getProxyImageUrl(adImageUrl)}
                     alt={ad.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
-                  <div className={`absolute inset-0 flex flex-col ${positionClass} p-6`} style={{ color: ad.textColor || '#ffffff' }}>
-                    <h4 className={`${fontClass} ${mainSizeClass} mb-2 drop-shadow-md w-full`} style={{ color: 'inherit' }}>{ad.title}</h4>
+                  <div 
+                    className={`absolute inset-0 flex flex-col ${positionClass} p-6`} 
+                    style={{ 
+                      color: ad.textColor || '#ffffff',
+                      fontFamily: ad.textFont?.split('-')[0] || 'Cairo' 
+                    }}
+                  >
+                    <h4 className={`${fontClass} ${mainSizeClass} mb-2 drop-shadow-md`} style={{ color: 'inherit' }}>{ad.title}</h4>
                     {ad.description && (
-                      <p className={`${fontClass} ${subSizeClass} opacity-90 line-clamp-3 drop-shadow-md w-full`} style={{ color: 'inherit' }}>{ad.description}</p>
+                      <p className={`${fontClass} ${subSizeClass} opacity-90 line-clamp-3 drop-shadow-md`} style={{ color: 'inherit' }}>{ad.description}</p>
                     )}
                   </div>
                 </div>
