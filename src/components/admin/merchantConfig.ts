@@ -308,7 +308,7 @@ const merchants: MerchantProfile[] = [
     color: "from-amber-600 to-yellow-500",
     icon: Sparkles,
     emblem: "👑",
-    logo: "/assets/stores/shekha.webp",
+    logo: "https://wbakbuqvdbmweujkbzxn.supabase.co/storage/v1/object/public/ishro-assets/stores/shekha/logo/logo.webp",
     stats: { orders: 0, satisfaction: 100, growth: "+0%" },
     disabled: []
   }

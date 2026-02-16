@@ -1,7 +1,7 @@
 export const shekhaStoreConfig = {
   storeId: 1764003949999,
-  icon: "🏪",
-  logo: "/assets/shekha/logo.png",
+  icon: "👑",
+  logo: "https://wbakbuqvdbmweujkbzxn.supabase.co/storage/v1/object/public/ishro-assets/stores/shekha/logo/logo.webp",
   color: "from-amber-400 to-orange-600",
   name: "shekha",
   nameAr: "متجر شيخة",

@@ -213,7 +213,7 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
                 type="button"
                 onClick={() => goToSlide(index)}
                 aria-label={`الانتقال إلى الشريحة ${index + 1}`}
-                aria-pressed="true"
+                aria-pressed={isActive}
                 className="transition-colors duration-300 rounded-full w-10 h-3 bg-gradient-to-r from-rose-400 to-pink-500"
               />
             ) : (
@@ -222,7 +222,7 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
                 type="button"
                 onClick={() => goToSlide(index)}
                 aria-label={`الانتقال إلى الشريحة ${index + 1}`}
-                aria-pressed="false"
+                aria-pressed={isActive}
                 className="transition-colors duration-300 rounded-full w-3 h-3 bg-white/60 hover:bg-white/80"
               />
             );
@@ -237,7 +237,7 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
             type="button"
             onClick={() => setIsAutoPlaying(false)}
             aria-label="إيقاف التشغيل التلقائي"
-            aria-pressed="true"
+            aria-pressed={isAutoPlaying}
             className="p-2 rounded-full backdrop-blur-sm border transition-colors duration-300 bg-green-500/90 border-green-300 text-white"
           >
             <div className="h-3 w-3 bg-white rounded-full animate-pulse" />
@@ -247,7 +247,7 @@ const PrettySlider: React.FC<PrettySliderProps> = ({
             type="button"
             onClick={() => setIsAutoPlaying(true)}
             aria-label="تشغيل السلايدر تلقائيًا"
-            aria-pressed="false"
+            aria-pressed={isAutoPlaying}
             className="p-2 rounded-full backdrop-blur-sm border transition-colors duration-300 bg-white/90 border-gray-300 text-gray-600"
           >
             <div className="h-3 w-3 bg-gray-400 rounded-full" />

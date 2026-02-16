@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, X, Check, AlertCircle, Image as ImageIcon, ArrowRight } from 'lucide-react';
 import { adTemplates, type AdTemplate, type PublishedAd } from '@/data/adTemplates';
 import { getApiUrl } from '@/utils/apiConfig';
+import { getTextPositionClass, getMainTextSizeClass, getSubTextSizeClass, getFontClass } from './StoreAds';
 
 interface AdsManagementViewProps {
   storeData: any;
@@ -731,57 +732,18 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
                     
                     {/* Overlay with dynamic text positioning and styling */}
                     <div 
-                      className={`absolute inset-0 p-6 flex flex-col ${
-                        (() => {
-                          switch (adDraft.textPosition) {
-                            case 'top-left': return 'items-end justify-start text-left';
-                            case 'top-center': return 'items-center justify-start text-center';
-                            case 'top-right': return 'items-start justify-start text-right';
-                            case 'center-left': return 'items-end justify-center text-left';
-                            case 'center': return 'items-center justify-center text-center';
-                            case 'center-right': return 'items-start justify-center text-right';
-                            case 'bottom-left': return 'items-end justify-end text-left';
-                            case 'bottom-center': return 'items-center justify-end text-center';
-                            case 'bottom-right': return 'items-start justify-end text-right';
-                            default: return 'items-center justify-center text-center';
-                          }
-                        })()
-                      }`}
+                      className={`absolute inset-0 p-6 flex flex-col ${getTextPositionClass(adDraft.textPosition)}`}
                       style={{ 
-                        color: adDraft.textColor || '#ffffff',
-                        fontFamily: adDraft.textFont?.split('-')[0] || 'Cairo'
+                        color: adDraft.textColor || '#ffffff'
                       }}
                     >
                       <h3 
-                        className="font-bold mb-2 drop-shadow-lg leading-tight transition-all duration-300"
-                        style={{ 
-                          fontSize: (() => {
-                            switch(adDraft.mainTextSize) {
-                              case 'sm': return '1rem';
-                              case 'base': return '1.25rem';
-                              case 'lg': return '1.75rem';
-                              case 'xl': return '2.25rem';
-                              case '2xl': return '3rem';
-                              default: return '1.75rem';
-                            }
-                          })(),
-                          fontWeight: adDraft.textFont?.includes('Bold') ? 'bold' : 'normal'
-                        }}
+                        className={`font-bold mb-2 drop-shadow-lg leading-tight transition-all duration-300 ${getFontClass(adDraft.textFont)} ${getMainTextSizeClass(adDraft.mainTextSize)}`}
                       >
                         {adDraft.title || 'عنوان الإعلان'}
                       </h3>
                       <p 
-                        className="opacity-90 drop-shadow-md line-clamp-3 transition-all duration-300"
-                        style={{ 
-                          fontSize: (() => {
-                            switch(adDraft.subTextSize) {
-                              case 'xs': return '0.75rem';
-                              case 'sm': return '0.875rem';
-                              case 'base': return '1.125rem';
-                              default: return '1.125rem';
-                            }
-                          })()
-                        }}
+                        className={`opacity-90 drop-shadow-md line-clamp-3 transition-all duration-300 ${getFontClass(adDraft.textFont)} ${getSubTextSizeClass(adDraft.subTextSize)}`}
                       >
                         {adDraft.description || 'وصف الإعلان سيظهر هنا بشكل رائع وجذاب'}
                       </p>

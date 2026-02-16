@@ -27,7 +27,7 @@ interface StoreAdsProps {
   className?: string;
 }
 
-const getTextPositionClass = (position?: string): string => {
+export const getTextPositionClass = (position?: string): string => {
   // In RTL: items-start is Right, items-end is Left
   switch (position) {
     case 'top-left':
@@ -53,7 +53,7 @@ const getTextPositionClass = (position?: string): string => {
   }
 };
 
-const getMainTextSizeClass = (size?: string): string => {
+export const getMainTextSizeClass = (size?: string): string => {
   switch (size) {
     case 'sm':
       return 'text-sm md:text-base';
@@ -70,7 +70,7 @@ const getMainTextSizeClass = (size?: string): string => {
   }
 };
 
-const getSubTextSizeClass = (size?: string): string => {
+export const getSubTextSizeClass = (size?: string): string => {
   switch (size) {
     case 'xs':
       return 'text-xs md:text-sm';
@@ -83,7 +83,7 @@ const getSubTextSizeClass = (size?: string): string => {
   }
 };
 
-const getFontClass = (font?: string): string => {
+export const getFontClass = (font?: string): string => {
   switch (font) {
     case 'Cairo-Light':
       return 'font-light';

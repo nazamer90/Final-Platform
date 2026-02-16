@@ -289,12 +289,27 @@ const baseStoresData = [
     },
     social: {},
     isActive: true
+  },
+  {
+    id: 1764003949999,
+    name: "متجر شيخة",
+    slug: "shekha",
+    description: "أرقى الموديلات الفاخرة والأزياء العصرية",
+    logo: "https://wbakbuqvdbmweujkbzxn.supabase.co/storage/v1/object/public/ishro-assets/stores/shekha/logo/logo.webp",
+    categories: ["أزياء وملابس"],
+    url: "/shekha",
+    endpoints: {
+      products: "",
+      discounts: ""
+    },
+    social: {},
+    isActive: true
   }
 ];
 
 let cachedStoresData: any[] | null = null;
 
-const ALLOWED_STORES = ['nawaem', 'sheirine', 'pretty', 'delta-store', 'magna-beauty', 'indeesh'];
+const ALLOWED_STORES = ['nawaem', 'sheirine', 'pretty', 'delta-store', 'magna-beauty', 'indeesh', 'shekha'];
 
 export function cleanupAnonymousStores() {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') {

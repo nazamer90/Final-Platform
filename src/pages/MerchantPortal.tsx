@@ -110,6 +110,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
         <h2 className="text-xl font-bold text-gray-800 mb-6">لوحة التحكم</h2>
         <nav className="space-y-2">
           <button
+            type="button"
             onClick={() => { setActiveSection('نظرة عامة'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'نظرة عامة' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -117,6 +118,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('الطلبات'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'الطلبات' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -124,6 +126,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('الطلبات اليدوية'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'الطلبات اليدوية' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -131,6 +134,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('الطلبات المتروكة'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'الطلبات المتروكة' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -138,6 +142,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('الطلبات الغير متوفرة'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'الطلبات الغير متوفرة' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -145,6 +150,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('الكتالوج'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'الكتالوج' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -152,6 +158,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('المنتجات'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'المنتجات' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -159,6 +166,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('التصنيفات'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'التصنيفات' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -166,6 +174,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('المخزون'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'المخزون' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -173,6 +182,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('إدارة تغيير المخزون'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'إدارة تغيير المخزون' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -181,6 +191,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
 
 
           <button
+            type="button"
             onClick={() => { setActiveSection('العملاء'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'العملاء' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -188,6 +199,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('مجموعة العملاء'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'مجموعة العملاء' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -195,6 +207,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('التقييمات'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'التقييمات' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -202,6 +215,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('الأسئلة'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'الأسئلة' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
@@ -209,6 +223,7 @@ const MerchantPortal: React.FC<MerchantPortalProps> = ({ storeData, setStoreData
           </button>
 
           <button
+            type="button"
             onClick={() => { setActiveSection('إشعارات بالمخزون'); setSidebarOpen(false); }}
             className={`w-full text-right p-3 rounded-lg transition-colors ${activeSection === 'إشعارات بالمخزون' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'}`}
           >
