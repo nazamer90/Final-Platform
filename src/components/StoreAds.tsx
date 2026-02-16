@@ -106,6 +106,23 @@ export const getFontClass = (font?: string): string => {
   }
 };
 
+export const normalizeAd = (ad: any): Ad => {
+  return {
+    ...ad,
+    templateId: ad.templateId || ad.template_id,
+    linkUrl: ad.linkUrl || ad.link_url,
+    imageUrl: ad.imageUrl || ad.image_url,
+    isActive: ad.isActive !== undefined ? ad.isActive : ad.is_active,
+    placement: ad.placement || ad.layout,
+    textPosition: ad.textPosition || ad.text_position,
+    textColor: ad.textColor || ad.text_color,
+    textFont: ad.textFont || ad.text_font,
+    mainTextSize: ad.mainTextSize || ad.main_text_size,
+    subTextSize: ad.subTextSize || ad.sub_text_size,
+    createdAt: ad.createdAt || ad.created_at,
+  };
+};
+
 const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
   const [ads, setAds] = useState<Ad[]>([]);
   const [bannerAds, setBannerAds] = useState<Ad[]>([]);
@@ -137,7 +154,8 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
         const result = await response.json();
         
         const adsData = Array.isArray(result.data) ? result.data : [];
-        const activeAds = adsData.filter((ad: Ad) => ad.isActive === true);
+        const normalizedAds = adsData.map(normalizeAd);
+        const activeAds = normalizedAds.filter((ad: Ad) => ad.isActive === true);
         
         const bannerAds = activeAds.filter(ad => ad.placement === 'banner' || ad.placement === 'floating' || !ad.placement);
         const betweenAds = activeAds.filter(ad => ad.placement === 'between_products' || ad.placement === 'grid');
@@ -157,7 +175,8 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
     if (savedAds) {
       try {
         const parsedAds = JSON.parse(savedAds);
-        const activeAds = parsedAds.filter((ad: Ad) => ad.isActive === true);
+        const normalizedAds = Array.isArray(parsedAds) ? parsedAds.map(normalizeAd) : [];
+        const activeAds = normalizedAds.filter((ad: Ad) => ad.isActive === true);
         setAds(activeAds);
         setBannerAds(activeAds.filter(ad => ad.placement === 'banner' || ad.placement === 'floating' || !ad.placement));
         setBetweenProductsAds(activeAds.filter(ad => ad.placement === 'between_products' || ad.placement === 'grid'));
@@ -217,10 +236,10 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
               {ad.imageUrl && (
                 <>
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
-                  <div className={`absolute inset-0 flex flex-col ${positionClass} p-4`} style={{ color: ad.textColor || '#ffffff', maxWidth: '100%' }}>
-                    <h3 className={`${fontClass} ${mainSizeClass} mb-1 drop-shadow-lg`}>{ad.title}</h3>
+                  <div className={`absolute inset-0 flex flex-col ${positionClass} p-4`} style={{ color: ad.textColor || '#ffffff' }}>
+                    <h3 className={`${fontClass} ${mainSizeClass} mb-1 drop-shadow-lg w-full`} style={{ color: 'inherit' }}>{ad.title}</h3>
                     {ad.description && (
-                      <p className={`${fontClass} ${subSizeClass} opacity-90 px-2 line-clamp-2 drop-shadow-lg`}>{ad.description}</p>
+                      <p className={`${fontClass} ${subSizeClass} opacity-90 px-2 line-clamp-2 drop-shadow-lg w-full`} style={{ color: 'inherit' }}>{ad.description}</p>
                     )}
                   </div>
                 </>
@@ -255,10 +274,10 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
-                  <div className={`absolute inset-0 flex flex-col ${positionClass} p-6 w-full`} style={{ color: ad.textColor || '#ffffff' }}>
-                    <h4 className={`${fontClass} ${mainSizeClass} mb-2 drop-shadow-md`}>{ad.title}</h4>
+                  <div className={`absolute inset-0 flex flex-col ${positionClass} p-6`} style={{ color: ad.textColor || '#ffffff' }}>
+                    <h4 className={`${fontClass} ${mainSizeClass} mb-2 drop-shadow-md w-full`} style={{ color: 'inherit' }}>{ad.title}</h4>
                     {ad.description && (
-                      <p className={`${fontClass} ${subSizeClass} opacity-90 line-clamp-3 drop-shadow-md`}>{ad.description}</p>
+                      <p className={`${fontClass} ${subSizeClass} opacity-90 line-clamp-3 drop-shadow-md w-full`} style={{ color: 'inherit' }}>{ad.description}</p>
                     )}
                   </div>
                 </div>

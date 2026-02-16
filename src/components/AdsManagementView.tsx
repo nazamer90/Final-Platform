@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, X, Check, AlertCircle, Image as ImageIcon, ArrowRight } from 'lucide-react';
 import { adTemplates, type AdTemplate, type PublishedAd } from '@/data/adTemplates';
 import { getApiUrl } from '@/utils/apiConfig';
-import { getTextPositionClass, getMainTextSizeClass, getSubTextSizeClass, getFontClass } from './StoreAds';
+import { getTextPositionClass, getMainTextSizeClass, getSubTextSizeClass, getFontClass, normalizeAd } from './StoreAds';
 
 interface AdsManagementViewProps {
   storeData: any;
@@ -101,8 +101,10 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
       
       if (response.ok) {
         const result = await response.json();
-        setPublishedAds(result.data);
-        localStorage.setItem(`eshro_store_ads_${storeId}`, JSON.stringify(result.data));
+        const adsData = Array.isArray(result.data) ? result.data : [];
+        const normalizedAds = adsData.map(normalizeAd) as AdWithPlacement[];
+        setPublishedAds(normalizedAds);
+        localStorage.setItem(`eshro_store_ads_${storeId}`, JSON.stringify(normalizedAds));
         return;
       }
     } catch (error) {
@@ -113,7 +115,9 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
     const savedAds = localStorage.getItem(storageKey);
     if (savedAds) {
       try {
-        setPublishedAds(JSON.parse(savedAds));
+        const parsedAds = JSON.parse(savedAds);
+        const normalizedAds = Array.isArray(parsedAds) ? parsedAds.map(normalizeAd) : [];
+        setPublishedAds(normalizedAds as AdWithPlacement[]);
       } catch {}
     }
   };
@@ -206,9 +210,10 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
 
       if (response.ok) {
         const result = await response.json();
+        const normalizedData = normalizeAd(result.data);
         const newAd: AdWithPlacement = {
-          ...result.data,
-          layout: 'between_products',
+          ...(normalizedData as any),
+          layout: normalizedData.placement as any || 'between_products',
         };
 
         let updatedAds;
