@@ -74,6 +74,7 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
   onSave
 }) => {
   const [step, setStep] = useState<'list' | 'step1' | 'step2' | 'step3'>('list');
+  const [editingAdId, setEditingAdId] = useState<string | null>(null);
   const [adDraft, setAdDraft] = useState<AdDraft>({
     templateId: '',
     title: '',
@@ -147,23 +148,23 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
       subTextSize: 'base',
     });
     setSelectedDisplayMode('');
+    setEditingAdId(null);
   };
 
-  const handleStep1Continue = () => {
-    if (!adDraft.title.trim()) {
-      showNotification('يرجى إدخال عنوان الإعلان', 'error');
-      return;
-    }
-    if (!adDraft.description.trim()) {
-      showNotification('يرجى إدخال نص الإعلان', 'error');
-      return;
-    }
-    setStep('step2');
-  };
-
-  const handleTemplateSelect = (templateId: string) => {
-    setAdDraft({ ...adDraft, templateId });
-    setStep('step3');
+  const handleEditAd = (ad: AdWithPlacement) => {
+    setAdDraft({
+      templateId: ad.templateId,
+      title: ad.title,
+      description: ad.description,
+      textPosition: ad.textPosition as any || 'center',
+      textColor: ad.textColor || '#ffffff',
+      textFont: ad.textFont as any || 'Cairo-SemiBold',
+      mainTextSize: ad.mainTextSize as any || 'lg',
+      subTextSize: ad.subTextSize as any || 'base',
+    });
+    setSelectedDisplayMode(ad.placement || '');
+    setEditingAdId(ad.id);
+    setStep('step1');
   };
 
   const handlePublishAd = async () => {
@@ -181,8 +182,13 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
 
     try {
       const apiUrl = getApiUrl();
-      const response = await fetch(`${apiUrl}/ads/store/${storeId}`, {
-        method: 'POST',
+      const method = editingAdId ? 'PUT' : 'POST';
+      const url = editingAdId 
+        ? `${apiUrl}/ads/store/${storeId}/${editingAdId}`
+        : `${apiUrl}/ads/store/${storeId}`;
+
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           templateId: adDraft.templateId,
@@ -204,7 +210,13 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
           layout: 'between_products',
         };
 
-        const updatedAds = [...publishedAds, newAd];
+        let updatedAds;
+        if (editingAdId) {
+          updatedAds = publishedAds.map(ad => ad.id === editingAdId ? newAd : ad);
+        } else {
+          updatedAds = [...publishedAds, newAd];
+        }
+        
         setPublishedAds(updatedAds);
         const finalStoreId = storeData?.slug || storeData?.storeSlug || storeData?.id;
         localStorage.setItem(`eshro_store_ads_${finalStoreId}`, JSON.stringify(updatedAds));
@@ -213,18 +225,18 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
           detail: { storeId, ads: updatedAds }
         }));
         
-        showNotification('تم نشر الإعلان بنجاح!', 'success');
+        showNotification(editingAdId ? 'تم تحديث الإعلان بنجاح!' : 'تم نشر الإعلان بنجاح!', 'success');
         setStep('list');
         resetForm();
         onSave();
       } else {
         const errorData = await response.json().catch(() => ({}));
-        const errorMsg = errorData.error || errorData.message || response.statusText || 'فشل النشر بدون تفاصيل';
-        showNotification(`فشل النشر: ${errorMsg}`, 'error');
+        const errorMsg = errorData.error || errorData.message || response.statusText || 'فشل العملية بدون تفاصيل';
+        showNotification(`فشل العملية: ${errorMsg}`, 'error');
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
-      showNotification(`حدث خطأ في النشر: ${errorMessage}`, 'error');
+      showNotification(`حدث خطأ في العملية: ${errorMessage}`, 'error');
     }
   };
 
@@ -341,14 +353,24 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
                       <span>🔗 {ad.clicks} نقرة</span>
                     </div>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full text-red-600 hover:text-red-700"
-                    onClick={() => handleDeleteAd(ad.id)}
-                  >
-                    حذف الإعلان
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                      onClick={() => handleEditAd(ad)}
+                    >
+                      تعديل الإعلان
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => handleDeleteAd(ad.id)}
+                    >
+                      حذف
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             );
@@ -368,8 +390,8 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
               <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full font-semibold">1</span>
               <span className="text-gray-600">اختيار النص</span>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">الخطوة 1: أدخل عنوان ونص الإعلان</h2>
-            <p className="text-gray-600 mt-1">سيتم اختيار القالب في الخطوة التالية</p>
+            <h2 className="text-2xl font-bold text-gray-900">{editingAdId ? 'تعديل الإعلان: العنوان والنص' : 'الخطوة 1: أدخل عنوان ونص الإعلان'}</h2>
+            <p className="text-gray-600 mt-1">{editingAdId ? 'قم بتحديث بيانات إعلانك' : 'سيتم اختيار القالب في الخطوة التالية'}</p>
           </div>
           <Button variant="outline" onClick={() => setStep('list')}>
             <X className="h-4 w-4 ml-2" />
@@ -533,8 +555,8 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
               <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full font-semibold">2</span>
               <span className="text-gray-600">اختيار القالب</span>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">الخطوة 2: اختر قالب احترافي</h2>
-            <p className="text-gray-600 mt-1">اختر من 11 قالب احترافي - يتم الانتقال للخطوة التالية فوراً</p>
+            <h2 className="text-2xl font-bold text-gray-900">{editingAdId ? 'تعديل الإعلان: اختر قالب جديد' : 'الخطوة 2: اختر قالب احترافي'}</h2>
+            <p className="text-gray-600 mt-1">{editingAdId ? 'يمكنك تغيير القالب الحالي' : 'اختر من 11 قالب احترافي - يتم الانتقال للخطوة التالية فوراً'}</p>
           </div>
           <Button variant="outline" onClick={() => setStep('list')}>
             <X className="h-4 w-4 ml-2" />
@@ -605,8 +627,8 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
               <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full font-semibold">3</span>
               <span className="text-gray-600">طريقة العرض والنشر</span>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">الخطوة 3: اختر طريقة العرض</h2>
-            <p className="text-gray-600 mt-1">اختر من أين سيظهر الإعلان في متجرك</p>
+            <h2 className="text-2xl font-bold text-gray-900">{editingAdId ? 'تعديل الإعلان: طريقة العرض والتنسيق' : 'الخطوة 3: اختر طريقة العرض'}</h2>
+            <p className="text-gray-600 mt-1">{editingAdId ? 'قم بتحديث مكان ظهور الإعلان وتنسيقه' : 'اختر من أين سيظهر الإعلان في متجرك'}</p>
           </div>
           <Button variant="outline" onClick={() => setStep('list')}>
             <X className="h-4 w-4 ml-2" />
@@ -830,7 +852,7 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
             className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 disabled:opacity-50"
           >
             <Check className="h-4 w-4 ml-2" />
-            نشر الإعلان
+            {editingAdId ? 'حفظ التغييرات' : 'نشر الإعلان'}
           </Button>
           <Button
             variant="outline"
