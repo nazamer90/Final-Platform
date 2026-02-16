@@ -72,6 +72,7 @@ class AuthService {
           throw new Error(lastError);
         }
       } catch (error: any) {
+        // eslint-disable-next-line no-console
         console.warn(`Login attempt ${attempt} failed:`, error.message);
         lastError = error.message;
 

@@ -18,7 +18,7 @@ interface UserLoyaltyAccountAttributes {
   updatedAt: Date;
 }
 
-interface UserLoyaltyAccountCreationAttributes extends Optional<UserLoyaltyAccountAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+type UserLoyaltyAccountCreationAttributes = Optional<UserLoyaltyAccountAttributes, 'id' | 'createdAt' | 'updatedAt'>;
 
 class UserLoyaltyAccount extends Model<UserLoyaltyAccountAttributes, UserLoyaltyAccountCreationAttributes> implements UserLoyaltyAccountAttributes {
   public id!: number;

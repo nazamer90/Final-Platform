@@ -153,9 +153,9 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
 
   const handleEditAd = (ad: AdWithPlacement) => {
     setAdDraft({
-      templateId: ad.templateId,
-      title: ad.title,
-      description: ad.description,
+      templateId: ad.templateId || '',
+      title: ad.title || '',
+      description: ad.description || '',
       textPosition: ad.textPosition as any || 'center',
       textColor: ad.textColor || '#ffffff',
       textFont: ad.textFont as any || 'Cairo-SemiBold',
@@ -277,6 +277,19 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
       const errorMessage = error instanceof Error ? error.message : 'خطأ غير معروف';
       showNotification(`حدث خطأ أثناء الحذف: ${errorMessage}`, 'error');
     }
+  };
+
+  const handleStep1Continue = () => {
+    if (!adDraft.title || !adDraft.description) {
+      showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
+      return;
+    }
+    setStep('step2');
+  };
+
+  const handleTemplateSelect = (templateId: string) => {
+    setAdDraft({ ...adDraft, templateId });
+    setStep('step3');
   };
 
   if (step === 'list') {

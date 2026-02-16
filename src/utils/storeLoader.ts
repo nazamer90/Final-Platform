@@ -328,6 +328,7 @@ export async function getAllStoreProducts(): Promise<Product[]> {
         }
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error loading dynamic products for global search:', error);
     }
   }

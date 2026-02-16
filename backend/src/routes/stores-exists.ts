@@ -15,6 +15,7 @@ router.post('/stores-exists', async (req, res) => {
     const store = await findStoreBySlug(storeSlug);
     res.json({ success: true, exists: !!store, storeId: store?.id ?? null });
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error('check-exists error', err);
     res.status(500).json({ success: false, error: 'internal_error' });
   }

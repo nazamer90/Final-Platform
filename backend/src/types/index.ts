@@ -52,10 +52,12 @@ export type AuthRequest = Request & {
 };
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: JWTPayload;
     }
+    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Multer {
       interface File {
         fieldname: string;

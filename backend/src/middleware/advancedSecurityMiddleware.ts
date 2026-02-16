@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import crypto from 'crypto';
 import logger from '@utils/logger';
 
 export interface SecurityMetrics {
@@ -194,7 +195,6 @@ class AdvancedSecurityMiddleware {
         return res.status(401).json({ error: 'Request expired' });
       }
 
-      const crypto = require('crypto');
       const body = JSON.stringify(req.body || '');
       const expectedSignature = crypto
         .createHmac('sha256', secret)

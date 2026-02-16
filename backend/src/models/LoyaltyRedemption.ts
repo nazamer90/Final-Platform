@@ -19,7 +19,7 @@ interface LoyaltyRedemptionAttributes {
   updatedAt: Date;
 }
 
-interface LoyaltyRedemptionCreationAttributes extends Optional<LoyaltyRedemptionAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+type LoyaltyRedemptionCreationAttributes = Optional<LoyaltyRedemptionAttributes, 'id' | 'createdAt' | 'updatedAt'>;
 
 class LoyaltyRedemption extends Model<LoyaltyRedemptionAttributes, LoyaltyRedemptionCreationAttributes> implements LoyaltyRedemptionAttributes {
   public id!: number;

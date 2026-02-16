@@ -130,7 +130,7 @@ const SharedWishlists: React.FC<SharedWishlistsProps> = ({ onAddToCart }) => {
       ? product.images[0]
       : (product.image || '/assets/default-product.png');
     
-    // @ts-ignore
+    // @ts-expect-error: storeSlug is potentially undefined but required for getProxyImageUrl
     return getProxyImageUrl(rawPath, product.storeSlug as any, 'products');
   };
 

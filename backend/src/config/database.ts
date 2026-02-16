@@ -28,6 +28,7 @@ if (DB_DIALECT === 'postgres') {
     logger.info('🔌 Connecting to Postgres via DATABASE_URL');
     sequelize = new Sequelize(databaseUrl, {
       dialect: 'postgres',
+      // eslint-disable-next-line no-console
       logging: process.env.DB_LOGGING === 'true' ? console.log : false,
       define: {
         timestamps: true,
@@ -52,6 +53,7 @@ if (DB_DIALECT === 'postgres') {
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432', 10),
       dialect: 'postgres',
+      // eslint-disable-next-line no-console
       logging: process.env.DB_LOGGING === 'true' ? console.log : false,
       define: {
         timestamps: true,
@@ -91,6 +93,7 @@ if (DB_DIALECT === 'postgres') {
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '3306', 10),
       dialect: 'mysql',
+      // eslint-disable-next-line no-console
       logging: process.env.DB_LOGGING === 'true' ? console.log : false,
       define: {
         timestamps: true,

@@ -153,6 +153,7 @@ const renderElementToCanvas = async (el: HTMLElement) => {
         root.style.backgroundColor = '#ffffff';
         doc.body.style.backgroundColor = '#ffffff';
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('PDF generation clone fix failed:', e);
       }
     }

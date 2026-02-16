@@ -111,6 +111,7 @@ const MerchantSliderManagement: React.FC<MerchantSliderManagementProps> = ({
           }
         }
       } catch (apiError) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching sliders from API:', apiError);
       }
       
@@ -126,6 +127,7 @@ const MerchantSliderManagement: React.FC<MerchantSliderManagementProps> = ({
       setSyncStatus('connected');
 
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error loading sliders:', error);
       setSyncStatus('disconnected');
       showNotification('فشل في تحميل السلايدرز', 'error');
@@ -194,6 +196,7 @@ const MerchantSliderManagement: React.FC<MerchantSliderManagementProps> = ({
             detail: { storeSlug, sliders: updatedSliders }
           }));
         } catch (apiError) {
+          // eslint-disable-next-line no-console
           console.error('Error syncing sliders to backend:', apiError);
         }
         
@@ -287,6 +290,7 @@ const MerchantSliderManagement: React.FC<MerchantSliderManagementProps> = ({
         showNotification('فشل تحميل الصورة على الخادم. الرجاء المحاولة مرة أخرى.', 'error');
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error uploading image:', error);
       showNotification('حدث خطأ في تحميل الصورة', 'error');
     } finally {

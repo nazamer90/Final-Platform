@@ -13,6 +13,7 @@ const HelpCenterPage = () => {
       await downloadMerchantPDF('دليل-التاجر-الشامل.pdf');
       toast.success('تم تحميل الدليل بنجاح!');
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error:', error);
       toast.error('حدث خطأ في تحميل الدليل');
     } finally {

@@ -108,6 +108,7 @@ const StoreFrontSlider: React.FC<StoreFrontSliderProps> = ({
           setSliders(rendered);
         }
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Error parsing sliders from localStorage:', e);
       }
     }

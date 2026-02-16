@@ -16,7 +16,7 @@ interface LoyaltyTransactionAttributes {
   updatedAt: Date;
 }
 
-interface LoyaltyTransactionCreationAttributes extends Optional<LoyaltyTransactionAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+type LoyaltyTransactionCreationAttributes = Optional<LoyaltyTransactionAttributes, 'id' | 'createdAt' | 'updatedAt'>;
 
 class LoyaltyTransaction extends Model<LoyaltyTransactionAttributes, LoyaltyTransactionCreationAttributes> implements LoyaltyTransactionAttributes {
   public id!: number;

@@ -43,6 +43,7 @@ const setAuthTokens = (token: string, refreshToken?: string) => {
       localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
     }
   } catch {
+    // eslint-disable-next-line no-console
     console.warn('Failed to store auth tokens');
   }
 };
@@ -52,6 +53,7 @@ const clearAuthTokens = () => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
   } catch {
+    // eslint-disable-next-line no-console
     console.warn('Failed to clear auth tokens');
   }
 };

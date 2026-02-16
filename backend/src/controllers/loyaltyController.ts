@@ -76,6 +76,7 @@ export const useRedemption = async (req: Request, res: Response) => {
   try {
     const { redemptionId, orderId } = req.body;
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const redemption = await LoyaltyService.useRedemption(parseInt(redemptionId), parseInt(orderId));
 
     res.json({

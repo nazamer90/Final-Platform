@@ -4597,7 +4597,7 @@ useEffect(() => {
                             <CardContent className="p-4 space-y-3">
                               <div className="relative h-44 rounded-xl overflow-hidden bg-gray-100">
                                 <img
-                                  // @ts-ignore
+                                  // @ts-expect-error: merchantStoreSlug type mismatch but works at runtime
                                   src={getProxyImageUrl(primaryImage, (merchantStoreSlug || undefined) as any, 'products')}
                                   alt={product.name}
                                   className="w-full h-full object-cover"
@@ -4700,7 +4700,7 @@ useEffect(() => {
                           <CardContent className="p-4 space-y-3">
                             <div className="relative h-40 rounded-xl overflow-hidden bg-gray-100">
                               <img
-                                // @ts-ignore
+                                // @ts-expect-error: Complex dynamic image source mapping
                                 src={getProxyImageUrl((() => {
                                   if (category.image) return category.image;
                                   const imageKey = `category_image_${merchantStoreSlug}_${category.id}`;

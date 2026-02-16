@@ -97,7 +97,7 @@ export class MarketingCampaignService {
         whereClause = { lastLoginAt: { [Op.lt]: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) } };
         break;
 
-      case 'vip':
+      case 'vip': {
         const vipUsers = await User.findAll({
           include: [{
             model: Order,
@@ -116,11 +116,13 @@ export class MarketingCampaignService {
           raw: true,
         });
         return vipUsers as any[];
+      }
 
-      case 'new':
+      case 'new': {
         const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
         whereClause = { createdAt: { [Op.gt]: thirtyDaysAgo } };
         break;
+      }
 
       case 'custom':
         if (config.targetFilters) {
