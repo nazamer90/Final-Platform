@@ -11,7 +11,9 @@ export function sanitizeFilename(originalFilename: string): {
 
     const cleaned = basename
       .replace(/\.\./g, '')
+      // eslint-disable-next-line no-control-regex
       .replace(/\x00/g, '')
+      // eslint-disable-next-line no-control-regex
       .replace(/[<>:"|?*\x00-\x1f]/g, '-')
       .replace(/\s+/g, '-')
       .toLowerCase();

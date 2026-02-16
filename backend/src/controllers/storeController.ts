@@ -162,7 +162,7 @@ export const createStoreWithImages = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    let files = req.files as Record<string, Express.Multer.File[]>;
+    const files = req.files as Record<string, Express.Multer.File[]>;
     
     const {
       storeId,

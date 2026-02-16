@@ -489,7 +489,7 @@ const DynamicStoreSlider: React.FC<DynamicStoreSliderProps> = ({
               type="button"
               onClick={() => goToSlide(index)}
               aria-label={`الانتقال إلى الشريحة ${index + 1}`}
-              aria-pressed={index === activeSlide ? 'true' : 'false'}
+              aria-pressed={index === activeSlide}
               className={`transition-colors duration-300 rounded-full ${
                 index === activeSlide
                   ? `w-10 h-3 bg-gradient-to-r ${storeColors.gradient}`
@@ -506,7 +506,7 @@ const DynamicStoreSlider: React.FC<DynamicStoreSliderProps> = ({
           type="button"
           onClick={() => setIsAutoPlaying(!isAutoPlaying)}
           aria-label={isAutoPlaying ? 'إيقاف التشغيل التلقائي' : 'تشغيل السلايدر تلقائياً'}
-          aria-pressed={isAutoPlaying ? 'true' : 'false'}
+          aria-pressed={isAutoPlaying}
           className={`p-2 rounded-full backdrop-blur-sm border transition-colors duration-300 ${
             isAutoPlaying
               ? 'bg-green-500/90 border-green-300 text-white'

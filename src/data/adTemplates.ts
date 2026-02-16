@@ -223,4 +223,9 @@ export interface PublishedAd {
   createdAt: string;
   views: number;
   clicks: number;
+  textPosition?: string;
+  textColor?: string;
+  textFont?: string;
+  mainTextSize?: string;
+  subTextSize?: string;
 }

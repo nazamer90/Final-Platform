@@ -1,5 +1,7 @@
 // This file bridges the shared data with the new modular structure.
 export type { Product } from '../../storeProducts';
+import { allStoreProducts } from '../../allStoreProducts';
+
 export { 
   allStoreProducts, 
   getStoreProducts as getProductsByStore,
@@ -9,6 +11,5 @@ export {
 
 // Helper for backward compatibility
 export const getProductsByTag = (tag: string) => {
-  const { allStoreProducts } = require('../../allStoreProducts');
-  return allStoreProducts.filter((p: any) => p.tags.includes(tag));
+  return allStoreProducts.filter((p: any) => p.tags?.includes(tag));
 };

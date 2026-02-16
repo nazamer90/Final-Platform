@@ -28,57 +28,58 @@ interface StoreAdsProps {
 }
 
 const getTextPositionClass = (position?: string): string => {
+  // In RTL: items-start is Right, items-end is Left
   switch (position) {
     case 'top-left':
-      return 'top-0 left-0 text-right pt-2 pr-4';
+      return 'items-end justify-start text-left';
     case 'top-center':
-      return 'top-0 left-1/2 -translate-x-1/2 text-center pt-2 px-4';
+      return 'items-center justify-start text-center';
     case 'top-right':
-      return 'top-0 right-0 text-left pt-2 pl-4';
+      return 'items-start justify-start text-right';
     case 'center-left':
-      return 'top-1/2 -translate-y-1/2 left-0 text-right px-2 pr-4';
+      return 'items-end justify-center text-left';
     case 'center':
-      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center px-4';
+      return 'items-center justify-center text-center';
     case 'center-right':
-      return 'top-1/2 -translate-y-1/2 right-0 text-left px-2 pl-4';
+      return 'items-start justify-center text-right';
     case 'bottom-left':
-      return 'bottom-0 left-0 text-right pb-2 pr-4';
+      return 'items-end justify-end text-left';
     case 'bottom-center':
-      return 'bottom-0 left-1/2 -translate-x-1/2 text-center pb-2 px-4';
+      return 'items-center justify-end text-center';
     case 'bottom-right':
-      return 'bottom-0 right-0 text-left pb-2 pl-4';
+      return 'items-start justify-end text-right';
     default:
-      return 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center px-4';
+      return 'items-center justify-center text-center';
   }
 };
 
 const getMainTextSizeClass = (size?: string): string => {
   switch (size) {
     case 'sm':
-      return 'text-sm';
+      return 'text-sm md:text-base';
     case 'base':
-      return 'text-base';
+      return 'text-base md:text-lg';
     case 'lg':
-      return 'text-lg';
+      return 'text-lg md:text-3xl';
     case 'xl':
-      return 'text-xl';
+      return 'text-xl md:text-5xl';
     case '2xl':
-      return 'text-2xl';
+      return 'text-2xl md:text-7xl';
     default:
-      return 'text-lg';
+      return 'text-lg md:text-2xl';
   }
 };
 
 const getSubTextSizeClass = (size?: string): string => {
   switch (size) {
     case 'xs':
-      return 'text-xs';
+      return 'text-xs md:text-sm';
     case 'sm':
-      return 'text-sm';
+      return 'text-sm md:text-base';
     case 'base':
-      return 'text-base';
+      return 'text-base md:text-2xl';
     default:
-      return 'text-base';
+      return 'text-base md:text-lg';
   }
 };
 
@@ -215,11 +216,11 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
 
               {ad.imageUrl && (
                 <>
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-all" />
-                  <div className={`absolute ${positionClass} p-4`} style={{ color: textColor, maxWidth: '90%' }}>
-                    <h3 className={`${fontClass} ${mainSizeClass} md:text-xl mb-1 drop-shadow-lg`}>{ad.title}</h3>
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
+                  <div className={`absolute inset-0 flex flex-col ${positionClass} p-4`} style={{ color: ad.textColor || '#ffffff', maxWidth: '100%' }}>
+                    <h3 className={`${fontClass} ${mainSizeClass} mb-1 drop-shadow-lg`}>{ad.title}</h3>
                     {ad.description && (
-                      <p className={`${fontClass} ${subSizeClass} md:text-base opacity-90 px-2 line-clamp-2 drop-shadow-lg`}>{ad.description}</p>
+                      <p className={`${fontClass} ${subSizeClass} opacity-90 px-2 line-clamp-2 drop-shadow-lg`}>{ad.description}</p>
                     )}
                   </div>
                 </>
@@ -243,35 +244,38 @@ const StoreAds: React.FC<StoreAdsProps> = ({ storeId, className = '' }) => {
             return (
             <div
               key={adKey}
-              className="w-full bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer relative min-h-[120px]"
+              className="w-full bg-gradient-to-r from-gray-50 to-slate-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer relative min-h-[120px] group"
               onClick={() => handleAdClick(ad)}
             >
               {ad.imageUrl ? (
-                <div className="relative w-full h-full min-h-[200px] md:min-h-[250px]">
+                <div className="relative w-full h-full min-h-[250px] md:min-h-[400px]">
                   <img
                     src={getProxyImageUrl(ad.imageUrl)}
                     alt={ad.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all" />
-                  <div className={`absolute ${positionClass} p-6 w-full`} style={{ color: ad.textColor || '#ffffff' }}>
-                    <h4 className={`${fontClass} ${mainSizeClass} md:text-2xl mb-2 drop-shadow-md`}>{ad.title}</h4>
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
+                  <div className={`absolute inset-0 flex flex-col ${positionClass} p-6 w-full`} style={{ color: ad.textColor || '#ffffff' }}>
+                    <h4 className={`${fontClass} ${mainSizeClass} mb-2 drop-shadow-md`}>{ad.title}</h4>
                     {ad.description && (
-                      <p className={`${fontClass} ${subSizeClass} md:text-lg opacity-90 line-clamp-3 drop-shadow-md`}>{ad.description}</p>
+                      <p className={`${fontClass} ${subSizeClass} opacity-90 line-clamp-3 drop-shadow-md`}>{ad.description}</p>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col md:flex-row items-center p-4 md:p-6 gap-4">
-                  <div className="flex-1 text-center md:text-right" style={{ color: textColor }}>
-                    <h4 className={`${fontClass} ${mainSizeClass} md:text-base mb-1`}>{ad.title}</h4>
+                <div className="flex flex-col md:flex-row items-center p-6 md:p-10 gap-6 min-h-[200px]">
+                  <div className="flex-1 text-center md:text-right" style={{ color: ad.textColor || '#000000' }}>
+                    <h4 className={`${fontClass} ${mainSizeClass} mb-3`}>{ad.title}</h4>
                     {ad.description && (
-                      <p className={`${fontClass} ${subSizeClass} md:text-sm line-clamp-2`} style={{ color: textColor, opacity: 0.8 }}>{ad.description}</p>
+                      <p className={`${fontClass} ${subSizeClass} line-clamp-2 opacity-80`}>{ad.description}</p>
                     )}
                   </div>
                   <div className="flex-shrink-0">
-                    <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg text-sm font-medium hover:from-blue-600 hover:to-indigo-600 transition">
-                      عرض
+                    <button 
+                      className="px-8 py-3 bg-white border-2 rounded-xl text-lg font-bold hover:bg-gray-50 transition-all shadow-sm"
+                      style={{ color: ad.textColor || '#000000', borderColor: ad.textColor || '#000000' }}
+                    >
+                      اكتشف المزيد
                     </button>
                   </div>
                 </div>

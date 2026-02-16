@@ -717,25 +717,81 @@ const AdsManagementView: React.FC<AdsManagementViewProps> = ({
                 <CardTitle>معاينة الإعلان</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg p-6 flex flex-col items-center justify-center min-h-96">
-                  <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg">
-                    <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center mb-4">
-                      <img
-                        src={`/AdsForms/${adDraft.templateId}.jpg`}
-                        alt={adDraft.templateId}
-                        className="w-full h-full object-cover rounded-lg"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg p-4 flex flex-col items-center justify-center min-h-[400px]">
+                  {/* Container for the ad template and overlay */}
+                  <div className="relative w-full aspect-video bg-white rounded-xl shadow-2xl overflow-hidden group">
+                    <img
+                      src={`/AdsForms/${adDraft.templateId}.jpg`}
+                      alt={adDraft.templateId}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    
+                    {/* Overlay with dynamic text positioning and styling */}
+                    <div 
+                      className={`absolute inset-0 p-6 flex flex-col ${
+                        (() => {
+                          switch (adDraft.textPosition) {
+                            case 'top-left': return 'items-end justify-start text-left';
+                            case 'top-center': return 'items-center justify-start text-center';
+                            case 'top-right': return 'items-start justify-start text-right';
+                            case 'center-left': return 'items-end justify-center text-left';
+                            case 'center': return 'items-center justify-center text-center';
+                            case 'center-right': return 'items-start justify-center text-right';
+                            case 'bottom-left': return 'items-end justify-end text-left';
+                            case 'bottom-center': return 'items-center justify-end text-center';
+                            case 'bottom-right': return 'items-start justify-end text-right';
+                            default: return 'items-center justify-center text-center';
+                          }
+                        })()
+                      }`}
+                      style={{ 
+                        color: adDraft.textColor || '#ffffff',
+                        fontFamily: adDraft.textFont?.split('-')[0] || 'Cairo'
+                      }}
+                    >
+                      <h3 
+                        className="font-bold mb-2 drop-shadow-lg leading-tight transition-all duration-300"
+                        style={{ 
+                          fontSize: (() => {
+                            switch(adDraft.mainTextSize) {
+                              case 'sm': return '1rem';
+                              case 'base': return '1.25rem';
+                              case 'lg': return '1.75rem';
+                              case 'xl': return '2.25rem';
+                              case '2xl': return '3rem';
+                              default: return '1.75rem';
+                            }
+                          })(),
+                          fontWeight: adDraft.textFont?.includes('Bold') ? 'bold' : 'normal'
                         }}
-                      />
+                      >
+                        {adDraft.title || 'عنوان الإعلان'}
+                      </h3>
+                      <p 
+                        className="opacity-90 drop-shadow-md line-clamp-3 transition-all duration-300"
+                        style={{ 
+                          fontSize: (() => {
+                            switch(adDraft.subTextSize) {
+                              case 'xs': return '0.75rem';
+                              case 'sm': return '0.875rem';
+                              case 'base': return '1.125rem';
+                              default: return '1.125rem';
+                            }
+                          })()
+                        }}
+                      >
+                        {adDraft.description || 'وصف الإعلان سيظهر هنا بشكل رائع وجذاب'}
+                      </p>
                     </div>
-                    <h3 className="font-bold text-gray-900 text-lg mb-2">{adDraft.title}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-3">{adDraft.description}</p>
                   </div>
+                  
                   {selectedMode && (
-                    <p className="text-xs text-gray-600 mt-6 text-center">
-                      ✓ سيظهر كـ: <strong>{selectedMode.label}</strong>
-                    </p>
+                    <div className="mt-4 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-700 shadow-sm border border-gray-200">
+                      سيظهر كـ: <span className="text-blue-600">{selectedMode.label}</span>
+                    </div>
                   )}
                 </div>
               </CardContent>

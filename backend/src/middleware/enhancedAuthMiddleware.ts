@@ -5,14 +5,6 @@ import { sendUnauthorized, sendError } from '@utils/response';
 import logger from '@utils/logger';
 import { Session } from 'express-session';
 
-declare global {
-  namespace Express {
-    interface Session {
-      lastActivity?: number;
-    }
-  }
-}
-
 export interface TwoFactorOptions {
   enabled: boolean;
   method: '2fa' | 'email' | 'sms';

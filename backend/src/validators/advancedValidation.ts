@@ -18,7 +18,7 @@ export interface SanitizationOptions {
 class AdvancedValidator {
   private patterns = {
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    url: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+    url: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
     phone: /^(\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/,
     ipv4: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
     creditCard: /^[0-9]{13,19}$/,
@@ -109,6 +109,7 @@ class AdvancedValidator {
       }
 
       if (!allowUnicode) {
+        // eslint-disable-next-line no-control-regex
         sanitized = sanitized.replace(/[^\x00-\x7F]/g, '');
       }
 

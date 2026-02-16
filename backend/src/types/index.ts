@@ -57,6 +57,9 @@ declare global {
     interface Request {
       user?: JWTPayload;
     }
+    interface Session {
+      lastActivity?: number;
+    }
     // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Multer {
       interface File {

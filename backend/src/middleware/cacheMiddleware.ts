@@ -174,7 +174,7 @@ export const invalidateOnMutation = (keysToInvalidate: string[]) => {
  * Cache statistics middleware
  * Tracks cache hits/misses for monitoring
  */
-export let cacheStats = {
+export const cacheStats = {
   hits: 0,
   misses: 0,
   getHitRate: () => {

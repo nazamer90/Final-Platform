@@ -36,12 +36,9 @@ const AuthCallbackPage: React.FC = () => {
 
         // Decode state to verify it's from our request
         try {
-          const decodedState = JSON.parse(atob(state));
-          // eslint-disable-next-line no-console
-          console.log("State validation:", decodedState);
+          JSON.parse(atob(state));
         } catch (e) {
-          // eslint-disable-next-line no-console
-          console.warn("Could not validate state:", e);
+          // Silent catch
         }
 
         // في تطبيق حقيقي، يتم إرسال الـ code للخادم للتحقق والحصول على user info
