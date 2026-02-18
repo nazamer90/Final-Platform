@@ -33,6 +33,13 @@ import { getDefaultProductImageSync, handleImageError } from '@/utils/imageUtils
 import { getTagColor, calculateBadge } from '@/utils/badgeCalculator';
 import { getProxyImageUrl, convertProductImages } from '@/utils/assetProxyUtil';
 import { getApiUrl, getApiBase } from '@/utils/apiConfig';
+import {
+  normalizeAd,
+  getTextPositionClass,
+  getFontClass,
+  getMainTextSizeClass,
+  getSubTextSizeClass,
+} from '@/components/StoreAds';
 
 interface ModernStorePageProps {
   storeSlug: string;
@@ -414,7 +421,9 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
         const response = await fetch(fetchUrl);
         if (response.ok) {
           const result = await response.json();
-          setStoreAds(result.data || []);
+          const rawAds = Array.isArray(result?.data) ? result.data : [];
+          // Normalize to support both camelCase and snake_case API payloads
+          setStoreAds(rawAds.map(normalizeAd));
         }
       }
     } catch (error) {
@@ -582,7 +591,60 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
         />
       )}
 
-
+      {/* إعلانات البانر (Banner Ads) */}
+      {storeAds.filter(ad => ad.placement === 'banner').length > 0 && (
+        <div className="bg-white border-b shadow-sm overflow-hidden">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+              {storeAds.filter(ad => ad.placement === 'banner').map(ad => {
+                const templateImage = `/AdsForms/${ad.templateId || 'adv1'}.jpg`;
+                const adImageUrl = ad.imageUrl || templateImage;
+                
+                return (
+                  <div 
+                    key={ad.id} 
+                    className="flex-shrink-0 relative w-[280px] md:w-[400px] h-32 md:h-48 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                    onClick={() => ad.linkUrl && window.open(ad.linkUrl, '_blank')}
+                  >
+                    <img 
+                      src={getProxyImageUrl(adImageUrl)} 
+                      alt={ad.title} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
+                    
+                    <div
+                      className={`absolute inset-0 flex flex-col ${getTextPositionClass(ad.textPosition)} p-4 md:p-6`}
+                      style={{
+                        color: ad.textColor || '#ffffff',
+                        fontFamily: ad.textFont?.split('-')[0] || 'Cairo, sans-serif',
+                      }}
+                    >
+                      <h4
+                        className={`${getFontClass(ad.textFont)} ${getMainTextSizeClass(ad.mainTextSize)} text-sm md:text-xl drop-shadow-2xl mb-1`}
+                        style={{ color: 'inherit' }}
+                      >
+                        {ad.title}
+                      </h4>
+                      {ad.description && (
+                        <p
+                          className={`${getFontClass(ad.textFont)} ${getSubTextSizeClass(ad.subTextSize)} text-xs md:text-sm opacity-90 drop-shadow-xl line-clamp-2 max-w-[85%]`}
+                          style={{ color: 'inherit' }}
+                        >
+                          {ad.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* قسم المنتجات */}
       <div className="container mx-auto px-4 py-8">
@@ -648,7 +710,15 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                       };
 
                       return (
-                        <Card className="relative overflow-hidden rounded-2xl border-none shadow-2xl group w-full" style={{ aspectRatio: '1920 / 450', minHeight: '250px' }}>
+                        <Card
+                          className="relative overflow-hidden rounded-2xl border-none shadow-2xl group w-full cursor-pointer"
+                          style={{ aspectRatio: '1920 / 450', minHeight: '250px' }}
+                          onClick={() => {
+                            if (currentAd?.linkUrl) {
+                              window.open(currentAd.linkUrl, '_blank');
+                            }
+                          }}
+                        >
                           <div className="relative w-full h-full">
                             {betweenProductAds.map((ad, adIndex) => (
                               <div
@@ -660,7 +730,7 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                                 }`}
                               >
                                 <img
-                                  src={getTemplateImage(ad.templateId)}
+                                  src={getProxyImageUrl(ad.imageUrl || getTemplateImage(ad.templateId))}
                                   alt={ad.title}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
@@ -669,11 +739,27 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                                 
-                                <div className="absolute inset-0 flex items-center justify-center p-4 text-white">
-                                  <div className="text-center">
-                                    <h3 className="text-lg md:text-xl font-bold drop-shadow-lg mb-1">{ad.title}</h3>
-                                    <p className="text-sm md:text-base text-white/90 drop-shadow-lg line-clamp-2">{ad.description}</p>
-                                  </div>
+                                <div
+                                  className={`absolute inset-0 flex flex-col ${getTextPositionClass(ad.textPosition)} p-4 md:p-8 lg:p-12`}
+                                  style={{
+                                    color: ad.textColor || '#ffffff',
+                                    fontFamily: ad.textFont?.split('-')[0] || 'Cairo, sans-serif',
+                                  }}
+                                >
+                                  <h3
+                                    className={`${getFontClass(ad.textFont)} ${getMainTextSizeClass(ad.mainTextSize)} drop-shadow-2xl mb-2`}
+                                    style={{ color: 'inherit' }}
+                                  >
+                                    {ad.title}
+                                  </h3>
+                                  {ad.description && (
+                                    <p
+                                      className={`${getFontClass(ad.textFont)} ${getSubTextSizeClass(ad.subTextSize)} opacity-90 drop-shadow-xl line-clamp-3 max-w-[80%]`}
+                                      style={{ color: 'inherit' }}
+                                    >
+                                      {ad.description}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             ))}
@@ -686,6 +772,8 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                                 className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 z-20"
                                 title="السابق"
                                 aria-label="السابق"
+                                // prevent triggering the card click
+                                onMouseDown={(e) => e.stopPropagation()}
                               >
                                 <ArrowLeft className="h-6 w-6 text-gray-800" />
                               </button>
@@ -694,6 +782,8 @@ const ModernStorePage: React.FC<ModernStorePageProps> = ({
                                 className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 z-20"
                                 title="التالي"
                                 aria-label="التالي"
+                                // prevent triggering the card click
+                                onMouseDown={(e) => e.stopPropagation()}
                               >
                                 <ArrowRight className="h-6 w-6 text-gray-800" />
                               </button>
